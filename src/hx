@@ -3,17 +3,23 @@ use Time::HiRes qw(ualarm);
 use Term::ReadKey qw(GetTerminalSize);
 use strict;
 
-my $c_bold = '[1m';
+
+## Color constants:  ###########################################################
+
+# ANSI defaults:
+my $c_bold   = '[1m';
 my $c_unbold = '[22m';
-my $c_faint = '[2m';
+my $c_faint   = '[2m';
 my $c_unfaint = '[22m';
 my $c0 = '[0m';
 
+# Base color configuration:
 my $c_sym = '[33m';
 my $c_contsym = '[38;2;113;97;25m';
 my $c_meta = '[38;2;114;204;204m';
 my $c_followsep = '[32m'.$c_faint;
 
+# Detailed color configuration:
 my $c_date = $c_sym;
 my $c_host = $c_sym;
 my $c_app = $c_sym;
@@ -31,6 +37,29 @@ my $c_exception_scn  = $c_bold;
 my $c_exception_code = $c_bold;
 my $c_exception0 = $c_unbold;
 my $c_message = $c0;
+
+my $c_http_success        = '[38;2;98;214;113m';
+my $c_http_redir          = '[38;2;202;214;98m';
+my $c_http_client_error   = '[38;2;155;72;72m';
+my $c_http_client_failure = '[38;2;235;41;41m';
+my $c_http_server_error   = '[38;5;199;1m';
+
+
+## Output configuration:  ######################################################
+
+my $linestart     = "${c_sym}●${c0} ";
+my $metalinestart = "${c_meta}●${c0} ";
+my $contlinestart = "${c_contsym}●${c0} ";
+my $followsep     = $c_followsep . ("⁻" x (GetTerminalSize())[0]) . "${c0}\n";
+
+# As soon as the <> read pauses for more than 200ms, we print a separator line.
+# This serves to separate "tail -f"'s past output from future output.
+# This only happens once.
+# This only happens if there was some previous output (we don't need in case of "tail -f -n0").
+my $do_linesep = 200;
+
+
+## Regular Expressions:  #######################################################
 
 my $re_json_number     = '\\s*-?\\d+(?:\\.\\d+)?(?:[eE][\\-\\+]?\\d+)?\\s*';
 my $re_json_const      = '\\s*(?:null|true|false)\\s*';
@@ -56,17 +85,8 @@ my $re_abspath = '(?:/[a-z]+[a-z0-9]+(?:/[a-zA-Z0-9\\-_\\.$]+)+)';
 my $re_relpath = '(?:(?:[A-Za-z0-9\\-_\\.$]+/)*[A-Za-z0-9\\-_\\.$]+)';
 my $re_path    = "(?:$re_abspath|$re_relpath)";
 
-my $linestart     = "${c_sym}●${c0} ";
-my $metalinestart = "${c_meta}●${c0} ";
-my $contlinestart = "${c_contsym}●${c0} ";
-my $followsep     = $c_followsep . ("⁻" x (GetTerminalSize())[0]) . "${c0}\n";
 
-sub format_date ($) { $c_date . $_[0] . $c0 }
-sub format_host ($) { $c_host . $_[0] . $c0 }
-sub format_message ($) { $c_message . $_[0] . $c0 }
-sub format_app  ($) { $c_app . $_[0] . $c0 }
-sub format_rpt ($) { $c_rpt . $_[0] . $c0 }
-sub format_meta ($) { $c_meta . $_[0] . $c0 }
+## Other constants:  ###########################################################
 
 my %http_success        = map{$_=>1} (200 .. 299);
 my %http_redir          = map{$_=>1} (300 .. 399, 100 .. 199);
@@ -74,34 +94,15 @@ my %http_client_error   = map{$_=>1} (400, 404, 405, 407, 408, 410, 411, 413, 41
 my %http_client_failure = map{$_=>1} (401, 402, 403, 406, 409, 412, 416, 417, 420, 421, 422, 423, 424, 426, 428, 451);
 my %http_server_error   = map{$_=>1} (500 .. 599);
 
-my $c_http_success        = '[38;2;98;214;113m';
-my $c_http_redir          = '[38;2;202;214;98m';
-my $c_http_client_error   = '[38;2;155;72;72m';
-my $c_http_client_failure = '[38;2;235;41;41m';
-my $c_http_server_error   = '[38;5;199;1m';
 
-my $had_output = 0;  # true after some visible input has been printed
+## Formatting functions:  ######################################################
 
-# As soon as the <> read pauses for more than 200ms, we print a separator line.
-# This serves to separate "tail -f"'s past output from future output.
-# This only happens once.
-# This only happens if there was some previous output (we don't need in case of "tail -f -n0").
-my $do_linesep = 200;
-
-sub stop_linesep_wait () {
-	return unless $do_linesep;
-	ualarm(0);
-	$SIG{'ALRM'} = 'DEFAULT';
-}
-sub start_linesep_wait () {
-	return unless $do_linesep;
-	$SIG{'ALRM'} = sub {
-		stop_linesep_wait();
-		undef $do_linesep;
-		print $followsep  if $had_output;
-	};
-	ualarm($do_linesep * 1000);
-}
+sub format_date ($) { $c_date . $_[0] . $c0 }
+sub format_host ($) { $c_host . $_[0] . $c0 }
+sub format_message ($) { $c_message . $_[0] . $c0 }
+sub format_app  ($) { $c_app . $_[0] . $c0 }
+sub format_rpt ($) { $c_rpt . $_[0] . $c0 }
+sub format_meta ($) { $c_meta . $_[0] . $c0 }
 
 sub _format_tracefile ($$) {
 	my ($file, $lineno) = (@_);
@@ -252,9 +253,30 @@ sub format_stack ($) {
 	$c_stack . $in . $c0
 }
 
-#start_linesep_wait()  unless $do_linesep;
-#start_linesep_wait()  if $do_linesep;
-#while (<>) {
+
+## Line-separator functions:  ##################################################
+
+my $had_output = 0;  # true after some visible input has been printed
+
+sub stop_linesep_wait () {
+	return unless $do_linesep;
+	ualarm(0);
+	$SIG{'ALRM'} = 'DEFAULT';
+}
+
+sub start_linesep_wait () {
+	return unless $do_linesep;
+	$SIG{'ALRM'} = sub {
+		stop_linesep_wait();
+		undef $do_linesep;
+		print $followsep  if $had_output;
+	};
+	ualarm($do_linesep * 1000);
+}
+
+
+## Main input loop:  ###########################################################
+
 for (start_linesep_wait(); defined($_ = <>) && (stop_linesep_wait(), 1); start_linesep_wait()) {
 	# every non-empty line is a full log line.
 	if (m/^\s*$/) {
