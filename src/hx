@@ -2,6 +2,9 @@
 use Time::HiRes qw(ualarm);
 use Term::ReadKey qw(GetTerminalSize);
 use strict;
+use FindBin;
+use lib $FindBin::Bin;
+use regexes;
 
 
 ## Color constants:  ###########################################################
@@ -57,33 +60,6 @@ my $followsep     = $c_followsep . ("⁻" x (GetTerminalSize())[0]) . "${c0}\n";
 # This only happens once.
 # This only happens if there was some previous output (we don't need in case of "tail -f -n0").
 my $do_linesep = 200;
-
-
-## Regular Expressions:  #######################################################
-
-my $re_json_number     = '\\s*-?\\d+(?:\\.\\d+)?(?:[eE][\\-\\+]?\\d+)?\\s*';
-my $re_json_const      = '\\s*(?:null|true|false)\\s*';
-my $re_json_string     = '(?<jstr0>\\s*")(?<jstr>(?:\\\\.|[^"\\\\]+)*+)(?<jstr1>"\\s*)';
-my $re_json_array      = "\\s*\\[(?:(?&json)(?:,(?&json))*|\\s*)\\]\\s*";
-my $re_json_object     = "\\s*\\{(?:$re_json_string:(?&json)(?:,$re_json_string:(?&json))*|\\s*)?\\}\\s*";
-my $re_json            = "(?<json>$re_json_number|$re_json_const|$re_json_string|$re_json_array|$re_json_object)";
-my $re_lineno  = '(?::\\d+|\(\d+\)| on line \d+)';
-my $re_loglevel = '(?:(?:PHP )?(?i:warn|warning|warnung|err|error|fehler|info|information|note|notice|hinweis|crit|critical|schwerwiegend|emerg|emergency|debug|dbg|alrt|alert|parse error|fatal error))';
-
-my $re_nsname = '(?:\\\\?(?:[A-Za-z]\w*\\\\)+)';
-my $re_classname = "(?:$re_nsname?[A-Za-z]\\w+)";
-my $re_fnname = '(?:[A-Za-z_]\\w*|\\{closure\\})';
-my $re_fnprefix = '(?:->|::)';
-my $re_fncall = "(?:(?<class>${re_nsname}(?=\{)|${re_classname}(?=${re_fnprefix})|${re_classname}::${re_nsname})?(?<fnp>${re_fnprefix})?(?<fn>${re_fnname})(?<args> ?\\(.*\\)))";
-
-my $re_fqcn = '(?:(?:[A-Za-z][A-Za-z0-9_]+\\\\)+[A-Za-z][A-Za-z0-9_]*\b)';  # fqcn must contain backslashes
-my $re_excn = '(?:(?:[A-Z][A-Za-z0-9_]*)?(?:[Ee]xception|[Ee]rror)|ExceptionStack)';  # short exception class name must end in "exception" or "error"
-my $re_ex_code = '(?:\\/\\d+|\\(code:? \\d+\\))';
-my $re_exception = "(?:(?:$re_fqcn|$re_excn)$re_ex_code?)";
-
-my $re_abspath = '(?:/[a-z]+[a-z0-9]+(?:/[a-zA-Z0-9\\-_\\.$]+)+)';
-my $re_relpath = '(?:(?:[A-Za-z0-9\\-_\\.$]+/)*[A-Za-z0-9\\-_\\.$]+)';
-my $re_path    = "(?:$re_abspath|$re_relpath)";
 
 
 ## Other constants:  ###########################################################
@@ -283,12 +259,12 @@ for (start_linesep_wait(); defined($_ = <>) && (stop_linesep_wait(), 1); start_l
 		print ; next
 	}
 
-	if (s/^(==+> +)($re_path)( +<==+\s*$)//) {
+	if (s/^$re_tail_filename//) {
 		# `tail` file header
 		print $metalinestart;
-		print format_meta($1);
-		print format_trace($2, $c_meta);
-		print format_meta($3);
+		print format_meta($+{'prefix'});
+		print format_trace($+{'filename'}, $c_meta);
+		print format_meta($+{'suffix'});
 		next;
 	}
 
@@ -310,24 +286,6 @@ for (start_linesep_wait(); defined($_ = <>) && (stop_linesep_wait(), 1); start_l
 	my ($message_isolated, $loglevel_isolated, $exception_isolated, $text_isolated);
 
 	# The start is probably the timestamp:
-	my $re_time   = '(?:\d\d:\d\d:\d\d)';
-	my $re_ms     = '(?:[\.,]\d{1,6})';
-	my $re_ddd    = '(?:[A-Za-z]{2,3} +\d+)';
-	my $re_ymd    = '(?:\d\d\d\d-\d\d-\d\d|\d\d\d\d\/\d\d\/\d\d|\d\d\d\d\.\d\d\.\d\d)';
-	my $re_tz     = '(?:[\+\-]\d\d(?::?\d\d)?|Z)';
-	my $re_ts8601 = "(?:${re_ymd}T${re_time}${re_ms}?(?:$re_tz)?)";  # 2019-07-07T18:22:34.001Z
-	my $re_tsw    = "(?:\\d{1,2}-\\w{2,4}-\\d{4} ${re_time}${re_ms}?)";  # 07-Jun-2019 11:36:20.106
-	my $re_app    = '(?:[A-Za-z/][A-Za-z0-9_\-\./]+?(?:\[\d+\]|\])?)';
-	my $re_word   = '(?:[A-Z][a-z]+)';
-	my $re_host   = '(?:[A-Za-z][A-Za-z0-9_\-\.]+)';
-	my $re_ip     = '(?:\[(?:[0-9a-fA-F]{1,4})?(?:::?[0-9a-fA-F]{1,4}){1,7}\]|(?:[0-9a-fA-F]{1,4})?(?:::?[0-9a-fA-F]{1,4}){1,7}|\d{1,3}(?:\.\d{1,3}){3})';
-	my $re_client = "(?:$re_ip|$re_host)";
-	my $re_mysqld = '(?:(?:\\/usr\\/sbin\\/)?mysqld: )';
-	my $re_a2date = "(?:\\[ ?\\d{1,2}/\\w{3}/\\d{4}[ :T]$re_time(?: ?$re_tz)?\\])";
-	my $re_a2clnt = "(?:(?:\\[(?:client )?$re_client(?::\\d+)?\\]))";
-	my $re_a2err  = '(?:AH\d+)';
-	my $re_dmesg_ts  = "(?:\\[\\d+${re_ms}?\\])";
-	my $re_dmesg_app = '(?:[A-Za-z0-9][\\w\\-\\.]*(?: [\\w\\-\\.:]+)?)';
 	if (s/^($re_ddd {1,2}$re_time) ($re_host) ($re_app)(: *)//) {
 		# syslog format
 		print format_date($1) . ' ';
