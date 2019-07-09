@@ -5,16 +5,10 @@ use strict;
 use FindBin;
 use lib $FindBin::Bin;
 use regexes;
+use const;
 
 
 ## Color constants:  ###########################################################
-
-# ANSI defaults:
-my $c_bold   = '[1m';
-my $c_unbold = '[22m';
-my $c_faint   = '[2m';
-my $c_unfaint = '[22m';
-my $c0 = '[0m';
 
 # Base color configuration:
 my $c_sym = '[33m';
