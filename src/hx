@@ -56,15 +56,6 @@ my $followsep     = $c_followsep . ("⁻" x (GetTerminalSize())[0]) . "${c0}\n";
 my $do_linesep = 200;
 
 
-## Other constants:  ###########################################################
-
-my %http_success        = map{$_=>1} (200 .. 299);
-my %http_redir          = map{$_=>1} (300 .. 399, 100 .. 199);
-my %http_client_error   = map{$_=>1} (400, 404, 405, 407, 408, 410, 411, 413, 414, 415, 429, 431);
-my %http_client_failure = map{$_=>1} (401, 402, 403, 406, 409, 412, 416, 417, 420, 421, 422, 423, 424, 426, 428, 451);
-my %http_server_error   = map{$_=>1} (500 .. 599);
-
-
 ## Formatting functions:  ######################################################
 
 sub format_date ($) { $c_date . $_[0] . $c0 }
@@ -133,11 +124,11 @@ sub format_json ($;$) {
 sub format_http ($) {
 	my $status = $_[0];
 	my $c_http = '';
-	if    (exists($http_client_error{$status}))   { $c_http = $c_http_client_error }
-	elsif (exists($http_client_failure{$status})) { $c_http = $c_http_client_failure }
-	elsif (exists($http_server_error{$status}))   { $c_http = $c_http_server_error }
-	elsif (exists($http_success{$status}))        { $c_http = $c_http_success }
-	elsif (exists($http_redir{$status}))          { $c_http = $c_http_redir }
+	if    (is_http_client_error($status))   { $c_http = $c_http_client_error }
+	elsif (is_http_client_failure($status)) { $c_http = $c_http_client_failure }
+	elsif (is_http_server_error($status))   { $c_http = $c_http_server_error }
+	elsif (is_http_success($status))        { $c_http = $c_http_success }
+	elsif (is_http_redir($status))          { $c_http = $c_http_redir }
 	return $c_http . $status . $c0;
 }
 
