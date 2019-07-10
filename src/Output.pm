@@ -1,6 +1,64 @@
 #!/usr/bin/perl
 use strict;
 
+## Formatting functions:  ######################################################
+
+sub format_token ($;%) {
+	my ($token, %opt) = @_;
+
+	return $token->content()  if ($token->is(T_EMPTYLINE) || $token->is(T_EOL));
+
+	return $linestart  if $token->is(T_LINE);
+	return $metalinestart  if $token->is(T_METALINE);
+	return $contlinestart  if $token->is(T_CONTLINE);
+
+	if ($opt{'line'} && $opt{'line'}->is(T_METALINE)) {
+		return format_trace($token->content(), $c_meta)  if $token->is(T_FILENAME);
+		return format_meta($token->content())  if $token->is(T_MESSAGE);
+	}
+
+	return format_date($token->content())  if $token->is(T_DATE);
+	return format_app($token->content())  if $token->is(T_APP);
+	return format_host($token->content())  if $token->is(T_HOST);
+	return format_loglevel($token)  if $token->is(T_LOGLEVEL);
+
+	return format_stack($token->content())  if $token->is(T_STACK);
+	return format_trace($token->content())  if $token->is(T_TRACE);
+	return format_trace($token->content())  if $token->is(T_FILENAME);
+	return format_exception($token->content())  if $token->is(T_ERROR);
+	return format_fncall($token->content())  if $token->is(T_FNCALL);
+	return format_rpt($token->content())  if $token->is(T_REPEAT);
+	return format_rpt($token->content())  if $token->is(T_REPEATEND);
+
+	if ($token->is(T_INFO)) {
+		my $content = $token->content();
+
+		if ($token->is(T_WRAP)) {
+			$content = format_wrapbegin($content);
+		} elsif ($token->is(T_JSON)) {
+			$content = format_json($content);
+		} elsif ($token->attr('type') eq 'rfc-5424-sd') {
+			# reformat RFC-5424-style Structured Data elements
+			$content = format_rfc5424_sd($content);
+		}
+
+		$content = ($opt{'had_message'})
+			? format_info($content)
+			: format_info_prefix($content);
+
+		if ($token->is(T_HTTP_STATUS)) {
+			$content = format_http($content, $token->attr('st'), get_ansi_prefix($content));
+		} elsif ($token->is(T_WRAPEND)) {
+			$content = format_wrapend($content);
+		}
+
+		return $content;
+	}
+
+	return format_http($token->content(), $token->attr('st'))  if $token->is(T_HTTP_STATUS);
+
+	return $token->content()
+}
 
 ## Formatting functions:  ######################################################
 
@@ -67,15 +125,22 @@ sub format_json ($;$) {
 	$c_json . $out . $c0
 }
 
-sub format_http ($) {
-	my $status = $_[0];
-	my $c_http = '';
+sub format_http ($$) {
+	my ($string, $status, $c_end) = ($_[0], $_[1], $_[2]//'');
+
+	my $c_http;
 	if    (is_http_client_error($status))   { $c_http = $c_http_client_error }
 	elsif (is_http_client_failure($status)) { $c_http = $c_http_client_failure }
 	elsif (is_http_server_error($status))   { $c_http = $c_http_server_error }
 	elsif (is_http_success($status))        { $c_http = $c_http_success }
 	elsif (is_http_redir($status))          { $c_http = $c_http_redir }
-	return $c_http . $status . $c0;
+
+	if ($c_http) {
+		my $re_http_status = qr/(?:^|(?<=\[|\s)|(?<!\d;))(\b\d{3}(?: [A-Za-z\-\(\)']+)*)/;
+		$string =~ s/$re_http_status/$c_http$1$c0$c_end/;
+	}
+
+	return $string
 }
 
 sub format_postfix_info ($) {
@@ -100,21 +165,11 @@ sub format_postfix_status ($) {
 }
 
 sub format_info ($;$) {
-	my ($in, $c_info) = ($_[0], $_[1] // $c_info);
-	if ($in =~ m/^( *\[)(\d\d\d)(\])$/ && ($2 >= 100 && $2 <= 599)) {
-		return $c_info . $1 . format_http($2) . $c_info . $3 . $c0;
-	}
-	$c_info . $in . $c0
+	($_[1] // $c_info) . $_[0] . $c0
 }
 
 sub format_info_prefix ($;$) {
 	my ($in, $mode) = @_;
-
-	if ($mode eq 'RFC5424') {
-		# reformat RFC-5424-style Structured Data elements
-		$in = format_rfc5424_sd($in);
-	}
-
 	format_info($in, $c_info_prefix)
 }
 
@@ -138,9 +193,9 @@ sub format_rfc5424_sd ($) {
 }
 
 sub format_loglevel ($) {
-	my ($color, $msg) = ($c_loglevel, $_[0]);
-	if    ($msg =~ m/\b(?:warn|warning|warnung)\b/i) { $color = $c_loglevel_warn }
-	elsif ($msg =~ m/\b(?:err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency)\b/i) { $color = $c_loglevel_err }
+	my ($color, $msg, $level) = ($c_loglevel, $_[0]->content(), $_[0]->attr('level'));
+	if    ($level >= L_ERROR)   { $color = $c_loglevel_err }
+	elsif ($level >= L_WARNING) { $color = $c_loglevel_warn }
 	return $color . $msg . $c0
 }
 
@@ -159,6 +214,19 @@ sub format_stack ($) {
 	$in =~ s/(?<=; )$re_exc_msg/      format_exception($1) . $2 . &$fmt_stack_msg($3) /ge;
 	$c_stack . $in . $c0
 }
+
+sub format_wrapbegin ($) {
+	my ($in) = ($_[0]);
+	$in =~ s/(")(?=\s?$)/$c_bold$1$c_unbold/;
+	$in
+}
+
+sub format_wrapend ($) {
+	my ($in, $c0) = ($_[0], $_[1]//'');
+	$in =~ s/^($re_ansi_color)?(")/$c_bold$c_info_prefix$2$c_unbold$1/;
+	$in
+}
+
 
 
 1

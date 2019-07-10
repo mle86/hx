@@ -13,9 +13,11 @@ use vars qw(
 	$c_exception_scn $c_exception_fqcn $c_exception_code $c_exception0
 	$c_message
 	$c_http_success $c_http_redir $c_http_client_error $c_http_client_failure $c_http_server_error
+	$linestart $metalinestart $contlinestart
 );
-use Regexes;
 use Const;
+use Regexes;
+use Token qw(:types);
 use Output;
 
 
@@ -57,9 +59,9 @@ our $c_http_server_error   = '[38;5;199;1m';
 
 sub nowarn (&;@) { local $SIG{__WARN__} = sub { }; $_[0]->(@_) }
 
-my $linestart     = "${c_sym}●${c0} ";
-my $metalinestart = "${c_meta}●${c0} ";
-my $contlinestart = "${c_contsym}●${c0} ";
+our $linestart     = "${c_sym}●${c0} ";
+our $metalinestart = "${c_meta}●${c0} ";
+our $contlinestart = "${c_contsym}●${c0} ";
 
 my $followsep     = $c_followsep . ("⁻" x nowarn{ (GetTerminalSize())[0] // 80 }) . "${c0}\n";
 
@@ -68,6 +70,24 @@ my $followsep     = $c_followsep . ("⁻" x nowarn{ (GetTerminalSize())[0] // 80
 # This only happens once.
 # This only happens if there was some previous output (we don't need in case of "tail -f -n0").
 my $do_linesep = 200;
+
+
+## Runtime configuration:  #####################################################
+
+use constant {
+	M_DEFAULT => 0,
+	M_LEXER   => 1,
+	M_PRINTER => 2,
+};
+
+my $mode = M_DEFAULT;
+my $raw = 0;
+
+foreach (@ARGV) {
+	if    ($_ eq '--lexer')   { shift @ARGV; $mode = M_LEXER }
+	elsif ($_ eq '--printer') { shift @ARGV; $mode = M_PRINTER }
+	elsif ($_ eq '--raw')     { shift @ARGV; $raw = 1 }
+}
 
 
 ## Line-separator functions:  ##################################################
@@ -91,207 +111,234 @@ sub start_linesep_wait () {
 }
 
 
+## Main program entry point:  ##################################################
+
+if ($mode == M_LEXER) {
+	main_lexer_loop();
+} elsif ($mode == M_PRINTER) {
+	main_printer_loop();
+} else {
+	# Default, run as both lexer and printer:
+	my $pid = open(STDOUT, '|-');
+        die "cannot fork: $!"  unless defined $pid;
+	if ($pid > 0) {
+		main_lexer_loop();
+	} else {
+		main_printer_loop();
+	}
+
+}
+
+
 ## Main input loop:  ###########################################################
 
-for (start_linesep_wait(); defined($_ = <>) && (stop_linesep_wait(), 1); start_linesep_wait()) {
+sub striphttpstatus ($;$) {
+	return unless ($_[0] =~ s/^$re_http//);
+	Token->new([($_[1] // T_INFO), T_HTTP_STATUS], $&, st => $+{'hs'});
+}
+
+sub main_lexer_loop {
+while (<>) {
 	# every non-empty line is a full log line.
 	if (m/^\s*$/) {
-		print ; next
+		print Token->new(T_EMPTYLINE, $_);
+		print "\n";
+		next
 	}
 
 	if (s/^$re_tail_filename//) {
 		# `tail` file header
-		print $metalinestart;
-		print format_meta($+{'prefix'});
-		print format_trace($+{'filename'}, $c_meta);
-		print format_meta($+{'suffix'});
+		print Token->new(T_METALINE);
+		print Token->new(T_MESSAGE, $+{'prefix'});
+		print Token->new(T_FILENAME, $+{'filename'});
+		print Token->new(T_MESSAGE, $+{'suffix'});
+		print "\n";
 		next;
 	}
 
 	$had_output = 1;
+
+	my $is_continuation_line = (m/^\s*(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,})/);
+	print Token->new(($is_continuation_line) ? T_CONTLINE : T_LINE);
 
 	my $is_apache;
 	my $is_postfix;
 	my $is_rfc5424;
 	my $is_dmesg;
 	my $is_nginx_fastcgi;
-	my $is_continuation_line = (m/^\s*(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,})/);
-	if ($is_continuation_line) {
-		print $contlinestart;
-	} else {
-		print $linestart;
-	}
 
+	my $T_REST = T_MESSAGE;
+	my @suffix;
 	my $suffix = '';
 	my ($message_isolated, $loglevel_isolated, $exception_isolated, $text_isolated);
 
 	# The start is probably the timestamp:
 	if (s/^($re_ddd {1,2}$re_time) ($re_host) ($re_app)(: *)//) {
 		# syslog format
-		print format_date($1) . ' ';
-		print format_host($2) . ' ';
-		#print format_app($3 . $4) . '';
-		print format_app($3 . $4);
+		print Token->new(T_DATE, $1 . ' ', format => 'syslog');
+		print Token->new(T_HOST, $2 . ' ');
+		print Token->new(T_APP, $3 . $4);
 		$is_postfix = 1  if ($3 =~ m/^postfix/);
 		$message_isolated = 1;
 	} elsif (s/^($re_ddd {1,2}$re_time) ($re_host) (\d+) ($re_ts8601) ($re_host) ($re_app|-) (\d+|-) (\S+) //) {
 		# syslog RFC-5424 format
-		print format_date($1) . ' ';
-		print format_host($2) . ' ';
-		print format_info_prefix($3) . ' ';
-		print format_date($4) . ' ';
-		print format_host($5) . ' ';
-		print format_app($6) . ' ';
-		print format_app($7) . ' ';  # PID
-		print format_info_prefix($8) . ' ';  # msgid
+		print Token->new(T_DATE, $1 . ' ', format => 'syslog');
+		print Token->new(T_HOST, $2 . ' ');
+		print Token->new(T_INFO, $3 . ' ');
+		print Token->new(T_DATE, $4 . ' ', format => '8601');
+		print Token->new(T_HOST, $5 . ' ');
+		print Token->new(T_APP,  $6 . ' ');
+		print Token->new(T_APP,  $7 . ' ');  # PID
+		print Token->new(T_INFO, $8 . ' ');  # msgid
 		$message_isolated = 1;
 		$is_rfc5424 = 1;
 	} elsif (s/^(\[$re_ymd $re_time\]) ($re_app)(\.[A-Z]+)?(: *)//) {
 		# symfony format
-		print format_date($1) . ' ';
-		print format_app($2);
-		print format_loglevel($3 . $4);
+		print Token->new(T_DATE, $1 . ' ');
+		print Token->new(T_APP, $2);
+		print Token->new(T_LOGLEVEL, $3 . $4, read_loglevel($3));
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
 	} elsif (s/^(\[$re_word $re_word \d+ $re_time$re_ms? \d{4}\]) +(\[\w*:\w+\]) +(\[(?:pid )?\d+(?:[,:]tid \d+)?\]) +($re_a2clnt )?//) {
 		# Apache2 error format
-		print format_date($1) . ' ';
-		print format_loglevel($2) . ' ';
-		print format_app($3) . ' ';
-		print format_info_prefix($4)  if $4;
+		print Token->new(T_DATE,     $1 . ' ');
+		print Token->new(T_LOGLEVEL, $2 . ' ', read_loglevel($2));
+		print Token->new(T_APP,      $3 . ' ');
+		print Token->new(T_INFO,     $4)  if $4;
 		$is_apache = 1;
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
 	} elsif (s/^(?<vh>$re_client(?::\d+)?) (?<cl>$re_client|-) (?<id>\S+) (?<un>\S+) (?<ts>$re_a2date) (?=")// ||
 	         s/^(?<cl>$re_client|-) (?<id>\S+) (?<un>\S+) (?<ts>$re_a2date) (?=")//) {
 		# Apache2 custom format
-		print format_host($+{'vh'}) . ' '  if $+{'vh'};
-		print format_info_prefix($+{'cl'}) . ' ';  # client addr/hostname
-		print format_info_prefix($+{'id'}) . ' ';  # identd logname
-		print format_info_prefix($+{'un'}) . ' ';  # http basic username
-		print format_date($+{'ts'}) . ' ';
+		print Token->new(T_HOST, $+{'vh'} . ' ', type => 'vhost')  if $+{'vh'};
+		print Token->new([T_INFO, T_CLIENT], $+{'cl'} . ' ');  # client addr/hostname
+		print Token->new([T_INFO, T_USERNAME], $+{'id'} . ' ', type => 'ident');  # identd logname
+		print Token->new([T_INFO, T_USERNAME], $+{'un'} . ' ', type => 'basic');  # http basic username
+		print Token->new(T_DATE, $+{'ts'} . ' ', format => 'a2');
 		$is_apache = 1;
 		$message_isolated = 1;
 	} elsif (s/^($re_ts8601) (\d+) (\[\w+\]) ($re_mysqld)?// ||
 		 s/^(${re_ymd} ${re_time}) (\d+) (\[\w+\]) ($re_mysqld)?//) {
 		# mysqld error:
-		print format_date($1) . ' ';
-		print format_info_prefix($2) . ' ';
-		print format_loglevel($3) . ' ';
-		print format_app($4)  if $4;
+		print Token->new(T_DATE, $1 . ' ', format => '8601');
+		print Token->new(T_INFO, $2 . ' ');
+		print Token->new(T_LOGLEVEL, $3 . ' ', read_loglevel($3));
+		print Token->new(T_APP, $4)  if $4;
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
 	} elsif (s/^($re_dmesg_ts) ($re_dmesg_app:|\[$re_dmesg_app\])( |$)//) {
 		# dmesg
-		print format_date($1) . ' ';
-		print format_app($2) . $3;
+		print Token->new(T_DATE, $1 . ' ', format => 'dmesg');
+		print Token->new(T_APP, $2 . $3);
 		$message_isolated = 1;
 		$is_dmesg = 1;
 	} elsif (s/^($re_dmesg_ts) //) {
 		# dmesg (other)
-		print format_date($1) . ' ';
+		print Token->new(T_DATE, $1 . ' ', format => 'dmesg');
 		$is_dmesg = 1;
 	} elsif (s/^(Next) ($re_exception)(: )//) {
 		# Euv continuation:
-		print format_date($1) . ' ';
-		print format_exception($2) . '';
-		print $3;
+		print Token->new(T_DATE, $1 . ' ');
+		print Token->new([T_MESSAGE, T_ERROR], $2);
+		print Token->new(T_MESSAGE, $3);
 		$message_isolated = 1;
 	} elsif (s/^(PHP Fatal error: )( ?Uncaught )($re_exception)//) {
-		print format_app($1);
-		print $2;
-		print format_exception($3);
+		print Token->new(T_APP, $1);
+		print Token->new(T_MESSAGE, $2);
+		print Token->new([T_MESSAGE, T_ERROR], $3);
 		$message_isolated = 1;
 	} elsif (s/^($re_ymd $re_time(?:,\d+)?:)($re_loglevel:)([^:]+:)//) {
 		# LetsEncrypt/certbot
-		print format_date($1);
-		print format_loglevel($2);
-		print format_app($3);
+		print Token->new(T_DATE, $1);
+		print Token->new(T_LOGLEVEL, $2, read_loglevel($2));
+		print Token->new(T_APP, $3);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
 	} elsif (s/^($re_ymd $re_time(?:,\d+)?)( - )(\w[^\[]*)(\[$re_loglevel\]: )//) {
 		# cloud-init
-		print format_date($1 . $2);
-		print format_app($3);
-		print format_loglevel($4);
+		print Token->new(T_DATE, $1 . $2);
+		print Token->new(T_APP, $3);
+		print Token->new(T_LOGLEVEL, $4, read_loglevel($4));
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
 	} elsif (s/^($re_ymd $re_time$re_ms? )(\[$re_loglevel\] )?(\d+(?:#\d+)?: )(\*\d+ ?)?(FastCGI sent in (?:stderr|stdout): )(")//i) {
 		# nginx + fastcgi
-		print format_date($1);
-		print format_loglevel($2)  if $2;
-		print format_app($3);
-		print format_info_prefix($4)  if $4;
-		print format_info_prefix($5);
-		print $c_bold . format_info_prefix($6) . $c_unbold  if $6;
+		print Token->new(T_DATE, $1);
+		print Token->new(T_LOGLEVEL, $2, read_loglevel($2))  if $2;
+		print Token->new(T_APP, $3);
+		print Token->new(T_INFO, $4)  if $4;
+		print Token->new([T_INFO, T_WRAP], $5 . ($6 // ''));
 		$is_nginx_fastcgi = 1;
 		$message_isolated = 1;
 		$loglevel_isolated = 1  if $2;
 		if (s/(")((?: while reading response header from upstream)?, client: ${re_client}, (?:server:|request:).*)$//s) {
 			# end of fastcgi message should not affect main message parsing, it's a mostly boring wrapper -- so cut it out and put it into $suffix
-			$suffix = $c_bold . format_info_prefix($1) . $c_unbold . format_info($2) . $suffix;
+			unshift @suffix, Token->new(T_WRAPEND, $1 . $2);
 		}
-	} elsif (s/^($re_ymd $re_time$re_ms?|$re_ts8601|$re_tsw|\[$re_ymd $re_time$re_ms?\])( |:|$)//) {
-		print format_date($1 . $2);
+	} elsif (s/^($re_ymd $re_time$re_ms?|($re_ts8601)|$re_tsw|\[$re_ymd $re_time$re_ms?\])( |:|$)//) {
+		my %attr = ($3) ? (type => '8601') : ();
+		print Token->new(T_DATE, $1 . $2);
 		$message_isolated = 1;
 	}
 
 	if ($is_dmesg && s/^((-{3,}) ?[\[\(].+[\]\)] ?-{3,}\s*)//) {
-		print format_info($1);
-	} elsif (s/^(message repeated \d+ times: \[)(\s*)//) {
-		print format_rpt($1);
-		print $2;
+		print Token->new(T_INFO, $1, type => 'dmesg-separator');
+	} elsif (s/^(message repeated (\d+) times: \[)(\s*)//) {
+		print Token->new(T_REPEAT, $1, n => $2);
+		print Token->new(T_MESSAGE, $3);
 		if (s/(\s*\]\s*)$//) {
-			$suffix = format_rpt($1) . $suffix;
+			unshift @suffix, Token->new(T_REPEATEND, $1);
 		}
 	}
 
 	if ($message_isolated && !$loglevel_isolated && s/^(<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:  ?)//) {
-		print format_loglevel($1);
+		print Token->new(T_LOGLEVEL, $1, read_loglevel($1));
 		$loglevel_isolated = 1;
 	} elsif ($message_isolated && !$loglevel_isolated && s/^($re_loglevel) (\[\S+\]) ([a-z]+(?:\.\w+)+ )?//) {
 		# LOGLEVEL [component] org.java.classname
-		print format_loglevel($1) . ' ';
-		print format_app($2) . ' ';
-		print format_info_prefix($3)  if $3;
+		print Token->new(T_LOGLEVEL, $1 . ' ', read_loglevel($1));
+		print Token->new(T_APP, $2 . ' ');
+		print Token->new(T_INFO, $3)  if $3;
 		$loglevel_isolated = 1;
 	} elsif ($message_isolated && !$loglevel_isolated && s/^($re_loglevel) (\($re_path$re_lineno?\): )//) {
 		# LOGLEVEL (FILENAME.PY:LINENO):
-		print format_loglevel($1) . ' ';
-		print format_info_prefix($2);
+		print Token->new(T_LOGLEVEL, $1 . ' ', read_loglevel($1));
+		print Token->new(T_INFO, $2);
 		$loglevel_isolated = 1;
 	}
 
 	my $re_info_brackets = '(?:\\[[^\\]]+\\])';
 	if ($message_isolated && s/^($re_info_brackets(?: *$re_info_brackets)*)( *)//) {
-		print format_info_prefix($1, ($is_rfc5424 ? 'RFC5424' : undef));
-		print $2;
+		my %attr = ($is_rfc5424) ? (type => 'rfc-5424-sd') : ();
+		print Token->new(T_INFO, $1, %attr);
+		print Token->new(T_MESSAGE, $2);
 	} elsif ($message_isolated && $is_rfc5424 && s/^(-) //) {
 		# RFC5424 with empty Structured Data field
-		print format_info_prefix($1) . ' ';
+		print Token->new(T_INFO, $1 . ' ');
 	}
 
 	if ($message_isolated && !$loglevel_isolated && s/^(<$re_loglevel>  ?|$re_loglevel:  ?)//) {
-		print format_loglevel($1);
+		print Token->new(T_LOGLEVEL, $1, read_loglevel($1));
 		$loglevel_isolated = 1;
 	}
 
 	if ($message_isolated && s/^( *(?:PHP message:  ?)?(?:PHP Fatal error:  ?)?(?:Uncaught )?)($re_exception)(: +)//) {
-		print $1;
-		print format_exception($2);
-		print $3;
+		print Token->new(T_MESSAGE, $1);
+		print Token->new([T_MESSAGE, T_ERROR], $2);
+		print Token->new(T_MESSAGE, $3);
 		$exception_isolated = 1;
 	}
 
 	if ($message_isolated && $is_apache && s/^($re_a2err:) //) {
 		# apache2: "AH01620: Could not open..."
-		print format_exception($1) . ' ';
+		print Token->new([T_MESSAGE, T_ERROR], $1 . ' ');
 		$exception_isolated = 1;
 	} elsif ($message_isolated && $is_apache && s/^((?:\(\d+\))?\w+(?: \w+)*: )($re_a2clnt )?($re_a2err:) //) {
 		# apache2: "(13)Permission denied: [client 00.000.000.00:0000] AH01620: Could not open..."
-		print $1;
-		print $2  if $2;
-		print format_exception($3) . ' ';
+		print Token->new(T_MESSAGE, $1);
+		print Token->new(T_MESSAGE, $2)  if $2;
+		print Token->new([T_MESSAGE, T_ERROR], $3 . ' ');
 		$exception_isolated = 1;
 	}
 
@@ -303,29 +350,34 @@ for (start_linesep_wait(); defined($_ = <>) && (stop_linesep_wait(), 1); start_l
 		# AEH format
 		my ($message, $stack, $rest, $info) = ($1, $2, $3, undef);
 		if ($message =~ s/((?: $re_info_brackets)+)$//) { $info = $1; }
-		print format_message($message);
-		print format_info($info)  if $info;
-		print format_stack($stack)  if $stack;
-		print format_trace($rest);
+		print Token->new(T_MESSAGE, $message);
+		if ($info) {
+			print striphttpstatus($info);
+			print Token->new(T_INFO, $info);
+		}
+		print Token->new([T_ERROR, T_STACK], $stack)  if $stack;
+		print Token->new(T_TRACE, $3);
 		$text_isolated = 1;
 	} elsif ($message_isolated && s#^(.+?)( (?:in|at) $re_abspath(?:$re_lineno)?\b)(\s*$)##) {
 		# "MESSAGE in FILE:LINE" format
-		print format_message($1);
-		print format_trace($2);
-		print $3;
+		print Token->new(T_MESSAGE, $1);
+		print Token->new(T_TRACE, $2);
+		print Token->new(T_MESSAGE, $3);
 		$text_isolated = 1;
 	} elsif ($message_isolated && s#^(.+?)(?:(  ?)($re_info_brackets))?(  ?(?:in|at) $re_abspath(?:$re_lineno)?\b {1,2})(?=[\(\[])##) {
 		# mini-api format
-		print format_message($1);
-		print $2 . format_info($3);
-		print format_trace($4);
-		print $5;
+		my ($prefix, $info, $trace) = ($1 . $2, $3, $4);
+		print Token->new(T_MESSAGE, $prefix);
+		print striphttpstatus($info);
+		print Token->new(T_INFO, $info);
+		print Token->new(T_TRACE, $trace);
+
 		$text_isolated = 1;
 	} elsif ($message_isolated && s#("[A-Z]\w* [^"]+?") (\d+)( .*)$##) {
 		# Apache2 log
-		print format_message($1) . ' ';
-		print format_http($2);
-		print format_info($3);
+		print Token->new(T_MESSAGE, $1 . ' ');
+		print Token->new(T_MESSAGE, $2, http => $2);
+		print Token->new(T_INFO, $3);
 		$text_isolated = 1;
 	} elsif ($message_isolated && $is_postfix) {
 		s/(?<=dsn=)([\d\.]+)(?=, status=)/ format_postfix_status($1) /e;
@@ -334,15 +386,19 @@ for (start_linesep_wait(); defined($_ = <>) && (stop_linesep_wait(), 1); start_l
 
 
 	if ($is_continuation_line && s/^(#\d+ )?($re_abspath(?:$re_lineno)?)(: )($re_fncall)//) {
-		print format_info($1)  if $1;
-		print format_trace($2) . $3 . format_fncall($4);
+		print Token->new(T_INFO, $1)  if $1;
+		print Token->new(T_TRACE, $2);
+		print Token->new(T_MESSAGE, $3);
+		print Token->new(T_FNCALL, $4);
 	} elsif ($is_continuation_line) {
 		# all continuation lines get info-colored:
-		print $c_info;
+		$T_REST = T_INFO;
 	}
 
 	if ($message_isolated && s/^($re_info_brackets(?: +$re_info_brackets)*)//) {
-		print format_info($1);
+		my $info = $1;
+		print striphttpstatus($info);
+		print Token->new(T_INFO, $info);
 	}
 
 	# Stack trace:
@@ -360,12 +416,33 @@ for (start_linesep_wait(); defined($_ = <>) && (stop_linesep_wait(), 1); start_l
 	}
 
 	if ($message_isolated && $is_postfix && s/(\s*\(.+\))$//) {
-		$suffix = format_postfix_info($1) . $suffix;
+		unshift @suffix, Token->new(T_INFO, $1, type => 'postfix-suffix');
 	}
 
-	if (s/([\r\n]+)$//) { $suffix .= $1 }
-	print;
-	print $suffix;
+	if (s/([\r\n]+)$//) { push @suffix, Token->new(T_EOL, $1) }
+	print Token->new($T_REST, $_)  unless $_ eq '';
+	print foreach @suffix;
+	print "\n";
+
 	flush STDOUT;
-}
+} }
+
+
+## Main output loop:  ##########################################################
+
+sub main_printer_loop {
+while(<>) {
+	my ($last_line_token, $had_message);
+	foreach my $token (Token->unserialize_all($_)) {
+
+		if ($raw) {
+			print $token->content();
+		} else {
+			print format_token($token, line => $last_line_token, had_message => $had_message);
+			$had_message = 1  if (!$had_message && $token->is(T_MESSAGE));
+		}
+		flush STDOUT;
+		if (!$last_line_token && $token->is_line()) { $last_line_token = $token }
+	}
+} }
 

@@ -9,10 +9,11 @@ use vars qw(
 	$re_app $re_host $re_client
 	$re_word
 	$re_time $re_ddd $re_ms $re_ymd $re_ts8601 $re_tsw
-	$re_a2date $re_a2clnt $re_a2err
+	$re_a2date $re_a2clnt $re_a2err $re_http
 	$re_mysqld
 	$re_dmesg_ts $re_dmesg_app
 	$re_tail_filename
+	$re_ansi_color
 );
 
 
@@ -25,8 +26,18 @@ my  $re_json_array      = "\\s*\\[(?:(?&json)(?:,(?&json))*|\\s*)\\]\\s*";
 my  $re_json_object     = "\\s*\\{(?:$re_json_string:(?&json)(?:,$re_json_string:(?&json))*|\\s*)?\\}\\s*";
 our $re_json            = qr/(?<json>$re_json_number|$re_json_const|$re_json_string|$re_json_array|$re_json_object)/;
 
+
 our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+)/;
+
 our $re_loglevel = qr/(?:(?:PHP )?(?i:warn|warning|warnung|err|error|fehler|info|information|note|notice|hinweis|crit|critical|schwerwiegend|emerg|emergency|debug|dbg|alrt|alert|parse error|fatal error))/;
+
+my $re_loglevel_warn = qr/\b(?:warn|warning|warnung)\b/i;
+my $re_loglevel_err  = qr/\b(?:err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency)\b/i;
+sub read_loglevel ($) {
+	if    ($_[0] =~ m/$re_loglevel_warn/i) { return level => L_WARNING }
+	elsif ($_[0] =~ m/$re_loglevel_err/i)  { return level => L_ERROR }
+	return level => L_LOW
+}
 
 my  $re_nsname    = qr/(?:\\?(?:[A-Za-z]\w*\\)+)/;
 my  $re_classname = qr/(?:$re_nsname?[A-Za-z]\w+)/;
@@ -64,10 +75,17 @@ our $re_a2date = qr/(?:\[ ?\d{1,2}\/\w{3}\/\d{4}[ :T]$re_time(?: ?$re_tz)?\])/;
 our $re_a2clnt = qr/(?:(?:\[(?:client )?$re_client(?::\d+)?\]))/;
 our $re_a2err  = qr/(?:AH\d+)/;
 
+our $re_http = qr/(?:(?<hs0> *\[)(?<hs>\d\d\d)(?<hs1>\])$)/;
+
 our $re_dmesg_ts  = qr/(?:\[\d+${re_ms}?\])/;
 our $re_dmesg_app = qr/(?:[A-Za-z0-9][\w\-\.]*(?: [\w\-\.:]+)?)/;
 
 our $re_tail_filename = qr/(?:(?<prefix>==+> +)(?<filename>$re_path)(?<suffix> +<==+\s*$))/;
+
+our $re_ansi_color = qr/(?:\e\[\d+(?:;\d+)*m)/;
+sub get_ansi_prefix ($) {
+	return $1 if ($_[0] =~ m/^\s*($re_ansi_color+)/);
+}
 
 
 1
