@@ -14,9 +14,9 @@ use vars qw(
 	$c_message
 	$c_http_success $c_http_redir $c_http_client_error $c_http_client_failure $c_http_server_error
 );
-use regexes;
-use const;
-use output;
+use Regexes;
+use Const;
+use Output;
 
 
 ## Color constants:  ###########################################################
