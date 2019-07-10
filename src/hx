@@ -55,10 +55,13 @@ our $c_http_server_error   = '[38;5;199;1m';
 
 ## Output configuration:  ######################################################
 
+sub nowarn (&;@) { local $SIG{__WARN__} = sub { }; $_[0]->(@_) }
+
 my $linestart     = "${c_sym}●${c0} ";
 my $metalinestart = "${c_meta}●${c0} ";
 my $contlinestart = "${c_contsym}●${c0} ";
-my $followsep     = $c_followsep . ("⁻" x (GetTerminalSize())[0]) . "${c0}\n";
+
+my $followsep     = $c_followsep . ("⁻" x nowarn{ (GetTerminalSize())[0] // 80 }) . "${c0}\n";
 
 # As soon as the <> read pauses for more than 200ms, we print a separator line.
 # This serves to separate "tail -f"'s past output from future output.
