@@ -2,8 +2,6 @@
 use Time::HiRes qw(ualarm);
 use Term::ReadKey qw(GetTerminalSize);
 use strict;
-use FindBin;
-use lib $FindBin::Bin;
 use vars qw(
 	$c_sym $c_contsym $c_meta $c_followsep $c_rpt
 	$c_date $c_host $c_app
@@ -15,6 +13,12 @@ use vars qw(
 	$c_http_success $c_http_redir $c_http_client_error $c_http_client_failure $c_http_server_error
 	$linestart $metalinestart $contlinestart
 );
+
+BEGIN {
+	$0 =~ m#^(.*/)[^/]+$#;
+	unshift @INC, $1
+}
+
 use Const;
 use Regexes;
 use Token qw(:types);
