@@ -122,7 +122,13 @@ if ($mode == M_LEXER) {
 } elsif ($mode == M_PRINTER) {
 	while (my @tokens = Token->unserialize_all(scalar <>)) { print_tokens(@tokens); flush STDOUT; }
 } else {
-	while (my @tokens = lex_next_line(scalar <>)) { print_tokens(@tokens); flush STDOUT }
+	start_linesep_wait();
+	while (my @tokens = lex_next_line(scalar <>)) {
+		stop_linesep_wait();
+		print_tokens(@tokens);
+		flush STDOUT;
+		start_linesep_wait();
+	}
 }
 
 
@@ -448,6 +454,8 @@ sub print_tokens (@) {
 			print format_token($token, line => $last_line_token, had_message => $had_message);
 			$had_message = 1  if (!$had_message && $token->is(T_MESSAGE));
 		}
+
+		$had_output = 1;
 
 		if (!$last_line_token && $token->is_line()) { $last_line_token = $token }
 	}
