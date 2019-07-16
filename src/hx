@@ -332,7 +332,7 @@ sub lex_next_line {
 	}
 
 	if ($message_isolated && s/^( *(?:PHP message:  ?)?(?:PHP Fatal error:  ?)?(?:Uncaught )?)($re_exception)(: +)//) {
-		push @output, Token->new(T_MESSAGE, $1);
+		push @output, Token->new(T_MESSAGE, $1)  if $1;
 		push @output, Token->new([T_MESSAGE, T_ERROR], $2);
 		push @output, Token->new(T_MESSAGE, $3);
 		$exception_isolated = 1;
@@ -361,7 +361,7 @@ sub lex_next_line {
 		push @output, Token->new(T_MESSAGE, $message);
 		if ($info) {
 			push @output, striphttpstatus($info);
-			push @output, Token->new(T_INFO, $info);
+			push @output, Token->new(T_INFO, $info)  if $info;
 		}
 		push @output, Token->new([T_ERROR, T_STACK], $stack)  if $stack;
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
@@ -370,14 +370,14 @@ sub lex_next_line {
 		# "MESSAGE in FILE:LINE" format
 		push @output, Token->new(T_MESSAGE, $1);
 		push @output, Token->new(T_TRACE, $2);
-		push @output, Token->new(T_MESSAGE, $3);
+		push @output, Token->new(T_MESSAGE, $3)  if $3;
 		$text_isolated = 1;
 	} elsif ($message_isolated && s#^(.+?)(?:(  ?)($re_info_brackets))?(  ?(?:in|at) $re_abspath(?:$re_lineno)?\b {1,2})(?=[\(\[])##) {
 		# mini-api format
 		my ($prefix, $info, $trace) = ($1 . $2, $3, $4);
 		push @output, Token->new(T_MESSAGE, $prefix);
 		push @output, striphttpstatus($info);
-		push @output, Token->new(T_INFO, $info);
+		push @output, Token->new(T_INFO, $info)  if $info;
 		push @output, Token->new(T_TRACE, $trace);
 		$text_isolated = 1;
 	} elsif ($message_isolated && s#("[A-Z]\w* [^"]+?") (\d+)( .*)$##) {
@@ -405,16 +405,16 @@ sub lex_next_line {
 
 	if ($message_isolated && s/^($re_info_brackets(?: +$re_info_brackets)*)//) {
 		my $info = $1;
-		push @output, striphttpstatus($info);
-		push @output, Token->new(T_INFO, $info);
+		push @output, striphttpstatus($info)  if $info;
+		push @output, Token->new(T_INFO, $info)  if $info;
 	}
 
 	# Stack trace:
 	#if (s/^(.*)(\((?:trace|back ?trace|stack ?trace|call ?stack): .+?\))( |$)/format_trace($1) . $2/e;
 	if (s/^(.*?)(\((?:trace|back ?trace|stack ?trace|call ?stack): .+?\))( |$)//) {
-		push @output, Token->new(T_MESSAGE, $1);
+		push @output, Token->new(T_MESSAGE, $1)  if $1;
 		push @output, Token->new(T_TRACE, $2);
-		push @output, Token->new(T_MESSAGE, $3);
+		push @output, Token->new(T_MESSAGE, $3)  if $3;
 	}
 
 	# Trailing Symfony JSON data:
