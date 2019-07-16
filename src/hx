@@ -2,17 +2,6 @@
 use Time::HiRes qw(ualarm);
 use Term::ReadKey qw(GetTerminalSize);
 use strict;
-use vars qw(
-	$c_sym $c_contsym $c_meta $c_followsep $c_rpt
-	$c_date $c_host $c_app
-	$c_loglevel $c_loglevel_warn $c_loglevel_err
-	$c_info $c_info_prefix
-	$c_trace $c_stack $c_stack_msg
-	$c_exception_scn $c_exception_fqcn $c_exception_code $c_exception0
-	$c_message
-	$c_http_success $c_http_redir $c_http_client_error $c_http_client_failure $c_http_server_error
-	$linestart $metalinestart $contlinestart
-);
 
 BEGIN {
 	$0 =~ m#^(.*/)[^/]+$#;
@@ -355,8 +344,8 @@ sub lex_next_line {
 		$exception_isolated = 1;
 	}
 
-#	if ($message_isolated && s/^(?:($re_info_brackets +)+)//) {
-#		print format_info($1);
+#	if ($message_isolated && s/^((?:$re_info_brackets +)+)//) {
+#		push @output, Token->new(T_INFO, $1);
 #	}
 
 	if ($message_isolated && s#^(.+?)(  ?\(stack: .+\))?( \($re_exception (?:@|at|in) $re_path$re_lineno?\))##) {
@@ -413,7 +402,6 @@ sub lex_next_line {
 	}
 
 	# Stack trace:
-	#if (s/^(.*)(\((?:trace|back ?trace|stack ?trace|call ?stack): .+?\))( |$)/format_trace($1) . $2/e;
 	if (s/^(.*?)(\((?:trace|back ?trace|stack ?trace|call ?stack): .+?\))( |$)//) {
 		push @output, Token->new(T_MESSAGE, $1)  if $1;
 		push @output, Token->new(T_TRACE, $2);
@@ -423,7 +411,6 @@ sub lex_next_line {
 	# Trailing Symfony JSON data:
 	if ($message_isolated && s/((?=\{")$re_json) (?<rest>\[[^\]]*\] *$)//) {
 		unshift @suffix,
-#			Token->new(T_MESSAGE, $1),
 			Token->new([T_INFO, T_JSON], $1),
 			Token->new(T_INFO, ' ' . $+{'rest'});
 	}

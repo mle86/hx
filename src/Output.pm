@@ -1,6 +1,18 @@
 #!/usr/bin/perl
 use strict;
 
+use vars qw(
+	$c_sym $c_contsym $c_meta $c_followsep $c_rpt
+	$c_date $c_host $c_app
+	$c_loglevel $c_loglevel_warn $c_loglevel_err
+	$c_info $c_info_prefix
+	$c_trace $c_stack $c_stack_msg
+	$c_exception_scn $c_exception_fqcn $c_exception_code $c_exception0
+	$c_message
+	$c_http_success $c_http_redir $c_http_client_error $c_http_client_failure $c_http_server_error
+	$linestart $metalinestart $contlinestart
+);
+
 ## Formatting functions:  ######################################################
 
 sub format_token ($;%) {
@@ -136,16 +148,16 @@ sub format_http ($) {
 	$c_http . $status . $c0
 }
 
-sub format_postfix_info ($) {
-	my ($info, $out, $c_pfinfo, $c_hi, $c_lo) = ($_[0], '', $c_info, $c_bold, $c_unbold);
-
-	my $re_replycode = '[2345]\d\d';
-	my $re_dsn       = '\d\.\d\.\d';
-
-	$info =~ s/(?<=[\( ])(${re_replycode}(?:[\- ](?:${re_dsn})?)?)\b/ $c_hi . $1 . $c_lo /ge;
-
-	$c_pfinfo . $info . $c0
-}
+#sub format_postfix_info ($) {
+#	my ($info, $out, $c_pfinfo, $c_hi, $c_lo) = ($_[0], '', $c_info, $c_bold, $c_unbold);
+#
+#	my $re_replycode = '[2345]\d\d';
+#	my $re_dsn       = '\d\.\d\.\d';
+#
+#	$info =~ s/(?<=[\( ])(${re_replycode}(?:[\- ](?:${re_dsn})?)?)\b/ $c_hi . $1 . $c_lo /ge;
+#
+#	$c_pfinfo . $info . $c0
+#}
 
 sub format_postfix_status ($) {
 	my ($status, $c_status) = ($_[0], '');
