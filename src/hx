@@ -135,8 +135,13 @@ if ($mode == M_LEXER) {
 ## Main input loop:  ###########################################################
 
 sub striphttpstatus ($;$) {
+	my $type = $_[1] // T_INFO;
 	return unless ($_[0] =~ s/^$re_http//);
-	Token->new([($_[1] // T_INFO), T_HTTP_STATUS], $&, st => $+{'hs'});
+	return (
+		$+{'hs0'} ? Token->new($type, $+{'hs0'}) : undef,
+		Token->new([$type, T_HTTP_STATUS], $+{'hs'}),
+		$+{'hs1'} ? Token->new($type, $+{'hs1'}) : undef,
+	)
 }
 
 sub lex_next_line {
@@ -359,10 +364,8 @@ sub lex_next_line {
 		my ($message, $stack, $rest, $info) = ($1, $2, $3, undef);
 		if ($message =~ s/((?: $re_info_brackets)+)$//) { $info = $1; }
 		push @output, Token->new(T_MESSAGE, $message);
-		if ($info) {
-			push @output, striphttpstatus($info);
-			push @output, Token->new(T_INFO, $info)  if $info;
-		}
+		push @output, striphttpstatus($info)  if $info;
+		push @output, Token->new(T_INFO, $info)  if $info;
 		push @output, Token->new([T_ERROR, T_STACK], $stack)  if $stack;
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
 		$text_isolated = 1;
@@ -376,14 +379,14 @@ sub lex_next_line {
 		# mini-api format
 		my ($prefix, $info, $trace) = ($1 . $2, $3, $4);
 		push @output, Token->new(T_MESSAGE, $prefix);
-		push @output, striphttpstatus($info);
+		push @output, striphttpstatus($info)  if $info;
 		push @output, Token->new(T_INFO, $info)  if $info;
 		push @output, Token->new(T_TRACE, $trace);
 		$text_isolated = 1;
 	} elsif ($message_isolated && s#("[A-Z]\w* [^"]+?") (\d+)( .*)$##) {
 		# Apache2 log
 		push @output, Token->new(T_MESSAGE, $1 . ' ');
-		push @output, Token->new([T_MESSAGE, T_HTTP_STATUS], $2, st => $2);
+		push @output, Token->new([T_MESSAGE, T_HTTP_STATUS], $2);
 		push @output, Token->new(T_INFO, $3);
 		$text_isolated = 1;
 	} elsif ($message_isolated && $is_postfix) {

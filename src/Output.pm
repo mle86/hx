@@ -29,6 +29,7 @@ sub format_token ($;%) {
 	return format_fncall($token->content())  if $token->is(T_FNCALL);
 	return format_rpt($token->content())  if $token->is(T_REPEAT);
 	return format_rpt($token->content())  if $token->is(T_REPEATEND);
+	return format_http($token->content())  if $token->is(T_HTTP_STATUS);
 
 	if ($token->is(T_INFO)) {
 		my $content = $token->content();
@@ -46,16 +47,12 @@ sub format_token ($;%) {
 			? format_info($content)
 			: format_info_prefix($content);
 
-		if ($token->is(T_HTTP_STATUS)) {
-			$content = format_http($content, $token->attr('st'), get_ansi_prefix($content));
-		} elsif ($token->is(T_WRAPEND)) {
+		if ($token->is(T_WRAPEND)) {
 			$content = format_wrapend($content);
 		}
 
 		return $content;
 	}
-
-	return format_http($token->content(), $token->attr('st'))  if $token->is(T_HTTP_STATUS);
 
 	return $token->content()
 }
@@ -125,8 +122,8 @@ sub format_json ($;$) {
 	$c_json . $out . $c0
 }
 
-sub format_http ($$) {
-	my ($string, $status, $c_end) = ($_[0], $_[1], $_[2]//'');
+sub format_http ($) {
+	my $status = $_[0];
 
 	my $c_http;
 	if    (is_http_client_error($status))   { $c_http = $c_http_client_error }
@@ -134,13 +131,9 @@ sub format_http ($$) {
 	elsif (is_http_server_error($status))   { $c_http = $c_http_server_error }
 	elsif (is_http_success($status))        { $c_http = $c_http_success }
 	elsif (is_http_redir($status))          { $c_http = $c_http_redir }
+	else { return $status }
 
-	if ($c_http) {
-		my $re_http_status = qr/(?:^|(?<=\[|\s)|(?<!\d;))(\b\d{3}(?: [A-Za-z\-\(\)']+)*)/;
-		$string =~ s/$re_http_status/$c_http$1$c0$c_end/;
-	}
-
-	return $string
+	$c_http . $status . $c0
 }
 
 sub format_postfix_info ($) {
