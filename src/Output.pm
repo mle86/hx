@@ -178,7 +178,7 @@ sub format_rfc5424_sd ($) {
 	my ($c_id_hi, $c_id_lo) = ($c_bold, $c_unbold);
 	my ($c_pn_hi, $c_pn_lo) = ($c_bold, $c_unbold);
 
-	while ($in =~ s/^(\[)([^\s\]]+)( [^=]+=\"[^"]*\")*(\] ?)//) {
+	while ($in =~ s/^(\[)([^\s\]]+)((?: [^=]+=\"[^"]*\")*)(\] ?)//) {
 		my ($prefix, $id, $params, $suffix) = ($1, $2, $3, $4);
 
 		my $params_out = '';
