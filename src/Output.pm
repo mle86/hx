@@ -43,6 +43,8 @@ sub format_token ($;%) {
 	return format_rpt($token->content())  if $token->is(T_REPEATEND);
 	return format_http($token->content())  if $token->is(T_HTTP_STATUS);
 
+	return format_kv($token, $opt{'line'})  if $token->is(T_KV);
+
 	if ($token->is(T_INFO)) {
 		my $content = $token->content();
 
@@ -232,6 +234,11 @@ sub format_wrapend ($) {
 	$in
 }
 
+sub format_kv ($) {
+	my ($token, $content, $k) = ($_[0], $_[0]->content(), $_[0]->attr('k'));
+
+	$content
+}
 
 
 1

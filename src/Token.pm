@@ -12,7 +12,7 @@ my @types = qw(
 	T_LINE T_EMPTYLINE T_METALINE T_CONTLINE T_EOL
 	T_CLIENT T_USERNAME T_FNCALL T_INFO T_STACK T_TRACE
 	T_REPEAT T_REPEATEND T_WRAP T_WRAPEND
-	T_ERROR T_MESSAGE T_JSON T_FILENAME T_HTTP_STATUS
+	T_ERROR T_MESSAGE T_KV T_JSON T_FILENAME T_HTTP_STATUS
 );
 
 our @EXPORT_OK = (@types);
@@ -43,6 +43,7 @@ sub T_WRAPEND   () { 'WE' }
 
 sub T_ERROR       () { 'X' }
 sub T_MESSAGE     () { 'M' }
+sub T_KV          () { 'KV' }
 sub T_JSON        () { 'JS' }
 sub T_FILENAME    () { 'FN' }
 sub T_HTTP_STATUS () { 'HS' }
