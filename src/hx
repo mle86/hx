@@ -379,8 +379,13 @@ sub lex_next_line {
 		push @output, Token->new(T_INFO, $3);
 		$text_isolated = 1;
 	} elsif ($message_isolated && $is_postfix) {
-		s/(?<=dsn=)([\d\.]+)(?=, status=)/ format_postfix_status($1) /e;
-		s/\b(dsn|status|from|to|orig_to|relay|client|message-id)(=)/ $c_bold . $1 . $c_unbold . $2 /ge;
+		if (s/^( *[0-9A-Z]+: +)//) {
+			push @output, Token->new(T_MESSAGE, $1);
+			while (s/^(, ?)?($re_kv)//) {
+				push @output, Token->new(T_MESSAGE, $1)  if $1;
+				push @output, Token->new([T_MESSAGE, T_KV], $2, k => $+{'k'}, src => 'postfix');
+			}
+		}
 	}
 
 

@@ -235,9 +235,17 @@ sub format_wrapend ($) {
 }
 
 sub format_kv ($) {
-	my ($token, $content, $k) = ($_[0], $_[0]->content(), $_[0]->attr('k'));
+	my ($token, $content, $k, $is_boring_keyword) = ($_[0], $_[0]->content(), $_[0]->attr('k'));
 
-	$content
+	if ($token->attr('src') eq 'postfix') {
+		if ($k eq 'dsn' && $content =~ m/^${re_kv}$/) {
+			$content = $+{'k'} . $+{'s'} . format_postfix_status($+{'v'});
+		}
+		$is_boring_keyword = ($k =~ m/^(?:delays?|size|nrcpt)$/);
+	}
+
+	$content =~ s/\b($k)\b/${c_bold}$1${c_unbold}/  unless $is_boring_keyword;
+	return $content
 }
 
 
