@@ -182,8 +182,8 @@ sub lex_next_line {
 			Token->new(T_INFO, $3 . ' '),
 			Token->new(T_DATE, $4 . ' ', format => '8601'),
 			Token->new(T_HOST, $5 . ' '),
-			Token->new(T_APP,  $6 . ' '),
-			Token->new(T_APP,  $7 . ' '),  # PID
+			Token->new(T_APP,  $6 . ' ', type => 'rfc-5424-tag'),
+			Token->new(T_APP,  $7 . ' ', type => 'pid'),  # PID
 			Token->new(T_INFO, $8 . ' ');  # msgid
 		$message_isolated = 1;
 		$is_rfc5424 = 1;
