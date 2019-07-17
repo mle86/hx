@@ -2,6 +2,7 @@
 use strict;
 use vars qw(
 	$re_json $re_json_string
+	$re_continuation_line $re_repeat_begin $re_repeat_end
 	$re_lineno $re_loglevel
 	$re_fncall
 	$re_exception
@@ -27,6 +28,9 @@ my  $re_json_array      = "\\s*\\[(?:(?&json)(?:,(?&json))*|\\s*)\\]\\s*";
 my  $re_json_object     = "\\s*\\{(?:$re_json_string:(?&json)(?:,$re_json_string:(?&json))*|\\s*)?\\}\\s*";
 our $re_json            = qr/(?<json>$re_json_number|$re_json_const|$re_json_string|$re_json_array|$re_json_object)/;
 
+our $re_continuation_line = qr/(?:^\s*(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,}))/;
+our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
+our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
 our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+)/;
 

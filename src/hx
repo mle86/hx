@@ -145,15 +145,15 @@ sub lex_next_line {
 	if (s/^$re_tail_filename//) {
 		# `tail` file header
 		return
-		Token->new(T_METALINE),
-		Token->new(T_MESSAGE, $+{'prefix'}),
-		Token->new(T_FILENAME, $+{'filename'}),
-		Token->new(T_MESSAGE, $+{'suffix'});
+			Token->new(T_METALINE),
+			Token->new(T_MESSAGE, $+{'prefix'}),
+			Token->new(T_FILENAME, $+{'filename'}),
+			Token->new(T_MESSAGE, $+{'suffix'});
 	}
 
 	my $T_REST = T_MESSAGE;
 
-	my $is_continuation_line = (m/^\s*(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,})/);
+	my $is_continuation_line = m/$re_continuation_line/;
 	my @output = ( Token->new(($is_continuation_line) ? T_CONTLINE : T_LINE) );
 	my @suffix;
 
@@ -286,10 +286,10 @@ sub lex_next_line {
 
 	if ($is_dmesg && s/^((-{3,}) ?[\[\(].+[\]\)] ?-{3,}\s*)//) {
 		push @output, Token->new(T_INFO, $1, type => 'dmesg-separator');
-	} elsif (s/^(message repeated (\d+) times: \[)(\s*)//) {
-		push @output, Token->new(T_REPEAT, $1, n => $2);
-		push @output, Token->new(T_MESSAGE, $3);
-		if (s/(\s*\]\s*)$//) {
+	} elsif (s/^$re_repeat_begin//) {
+		push @output, Token->new(T_REPEAT, $+{'prefix'}, n => $+{'n'});
+		push @output, Token->new(T_MESSAGE, $+{'rest'});
+		if (s/($re_repeat_end)$//) {
 			unshift @suffix, Token->new(T_REPEATEND, $1);
 		}
 	}
