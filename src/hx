@@ -311,7 +311,10 @@ sub lex_next_line {
 	}
 
 	my $re_info_brackets = '(?:\\[[^\\]]+\\])';
-	if ($message_isolated && s/^($re_info_brackets(?: *$re_info_brackets)*)( *)//) {
+	if (s/^((?=\[?\{")$re_json)$//) {
+		# JSON-only line:
+		push @output, Token->new([T_MESSAGE, T_JSON], $1);
+	} elsif ($message_isolated && s/^($re_info_brackets(?: *$re_info_brackets)*)( *)//) {
 		my %attr = ($is_rfc5424) ? (type => 'rfc-5424-sd') : ();
 		push @output, Token->new(T_INFO, $1, %attr);
 		push @output, Token->new(T_MESSAGE, $2);
@@ -420,10 +423,10 @@ sub lex_next_line {
 			Token->new(T_INFO, ' ' . $+{'rest'});
 	}
 
-	# JSON-only line:
-	if (!$message_isolated && s/^((?=\{")$re_json)$//) {
-		push @output, Token->new([T_MESSAGE | T_JSON], $1);
-	}
+#	# JSON-only line:
+#	if (!$message_isolated && s/^((?=\{")$re_json)$//) {
+#		push @output, Token->new([T_MESSAGE, T_JSON], $1);
+#	}
 
 	if ($message_isolated && $is_postfix && s/(\s*\(.+\))$//) {
 		unshift @suffix, Token->new(T_INFO, $1, type => 'postfix-suffix');
