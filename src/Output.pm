@@ -42,6 +42,7 @@ sub format_token ($;%) {
 	return format_rpt($token->content())  if $token->is(T_REPEAT);
 	return format_rpt($token->content())  if $token->is(T_REPEATEND);
 	return format_http($token->content())  if $token->is(T_HTTP_STATUS);
+	return format_json($token)  if $token->is(T_JSON);
 
 	return format_kv($token, $opt{'line'})  if $token->is(T_KV);
 
@@ -117,9 +118,9 @@ sub format_fncall ($) {
 	$out
 }
 
-sub format_json ($;$) {
-	my ($out, $in, $c_json) = ('', $_[0], ($_[1] // $c_info));
-	my ($c_hi, $c_lo) = ($c_bold, $c_unbold);
+sub format_json ($) {
+	my ($out, $token, $in) = ('', $_[0], $_[0]->content());
+	my ($c_hi, $c_lo, $c_json) = ($c_bold, $c_unbold, $token->is(T_INFO) ? $c_info : $c_message);
 
 	while ($in ne '') {
 		if ($in =~ s/^$re_json_string(?<rest>\s*:\s*)//) {
@@ -129,7 +130,7 @@ sub format_json ($;$) {
 		}
 	}
 
-	if ($out =~ m/^(\s*\{)(.+)(\}\s*)\s*$/) {
+	if ($out =~ m/^(\s*\{)(.+)(\}\s*)\s*$/ || $out =~ m/^(\s*\[)(.+)(\]\s*)\s*$/) {
 		$out = $c_hi . $1 . $c_lo . $2 . $c_hi . $3 . $c_lo;
 	}
 
