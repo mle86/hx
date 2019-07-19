@@ -187,6 +187,10 @@ sub lex_next_line {
 			Token->new(T_INFO, $8 . ' ');  # msgid
 		$message_isolated = 1;
 		$is_rfc5424 = 1;
+	} elsif (s/^($re_sects) ($re_app: )//) {
+		push @output,
+			Token->new(T_DATE, $1 . ' '),
+			Token->new(T_APP, $2);
 	} elsif (s/^(\[$re_ymd $re_time\]) ($re_app)(\.[A-Z]+)?(: *)//) {
 		# symfony format
 		push @output,
