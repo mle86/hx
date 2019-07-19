@@ -11,41 +11,8 @@ BEGIN {
 use Const;
 use Regexes;
 use Token qw(:types);
+use Color;
 use Output;
-
-
-## Color constants:  ###########################################################
-
-# Base color configuration:
-our $c_sym = '[33m';
-our $c_contsym = '[38;2;113;97;25m';
-our $c_meta = '[38;2;114;204;204m';
-our $c_followsep = '[32m'.$c_faint;
-
-# Detailed color configuration:
-our $c_date = $c_sym;
-our $c_host = $c_sym;
-our $c_app = $c_sym;
-our $c_loglevel = $c_sym;
-our $c_loglevel_warn = '[38;5;220m';
-our $c_loglevel_err = '[38;2;255;145;36m';
-our $c_info = '[38;5;243m';
-our $c_info_prefix = '[38;2;125;117;83m';
-our $c_trace = $c_info;
-our $c_stack = $c_info;
-our $c_stack_msg = $c0;
-our $c_rpt = '[34m';
-our $c_exception_fqcn = $c_unbold;
-our $c_exception_scn  = $c_bold;
-our $c_exception_code = $c_bold;
-our $c_exception0 = $c_unbold;
-our $c_message = $c0;
-
-our $c_http_success        = '[38;2;98;214;113m';
-our $c_http_redir          = '[38;2;202;214;98m';
-our $c_http_client_error   = '[38;2;155;72;72m';
-our $c_http_client_failure = '[38;2;235;41;41m';
-our $c_http_server_error   = '[38;5;199;1m';
 
 
 ## Output configuration:  ######################################################
