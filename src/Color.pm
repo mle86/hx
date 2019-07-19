@@ -62,4 +62,22 @@ our $c_http_client_failure = '[38;2;235;41;41m';
 our $c_http_server_error   = '[38;5;199;1m';
 
 
+## Other presets:  #############################################################
+
+sub use_ecma48_colors () {
+	$c_contsym       = $c_sym . $c_faint;
+	$c_meta          = '[36m';
+	$c_loglevel_warn = $c_sym . $c_bold;
+	$c_loglevel_err  = $c_sym . $c_bold;
+	$c_info          = '[37m' . $c_faint;
+	$c_info_prefix   = $c_info;
+
+	$c_http_success        = '[32m';
+	$c_http_redir          = '[33m';
+	$c_http_client_error   = '[31m';
+	$c_http_client_failure = $c_http_client_error . $c_bold;
+	$c_http_server_error   = $c_http_client_failure;
+}
+
+
 1

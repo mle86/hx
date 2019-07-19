@@ -46,6 +46,7 @@ my $raw = 0;
 foreach (@ARGV) {
 	if    ($_ eq '--lexer')   { shift @ARGV; $mode = M_LEXER }
 	elsif ($_ eq '--printer') { shift @ARGV; $mode = M_PRINTER }
+	elsif ($_ eq '--ecma48')  { shift @ARGV; use_ecma48_colors() }
 	elsif ($_ eq '--raw')     { shift @ARGV; $raw = 1 }
 }
 
