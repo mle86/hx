@@ -9,7 +9,7 @@ use vars qw(
 	$re_path $re_abspath
 	$re_app $re_host $re_client
 	$re_word
-	$re_time $re_ddd $re_ms $re_ymd $re_ts8601 $re_tsw
+	$re_time $re_ddd $re_ms $re_ymd $re_ts8601 $re_tsw $re_sects
 	$re_a2date $re_a2clnt $re_a2err $re_http
 	$re_mysqld
 	$re_dmesg_ts $re_dmesg_app
@@ -66,6 +66,7 @@ our $re_ymd    = qr/(?:\d\d\d\d-\d\d-\d\d|\d\d\d\d\/\d\d\/\d\d|\d\d\d\d\.\d\d\.\
 my  $re_tz     = qr/(?:[\+\-]\d\d(?::?\d\d)?|Z)/;
 our $re_ts8601 = qr/(?:${re_ymd}T${re_time}${re_ms}?(?:$re_tz)?)/;  # 2019-07-07T18:22:34.001Z
 our $re_tsw    = qr/(?:\d{1,2}-\w{2,4}-\d{4} ${re_time}${re_ms}?)/;  # 07-Jun-2019 11:36:20.106
+our $re_sects  = qw/(?:\[\s*\d+\.\d+\])/;  # [   16.082998]
 
 our $re_app    = qr/(?:[A-Za-z\/][A-Za-z0-9_\-\.\/]+?(?:\[\d+\]|\])?)/;
 our $re_word   = qr/(?:[A-Z][a-z]+)/;
