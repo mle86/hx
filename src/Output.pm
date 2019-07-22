@@ -145,6 +145,7 @@ sub format_http ($) {
 	elsif (is_http_client_failure($status)) { $c_http = $c_http_client_failure }
 	elsif (is_http_server_error($status))   { $c_http = $c_http_server_error }
 	elsif (is_http_success($status))        { $c_http = $c_http_success }
+	elsif (is_http_info($status))           { $c_http = $c_http_info }
 	elsif (is_http_redir($status))          { $c_http = $c_http_redir }
 	else { return $status }
 
