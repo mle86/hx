@@ -1,0 +1,138 @@
+.TH HX "1" "July 2019" "hx 0.13.0" ""
+.SH NAME
+hx \- log files highlighter
+.SH SYNOPSIS
+\fBhx\fR [\fIOPTIONS\fR] [\fILOGFILE\fR...]
+.SH DESCRIPTION
+\fBhx\fR is a log files highlighter.
+.P
+Its main purpose is to make long log files
+with long lines
+easier to grasp at a glance
+through simple, consistent coloring.
+.P
+It will never change any of its input
+besides adding ANSI color sequences to it
+(with two exceptions:
+it will add a very visible dot
+at the start of every line
+for better visual line separation,
+and it will add a dashed separator line
+once after the stdin input pauses
+for better visual separation
+between \(lqold\(rq and \(lqnew\(rq lines).
+.P
+It understands a few more or less commonly-used log entry formats,
+most importantly the standard \fBsyslog\fR format.
+Apart from that, it can guess some less-defined formats
+such as a leading timestamp
+or a trailing error source filename.
+.P
+It is well suited for handling running logs
+such as returned by \(lq\fBtail\ -f /var/log/syslog\fR\(rq.
+.SH OPTIONS
+.TP
+.BR --ecma48
+Forces the program to output only basic, ECMA-48-compatbile ANSI coloring codes.
+This will lead to less colorful output
+but should increase compatibility
+in case your terminal does not support the extended coloring sequences.
+.SH OUTPUT
+\fBhx\fR makes extensive use of ANSI coloring sequences,
+including the \(lq\fBCSI\ 38;5;\fR\fIn\fR\ \fBm\fR\(rq sequence
+for extended color selection
+and the \(lq\fBCSI\ 38;2;\fR\fIr\fR\fB;\fR\fIg\fR\fB;\fR\fIb\fR\ \fBm\fR\(rq sequence
+for RGB true-color selection.
+They may not be supported by all terminals currently in use.
+Use the \fB--ecma48\fR option
+if you want \fBhx\fR to use ECMA-48-compatible ANSI sequences only.
+This will lead to less colorful output
+but should increase compatibility.
+.P
+The default colors are optimized for a black terminal background.
+.SS Coloring Rationale
+Generally the program tries to identify to the main log message part
+and print it in the terminal's \fIdefault color\fR (white).
+All other parts of the log message will be colored differently
+to visually separate them:
+the metadata prefix will be \fIyellow\fR,
+additional information at the end will be \fIgrey\fR,
+and additional information
+between the yellow metadata prefix and the white message
+will be \fIyellowish-grey\fR.
+.P
+The following sections
+list typical log line parts
+and how they fit into these broader categories.
+.SS Metadata Prefix
+Most log lines start with metadata.
+The program will color all of it \fIyellow\fR.
+This includes the
+.BR timestamp ,
+the
+.BR "application name"
+and/or
+.BR PID ,
+the
+.BR hostname ,
+the
+.BR username ,
+and the
+.BR "log level" .
+.SS Informational Prefix
+This is log metadata considered non-essential
+or additional information
+located between the log metadata prefix and the message content,
+including
+.RB "syslog " "message IDs" ,
+.BR "client addresses" " and " "usernames" ,
+or
+.RB "RFC-5424 " "structured data" .
+.
+It'll be colored \fIyellowish-grey\fR.
+.SS Log Message
+The only part which will be printed in the terminal's
+\fIstandard\~color\fR (usually \fIwhite\fR),
+this is the actual log message content.
+Any recognized
+.BR "exception class name" " prefix"
+or
+.BR "error code" " prefix"
+will also be \fIbolded\fR.
+.SS Informational Suffix
+This is data considered non-essential to the log message,
+including 
+.BR "bracketed suffixes" ,
+.RB "error source " "file/lineno" ,
+.BR "stack traces" ,
+and
+.BR "JSON error data" .
+.SS Others
+.IP - 2
+Additionally, all \(lqinformational\(rq sections
+may contain HTTP status codes
+which will be colored appropriately:
+1xx\ Info/\:3xx Redirection\~= \fIyellow\fR,
+2xx\ Success\~= \fIgreen\fR,
+4xx\ Client Error\~= \fIred\fR,
+5xx\ Server Error\~= \fIpink\fR.
+.IP - 2
+Similar coloring will be applied to Postfix DSN codes.
+.IP - 2
+JSON object keys will be \fIbolded\fR.
+.IP - 2
+File basenames will be \fIbolded\fR.
+.IP - 2
+The syslog prefix \(lqmessage repeated N times: [\(rq
+will be colored \fIblue\fR.
+.SH STANDARDS
+.ad l
+.IR "Control Functions for Character-Imaging I/O Devices" ,
+.UR http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-48,%202nd%20Edition,%20August%201979.pdf
+Standard ECMA-48
+.UE ,
+August 1979.
+.ad b
+.SH SEE ALSO
+.BR tail (1),
+.BR console_codes (4).
