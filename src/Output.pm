@@ -1,17 +1,9 @@
 #!/usr/bin/perl
 use strict;
-
 use vars qw(
-	$c_sym $c_contsym $c_meta $c_followsep $c_rpt
-	$c_date $c_host $c_app
-	$c_loglevel $c_loglevel_warn $c_loglevel_err
-	$c_info $c_info_prefix
-	$c_trace $c_stack $c_stack_msg
-	$c_exception_scn $c_exception_fqcn $c_exception_code $c_exception0
-	$c_message
-	$c_http_success $c_http_redir $c_http_client_error $c_http_client_failure $c_http_server_error
 	$linestart $metalinestart $contlinestart
 );
+
 
 ## Formatting functions:  ######################################################
 
@@ -69,7 +61,7 @@ sub format_token ($;%) {
 		return $content;
 	}
 
-	return $token->content()
+	return format_message($token->content())
 }
 
 ## Formatting functions:  ######################################################
@@ -97,7 +89,7 @@ sub format_exception ($) {
 	my ($prefix, $suffix) = ('', '');
 	if ($in =~ s/^((?:[^\\]+\\)+)//) { $prefix = $c_exception_fqcn . $1; }
 	if ($in =~ s/(\/\d+)$//) { $suffix = $c_exception_code . $1; }
-	$prefix . $c_exception_scn . $in . $suffix . $c_exception0
+	$prefix . $c_exception_scn . $in . $suffix . $c0
 }
 
 sub format_trace ($;$) {
@@ -115,7 +107,7 @@ sub format_fncall ($) {
 
 	$out =~ s#$re_fncall# $+{'class'} . $+{'fnp'} . $c_hi . $+{'fn'}.$+{'fn2'} . $c_lo . format_info( $+{'args'} ) #gem;
 
-	$out
+	$c_message . $out
 }
 
 sub format_json ($) {
@@ -219,8 +211,8 @@ sub format_stack ($) {
 		# Only one msg in stack? Keep it in the faint $c_stack==$c_info color, the merged message is already msg-formatted.
 		: sub($) { $_[0] };
 
-	$in =~ s/(?<=stack: )$re_exc_msg/ format_exception($1) . $2 . &$fmt_stack_msg($3) /e;
-	$in =~ s/(?<=; )$re_exc_msg/      format_exception($1) . $2 . &$fmt_stack_msg($3) /ge;
+	$in =~ s/(?<=stack: )$re_exc_msg/ format_exception($1) . $c_stack . $2 . &$fmt_stack_msg($3) /e;
+	$in =~ s/(?<=; )$re_exc_msg/      format_exception($1) . $c_stack . $2 . &$fmt_stack_msg($3) /ge;
 	$c_stack . $in . $c0
 }
 
@@ -247,7 +239,7 @@ sub format_kv ($) {
 	}
 
 	$content =~ s/\b($k)\b/${c_bold}$1${c_unbold}/  unless $is_boring_keyword;
-	return $content
+	return $c_message . $content
 }
 
 

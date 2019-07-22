@@ -15,23 +15,6 @@ use Color;
 use Output;
 
 
-## Output configuration:  ######################################################
-
-sub nowarn (&;@) { local $SIG{__WARN__} = sub { }; $_[0]->(@_) }
-
-our $linestart     = "${c_sym}●${c0} ";
-our $metalinestart = "${c_meta}●${c0} ";
-our $contlinestart = "${c_contsym}●${c0} ";
-
-my $followsep     = $c_followsep . ("⁻" x nowarn{ (GetTerminalSize())[0] // 80 }) . "${c0}\n";
-
-# As soon as the <> read pauses for more than 200ms, we print a separator line.
-# This serves to separate "tail -f"'s past output from future output.
-# This only happens once.
-# This only happens if there was some previous output (we don't need in case of "tail -f -n0").
-my $do_linesep = 200;
-
-
 ## Runtime configuration:  #####################################################
 
 use constant {
@@ -49,6 +32,23 @@ foreach (@ARGV) {
 	elsif ($_ eq '--ecma48')  { shift @ARGV; use_ecma48_colors() }
 	elsif ($_ eq '--raw')     { shift @ARGV; $raw = 1 }
 }
+
+
+## Output configuration:  ######################################################
+
+sub nowarn (&;@) { local $SIG{__WARN__} = sub { }; $_[0]->(@_) }
+
+our $linestart     = "${c_sym}●${c0} ";
+our $metalinestart = "${c_meta}●${c0} ";
+our $contlinestart = "${c_contsym}●${c0} ";
+
+my $followsep     = $c_followsep . ("⁻" x nowarn{ (GetTerminalSize())[0] // 80 }) . "${c0}\n";
+
+# As soon as the <> read pauses for more than 200ms, we print a separator line.
+# This serves to separate "tail -f"'s past output from future output.
+# This only happens once.
+# This only happens if there was some previous output (we don't need in case of "tail -f -n0").
+my $do_linesep = 200;
 
 
 ## Line-separator functions:  ##################################################
