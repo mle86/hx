@@ -48,6 +48,8 @@ Use the \fB--ecma48\fR option
 if you want \fBhx\fR to use ECMA-48-compatible ANSI sequences only.
 This will lead to less colorful output
 but should increase compatibility.
+Alternatively, the \fIHX_COLORS\fR environment variable can be used
+to manually set all coloring to compatible sequences.
 .P
 The default colors are optimized for a black terminal background.
 .SS Coloring Rationale
@@ -125,6 +127,175 @@ File basenames will be \fIbolded\fR.
 .IP - 2
 The syslog prefix \(lqmessage repeated N times: [\(rq
 will be colored \fIblue\fR.
+.SH HX_COLORS ENVIRONMENT VARIABLE
+The \fIHX_COLORS\fR environment variable, if set and non-empty,
+is read on start-up for color definitions
+which will overwrite the default colors
+(described in the \(lqOutput\(rq section above).
+.P
+The variable supports section\(emcolor assignments
+like this: \(lq\fBap=38;5;90\fR\(rq.
+This assigns the ANSI color 38;5;90 (dark violet)
+to the \fIap\fR section (app name/PID).
+.P
+Multiple assignments must be separated with colons (\fB:\fR).
+Multiple assignments to the same section overwrite earlier assignments.
+If the equals sign is not followed by a digit, the trailing part is assumed to be a section name;
+for example, \(lq\fBap=hn\fR\(rq assigns the \fIhn\fR (hostname) color to \fIap\fR (app/PID).
+The special section name \(lq\fB*\fR\(rq
+assigns a color definition
+to all sections not previously assigned in the variable.
+.SS Valid sections:
+.TP
+.B SY
+The line-start symbol in case of a normal line.
+.TP
+.B ML
+The line-start symbol in case of a meta line (such as \(lqtail\ -f\(rq filename headers).
+Also the meta line content.
+.TP
+.B CL
+The line-start symbol in case of a continuation line.
+.TP
+.B RP
+Syslog repeated message wrapper.
+.TP
+.B FS
+Separator line on input read pause.
+.TP
+.B dt
+Date/time.
+.TP
+.B ap
+Application name or process ID (PID).
+.TP
+.B hn
+Source hostname.
+.TP
+.B ix
+Informational message prefix.
+.TP
+.B in
+Informational message suffix.
+.TP
+.B le
+Log levels \fIerror\fR and higher.
+.TP
+.B lw
+Log levels \fIwarning\fR and higher.
+.TP
+.B ll
+All other log levels.
+.TP
+.B ms
+Message content.
+.TP
+.B er
+Error class name or error code.
+.TP
+.B eq
+Error class namespace.
+.TP
+.B tr
+Stack traces
+and error source (file/lineno).
+.TP
+.B st
+Exception stacks.
+.TP
+.B sm
+Exception stack single messages (only if more than one).
+.TP
+.B h1
+HTTP\ 1xx status codes (Informational).
+.TP
+.B h2
+HTTP\ 2xx status codes (Success).
+.TP
+.B h3
+HTTP\ 3xx status codes (Redirection).
+.TP
+.B h4
+HTTP\ 4xx status codes (Client Error).
+.TP
+.B h5
+HTTP\ 5xx status codes (Server Error).
+.TP
+.B h6
+HTTP\ 4xx status codes considered less important,
+such as HTTP\ 404\~Not Found.
+.TP
+.B *
+All sections not previously assigned.
+.SS Defaults
+By default,
+\fBhx\fR produces output
+as if it had been given
+this \fIHX_COLORS\fR value:
+.P
+.ad l
+.RS 2
+\fBSY\fR=33:\:\
+\fBCL\fR=38;2;113;97;25:\:\
+\fBML\fR=38;2;114;204;204:\:\
+\fBFS\fR=32;2:\:\
+\fBRP\fR=34:\:\
+\fBdt\fR=SY:\:\
+\fBhn\fR=SY:\:\
+\fBap\fR=SY:\:\
+\fBms\fR=0:\:\
+\fBll\fR=SY:\:\
+\fBlw\fR=38;5;220:\:\
+\fBle\fR=38;2;255;145;36:\:\
+\fBin\fR=38;5;243:\:\
+\fBix\fR=38;2;125;117;83:\:\
+\fBtr\fR=in:\:\
+\fBst\fR=in:\:\
+\fBsm\fR=ms:\:\
+\fBeq\fR=ms:\:\
+\fBer\fR=1:\:\
+\fBh1\fR=38;2;202;214;98:\:\
+\fBh2\fR=38;2;98;214;113:\:\
+\fBh3\fR=h1:\:\
+\fBh4\fR=38;2;235;41;41:\:\
+\fBh5\fR=38;5;199;1:\:\
+\fBh6\fR=38;2;155;72;72
+.RE
+.ad b
+.P
+When using the \fB--ecma48\fR option,
+\fBhx\fR uses output settings
+equivalent to these \fIHX_COLORS\fR settings:
+.P
+.ad l
+.RS 2
+\fBSY\fR=33:\:\
+\fBCL\fR=33;2:\:\
+\fBML\fR=36:\:\
+\fBFS\fR=32;2:\:\
+\fBRP\fR=34:\:\
+\fBdt\fR=SY:\:\
+\fBhn\fR=SY:\:\
+\fBap\fR=SY:\:\
+\fBms\fR=0:\:\
+\fBll\fR=33:\:\
+\fBlw\fR=33;1:\:\
+\fBle\fR=33;1:\:\
+\fBin\fR=37;2:\:\
+\fBix\fR=in:\:\
+\fBtr\fR=in:\:\
+\fBst\fR=in:\:\
+\fBsm\fR=ms:\:\
+\fBeq\fR=ms:\:\
+\fBer\fR=1:\:\
+\fBh1\fR=33:\:\
+\fBh2\fR=32:\:\
+\fBh3\fR=h1:\:\
+\fBh4\fR=31;1:\:\
+\fBh5\fR=31;1:\:\
+\fBh6\fR=31
+.RE
+.ad b
 .SH STANDARDS
 .ad l
 .IR "Control Functions for Character-Imaging I/O Devices" ,

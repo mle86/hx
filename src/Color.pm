@@ -81,4 +81,66 @@ sub use_ecma48_colors () {
 }
 
 
+## Parse env var:  #############################################################
+
+sub read_color_defs ($) {
+	my %is_assigned = ();
+	my %map = (
+		SY => \$c_sym,
+		ML => \$c_meta,
+		CL => \$c_contsym,
+		RP => \$c_rpt,
+		FS => \$c_followsep,
+
+		dt => \$c_date,
+		ap => \$c_app,
+		hn => \$c_host,
+
+		ix => \$c_info_prefix,
+		in => \$c_info,
+
+		ms => \$c_message,
+		er => \$c_exception_scn,
+		eq => \$c_exception_fqcn,
+
+		tr => \$c_trace,
+		st => \$c_stack,
+		sm => \$c_stack_msg,
+
+		ll => \$c_loglevel,
+		lw => \$c_loglevel_warn,
+		le => \$c_loglevel_err,
+
+		h1 => \$c_http_info,
+		h2 => \$c_http_success,
+		h3 => \$c_http_redir,
+		h4 => \$c_http_client_failure,
+		h6 => \$c_http_client_error,
+		h5 => \$c_http_server_error,
+	);
+
+	foreach my $assignment (split /:/, $_[0]) {
+		my ($k, $v) = split /=/, $assignment;
+
+		my $setto;
+		if    ($v =~ m/^\d/)                  { $setto = "\033[${v}m" }
+		elsif (defined(my $ref = $map{ $v })) { $setto = $$ref }
+		else { die "invalid assignment value: '${k}=${v}'" }
+
+		if ($k eq '*') {
+			foreach $k (keys %map) {
+				${$map{$k}} = $setto  unless $is_assigned{$k}
+			}
+			next
+		}
+
+		my $varname = $map{ $k }
+			or die "invalid section name: '${k}'";
+
+		$$varname = $setto;
+		$is_assigned{ $k } = 1;
+	}
+}
+
+
 1

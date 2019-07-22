@@ -33,6 +33,8 @@ foreach (@ARGV) {
 	elsif ($_ eq '--raw')     { shift @ARGV; $raw = 1 }
 }
 
+read_color_defs($ENV{'HX_COLORS'})  if (defined $ENV{'HX_COLORS'} && $ENV{'HX_COLORS'} ne '');
+
 
 ## Output configuration:  ######################################################
 
