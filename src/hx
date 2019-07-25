@@ -49,14 +49,23 @@ $linestart     = ($c_sym     . $linestart     . $c0)  if $linestart ne '';
 $contlinestart = ($c_contsym . $contlinestart . $c0)  if $contlinestart ne '';
 $metalinestart = ($c_meta    . $metalinestart . $c0)  if $metalinestart ne '';
 
-our $str_linesep;  # Line separator character. See Settings.pm.
-my $followsep     = $c_followsep . ($str_linesep x nowarn{ (GetTerminalSize())[0] // 80 }) . "${c0}\n";
-
 # As soon as the <> read pauses for more than 200ms, we print a separator line.
 # This serves to separate "tail -f"'s past output from future output.
 # This only happens once.
 # This only happens if there was some previous output (we don't need in case of "tail -f -n0").
 our $do_linesep;  # Line separator pause time (ms). See Settings.pm.
+our $str_linesep;  # Line separator character. See Settings.pm.
+my $rpt_linesep;
+
+{
+	local $str_linesep = $str_linesep;
+	utf8::decode($str_linesep);
+	my $len_linesep = length $str_linesep;
+	my $width = nowarn{ (GetTerminalSize())[0] // 80 };
+	$rpt_linesep = $width / $len_linesep;
+}
+
+my $followsep = $c_followsep . ($str_linesep x $rpt_linesep) . "${c0}\n";
 
 
 ## Line-separator functions:  ##################################################
