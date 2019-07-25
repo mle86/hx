@@ -13,6 +13,7 @@ use Regexes;
 use Token qw(:types);
 use Color;
 use Output;
+use Settings;
 
 
 ## Runtime configuration:  #####################################################
@@ -34,15 +35,19 @@ foreach (@ARGV) {
 }
 
 read_color_defs($ENV{'HX_COLORS'})  if (defined $ENV{'HX_COLORS'} && $ENV{'HX_COLORS'} ne '');
+read_settings(undef);
 
 
 ## Output configuration:  ######################################################
 
 sub nowarn (&;@) { local $SIG{__WARN__} = sub { }; $_[0]->(@_) }
 
-our $linestart     = "${c_sym}●${c0} ";
-our $metalinestart = "${c_meta}●${c0} ";
-our $contlinestart = "${c_contsym}●${c0} ";
+our $linestart;
+our $metalinestart;
+our $contlinestart;
+$linestart     = ($c_sym     . $linestart     . $c0)  if $linestart ne '';
+$contlinestart = ($c_contsym . $contlinestart . $c0)  if $contlinestart ne '';
+$metalinestart = ($c_meta    . $metalinestart . $c0)  if $metalinestart ne '';
 
 my $followsep     = $c_followsep . ("⁻" x nowarn{ (GetTerminalSize())[0] // 80 }) . "${c0}\n";
 
@@ -50,7 +55,7 @@ my $followsep     = $c_followsep . ("⁻" x nowarn{ (GetTerminalSize())[0] // 80
 # This serves to separate "tail -f"'s past output from future output.
 # This only happens once.
 # This only happens if there was some previous output (we don't need in case of "tail -f -n0").
-my $do_linesep = 200;
+our $do_linesep;  # Line separator pause time (ms). See Settings.pm.
 
 
 ## Line-separator functions:  ##################################################
