@@ -35,7 +35,7 @@ foreach (@ARGV) {
 }
 
 read_color_defs($ENV{'HX_COLORS'})  if (defined $ENV{'HX_COLORS'} && $ENV{'HX_COLORS'} ne '');
-read_settings(undef);
+read_settings($ENV{'HX_SETTINGS'} // undef);
 
 
 ## Output configuration:  ######################################################
@@ -49,7 +49,8 @@ $linestart     = ($c_sym     . $linestart     . $c0)  if $linestart ne '';
 $contlinestart = ($c_contsym . $contlinestart . $c0)  if $contlinestart ne '';
 $metalinestart = ($c_meta    . $metalinestart . $c0)  if $metalinestart ne '';
 
-my $followsep     = $c_followsep . ("⁻" x nowarn{ (GetTerminalSize())[0] // 80 }) . "${c0}\n";
+our $str_linesep;  # Line separator character. See Settings.pm.
+my $followsep     = $c_followsep . ($str_linesep x nowarn{ (GetTerminalSize())[0] // 80 }) . "${c0}\n";
 
 # As soon as the <> read pauses for more than 200ms, we print a separator line.
 # This serves to separate "tail -f"'s past output from future output.

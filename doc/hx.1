@@ -296,6 +296,84 @@ equivalent to these \fIHX_COLORS\fR settings:
 \fBh6\fR=31
 .RE
 .ad b
+.SH HX_SETTINGS ENVIRONMENT VARIABLE
+The \fIHX_SETTINGS\fR environment variable,
+if set and non-empty,
+is read on start-up
+to change various run-time settings.
+.P
+Boolean options can be switched on simply by including their option keyword
+and switched off by prefixing them with \(lq\fBno\fR\(rq.
+For example, the \fB--ecma48\fR compatibility output mode
+is enabled by adding the \(lq\fIecma48\fR\(rq keyword
+to the variable
+and explicitly disabled
+by adding the \(lq\fInoecma48\fR\(rq keyword.
+Some options take an optional or required value;
+supply it after an equals sign (\fB=\fR).
+Option values may be enclosed with doublequotes (\fB\(dq\fR).
+This is required for values which contain spaces or doublequotes
+(which must be escaped with backslashes).
+Multiple option keywords must be separated by one or more spaces.
+.SS Supported options:
+.TP
+.BR ecma48 ", " 48
+Enables the compatibility output mode.
+Equivalent to the \fB--ecma48\fR command line option.
+.br
+Default: disabled.
+.TP
+\fBpausewait\fR[\fB=\fR\fIdelay\fR], \fBpw\fR
+Enables printing the separator line once
+as soon as the input pauses for as least \fIdelay\fR milliseconds.
+(The \fIdelay\fR default is \fB200\fR if missing.)
+Has no effect if \fBpausesep\fR is unset.
+.br
+Default: enabled, 200ms.
+.TP
+\fBpausesep\fR[=\fIchar\fR], \fBps\fR
+Enables printing the separator line once
+as soon as the input pauses for several milliseconds.
+The line will consist of this \fIchar\fR,
+repeated until the terminal line is filled.
+(The \fIchar\fR default is \(lq\fB\[u207B]\fR\(rq if missing.)
+Has no effect if \fBpausewait\fR is unset.
+.TP
+\fBlineprefix\fR=\fIsymbol\fR, \fBpx\fR
+Enables or disables line prefixes
+for all line types at once.
+See \fBloglineprefix\fR,
+\fBmetalineprefix\fR,
+and \fBcontlineprefix\fR below.
+.br
+Default: enabled, \(dq\[u25CF] \(dq.
+.TP
+\fBloglineprefix\fR=\fIsymbol\fR, \fBlp\fR
+Line prefix string for regular output lines.
+(See \fBlineprefix\fR.)
+.TP
+\fBcontlineprefix\fR=\fIsymbol\fR, \fBcp\fR
+Line prefix string for continuation lines.
+(See \fBlineprefix\fR.)
+.TP
+\fBmetalineprefix\fR=\fIsymbol\fR, \fBmp\fR
+Line prefix string for meta lines.
+(See \fBlineprefix\fR.)
+.SS Defaults:
+By default,
+\fBhx\fR produces output
+as if it had been given
+this \fIHX_SETTINGS\fR value:
+.P
+.ad l
+.RS 2
+\fBpx\fR=\(dq\[u25CF] \(dq \
+\fBps\fR=\(dq\[u207B]\(dq \
+\fBpw\fR=200 \
+\fBno48\fR 
+.RE
+.ad b
+.P
 .SH STANDARDS
 .ad l
 .IR "Control Functions for Character-Imaging I/O Devices" ,
