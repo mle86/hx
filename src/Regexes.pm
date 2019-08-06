@@ -14,6 +14,7 @@ use vars qw(
 	$re_mysqld
 	$re_dmesg_ts $re_dmesg_app
 	$re_tail_filename
+	$re_cron_cmd
 	$re_kv
 	$re_ansi_color
 );
@@ -87,6 +88,8 @@ our $re_dmesg_ts  = qr/(?:\[\d+${re_ms}?\])/;
 our $re_dmesg_app = qr/(?:[A-Za-z0-9][\w\-\.]*(?: [\w\-\.:]+)?)/;
 
 our $re_tail_filename = qr/(?:(?<prefix>==+> +)(?<filename>$re_path)(?<suffix> +<==+\s*$))/;
+
+our $re_cron_cmd = qr/(?<user>\([\w\-]+\))(?<prefix> CMD \( +)(?<cmd>.+)(?<suffix>\)\s*$)/;
 
 our $re_kv = qr/(?<k>\w[\w\.\-]*)(?<s>[=:])(?<v>"[^"]*+"|<[^>]*+>|[^\s,]*+)(?=\s|,|$)/;
 

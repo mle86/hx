@@ -383,6 +383,14 @@ sub lex_next_line {
 				push @output, Token->new(T_KV, $2, k => $+{'k'}, src => 'postfix');
 			}
 		}
+	} elsif ($message_isolated && s#^$re_cron_cmd##) {
+		# Cron syslog entry: (username) CMD ( cmd)
+		push @output,
+			Token->new(T_USERNAME, $+{'user'}),
+			Token->new(T_INFO, $+{'prefix'});
+		unshift @suffix,
+			Token->new(T_INFO, $+{'suffix'});
+		$_ = $+{'cmd'}
 	}
 
 
