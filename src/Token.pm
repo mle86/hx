@@ -54,17 +54,17 @@ package Token;
 
 use overload '""' => \&serialize;
 
-my $typesep = '|';
+#my $typesep = '|';
 my $attrsep = ',';
 
-my $re_typesep = quotemeta $typesep;
+#my $re_typesep = quotemeta $typesep;
 my $re_attrsep = quotemeta $attrsep;
 my $re_type = qr/(?:[A-Z][A-Z0-9]{0,3})/;
 my $re_attr = qr/(?:(?<k>[a-z][a-z0-9\-\.]*)=(?<v>[a-z0-9\-\.]*))/;
 my $re_text = qr/(?:(?:\\.|[^\\)])*+)/;
 
 my $re_token_serialization = qr/
-	(?<types> ${re_type} (?:${re_typesep}${re_type})* )
+	(?<type> ${re_type} )
 	(?: \[ (?<attrs> ${re_attr} (?:${re_attrsep}${re_attr})* )? \] )?
 	(?: \( (?<text> ${re_text}) \) )?
 	(?:\s|$)/x;
@@ -75,9 +75,7 @@ my $re_token_serialization = qr/
 sub new ($$;$%) {
 	my ($class, $type, $content, %attributes) = @_;
 
-	$type = [$type]  unless (ref $type eq 'ARRAY');
-
-	if (defined $content && $content eq "\n" && ($type->[0] eq T_EMPTYLINE || $type->[0] eq T_EOL)) {
+	if (defined $content && $content eq "\n" && ($type eq T_EMPTYLINE || $type eq T_EOL)) {
 		undef $content;
 	}
 
@@ -94,7 +92,7 @@ sub unserialize ($$) {
 	$str =~ m/^$re_token_serialization/
 	  or die "invalid token serialization: '${str}'";
 
-	my @types = split /$re_typesep/, $+{'types'};
+	my $type = $+{'type'};
 	my %attributes = map{ split /=/ } split /$re_attrsep/, ($+{'attrs'} // '');
 	my $text = $+{'text'};
 
@@ -104,7 +102,7 @@ sub unserialize ($$) {
 		$text =~ s/\\(.)/$1/g;
 	}
 
-	return new($class, \@types, $text, %attributes);
+	return new($class, $type, $text, %attributes);
 }
 
 sub unserialize_all ($$) {
@@ -124,11 +122,12 @@ sub unserialize_all ($$) {
 
 ## Methods:
 
+
 sub serialize ($) {
 	my $self = $_[0];
 	local $1;
 
-	my $output = join($typesep, @{$self->{'type'}});
+	my $output = $self->{'type'};
 
 	if ($self->{'attributes'} && (my %attrs = %{$self->{'attributes'}})) {
 		$output .= '[' . (join $attrsep, map { $_ . '=' . $attrs{$_} } keys %attrs) . ']';
@@ -145,12 +144,12 @@ sub serialize ($) {
 
 sub is ($$) {
 	my ($self, $type) = @_;
-	foreach (@{$self->{'type'}}) { return 1 if $_ eq $type }
+	return 1 if $self->{'type'} eq $type;
 }
 
 sub is_line ($) {
-	my ($self) = ($_[0]);
-	foreach (@{$self->{'type'}}) { return 1 if ($_ eq T_LINE || $_ eq T_METALINE || $_ eq T_EMPTYLINE || $_ eq T_CONTLINE) }
+	my $t = $_[0]->{'type'};
+	return 1 if ($t eq T_LINE || $t eq T_METALINE || $t eq T_EMPTYLINE || $t eq T_CONTLINE)
 }
 
 sub attr ($$) {
@@ -167,7 +166,6 @@ sub content ($) {
 
 	$self->{'content'}
 }
-
 
 
 1

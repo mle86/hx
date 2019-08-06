@@ -34,34 +34,30 @@ sub format_token ($;%) {
 	return format_rpt($token->content())  if $token->is(T_REPEAT);
 	return format_rpt($token->content())  if $token->is(T_REPEATEND);
 	return format_http($token->content())  if $token->is(T_HTTP_STATUS);
-	return format_json($token)  if $token->is(T_JSON);
-
+	return format_json($token->content(), $opt{'had_message'})  if $token->is(T_JSON);
 	return format_kv($token, $opt{'line'})  if $token->is(T_KV);
 
-	if ($token->is(T_INFO)) {
-		my $content = $token->content();
+	my $content = $token->content();
 
-		if ($token->is(T_WRAP)) {
-			$content = format_wrapbegin($content);
-		} elsif ($token->is(T_JSON)) {
-			$content = format_json($content);
-		} elsif ($token->attr('type') eq 'rfc-5424-sd') {
+	if ($token->is(T_INFO) || $token->is(T_CLIENT) || $token->is(T_USERNAME) || $token->is(T_WRAP) || $token->is(T_WRAPEND)) {
+
+		if ($token->attr('type') eq 'rfc-5424-sd') {
 			# reformat RFC-5424-style Structured Data elements
 			$content = format_rfc5424_sd($content);
 		}
+
+		$content = format_wrapbegin($content)  if $token->is(T_WRAP);
 
 		$content = ($opt{'had_message'})
 			? format_info($content)
 			: format_info_prefix($content);
 
-		if ($token->is(T_WRAPEND)) {
-			$content = format_wrapend($content);
-		}
+		$content = format_wrapend($content)  if $token->is(T_WRAPEND);
 
 		return $content;
 	}
 
-	return format_message($token->content())
+	return format_message($content)
 }
 
 ## Formatting functions:  ######################################################
@@ -111,8 +107,8 @@ sub format_fncall ($) {
 }
 
 sub format_json ($) {
-	my ($out, $token, $in) = ('', $_[0], $_[0]->content());
-	my ($c_hi, $c_lo, $c_json) = ($c_bold, $c_unbold, $token->is(T_INFO) ? $c_info : $c_message);
+	my ($out, $in, $had_message) = ('', $_[0], $_[1]);
+	my ($c_hi, $c_lo, $c_json) = ($c_bold, $c_unbold, $had_message ? $c_info : $c_message);
 
 	while ($in ne '') {
 		if ($in =~ s/^$re_json_string(?<rest>\s*:\s*)//) {

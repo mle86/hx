@@ -113,7 +113,7 @@ sub striphttpstatus ($;$) {
 	return unless ($_[0] =~ s/^$re_http//);
 	return (
 		$+{'hs0'} ? Token->new($type, $+{'hs0'}) : undef,
-		Token->new([$type, T_HTTP_STATUS], $+{'hs'}),
+		Token->new(T_HTTP_STATUS, $+{'hs'}),
 		$+{'hs1'} ? Token->new($type, $+{'hs1'}) : undef,
 	)
 }
@@ -198,9 +198,9 @@ sub lex_next_line {
 		# Apache2 custom format
 		push @output, Token->new(T_HOST, $+{'vh'} . ' ', type => 'vhost')  if $+{'vh'};
 		push @output,
-			Token->new([T_INFO, T_CLIENT], $+{'cl'} . ' '),  # client addr/hostname
-			Token->new([T_INFO, T_USERNAME], $+{'id'} . ' ', type => 'ident'),  # identd logname
-			Token->new([T_INFO, T_USERNAME], $+{'un'} . ' ', type => 'basic'),  # http basic username
+			Token->new(T_CLIENT, $+{'cl'} . ' '),  # client addr/hostname
+			Token->new(T_USERNAME, $+{'id'} . ' ', type => 'ident'),  # identd logname
+			Token->new(T_USERNAME, $+{'un'} . ' ', type => 'basic'),  # http basic username
 			Token->new(T_DATE, $+{'ts'} . ' ', format => 'a2');
 		$is_apache = 1;
 		$message_isolated = 1;
@@ -228,14 +228,14 @@ sub lex_next_line {
 		# Euv continuation:
 		push @output,
 			Token->new(T_DATE, $1 . ' '),
-			Token->new([T_MESSAGE, T_ERROR], $2),
+			Token->new(T_ERROR, $2),
 			Token->new(T_MESSAGE, $3);
 		$message_isolated = 1;
 	} elsif (s/^(PHP Fatal error: )( ?Uncaught )($re_exception)//) {
 		push @output,
 			Token->new(T_APP, $1),
 			Token->new(T_MESSAGE, $2),
-			Token->new([T_MESSAGE, T_ERROR], $3);
+			Token->new(T_ERROR, $3);
 		$message_isolated = 1;
 	} elsif (s/^($re_ymd $re_time(?:,\d+)?:)($re_loglevel:)([^:]+:)//) {
 		# LetsEncrypt/certbot
@@ -259,13 +259,13 @@ sub lex_next_line {
 		push @output, Token->new(T_LOGLEVEL, $2, read_loglevel($2))  if $2;
 		push @output, Token->new(T_APP, $3);
 		push @output, Token->new(T_INFO, $4)  if $4;
-		push @output, Token->new([T_INFO, T_WRAP], $5 . ($6 // ''));
+		push @output, Token->new(T_WRAP, $5 . ($6 // ''));
 		$is_nginx_fastcgi = 1;
 		$message_isolated = 1;
 		$loglevel_isolated = 1  if $2;
 		if (s/(")((?: while reading response header from upstream)?, client: ${re_client}, (?:server:|request:).*)$//s) {
 			# end of fastcgi message should not affect main message parsing, it's a mostly boring wrapper -- so cut it out and put it into $suffix
-			unshift @suffix, Token->new([T_INFO, T_WRAPEND], $1 . $2);
+			unshift @suffix, Token->new(T_WRAPEND, $1 . $2);
 		}
 	} elsif (s/^($re_ymd $re_time$re_ms?|($re_ts8601)|$re_tsw|$re_sects|\[$re_ymd $re_time$re_ms?\])( |:|$)//) {
 		my %attr = ($2) ? (type => '8601') : ();
@@ -302,7 +302,7 @@ sub lex_next_line {
 	my $re_info_brackets = '(?:\\[[^\\]]+\\])';
 	if (s/^((?=\[?\{")$re_json)$//) {
 		# JSON-only line:
-		push @output, Token->new([T_MESSAGE, T_JSON], $1);
+		push @output, Token->new(T_JSON, $1);
 	} elsif ($message_isolated && s/^($re_info_brackets(?: *$re_info_brackets)*)( *)//) {
 		my %attr = ($is_rfc5424) ? (type => 'rfc-5424-sd') : ();
 		push @output, Token->new(T_INFO, $1, %attr);
@@ -319,20 +319,20 @@ sub lex_next_line {
 
 	if ($message_isolated && s/^( *(?:PHP message:  ?)?(?:PHP Fatal error:  ?)?(?:Uncaught )?)($re_exception)(: +)//) {
 		push @output, Token->new(T_MESSAGE, $1)  if $1;
-		push @output, Token->new([T_MESSAGE, T_ERROR], $2);
+		push @output, Token->new(T_ERROR, $2);
 		push @output, Token->new(T_MESSAGE, $3);
 		$exception_isolated = 1;
 	}
 
 	if ($message_isolated && $is_apache && s/^($re_a2err:) //) {
 		# apache2: "AH01620: Could not open..."
-		push @output, Token->new([T_MESSAGE, T_ERROR], $1 . ' ');
+		push @output, Token->new(T_ERROR, $1 . ' ');
 		$exception_isolated = 1;
 	} elsif ($message_isolated && $is_apache && s/^((?:\(\d+\))?\w+(?: \w+)*: )($re_a2clnt )?($re_a2err:) //) {
 		# apache2: "(13)Permission denied: [client 00.000.000.00:0000] AH01620: Could not open..."
 		push @output, Token->new(T_MESSAGE, $1);
 		push @output, Token->new(T_MESSAGE, $2)  if $2;
-		push @output, Token->new([T_MESSAGE, T_ERROR], $3 . ' ');
+		push @output, Token->new(T_ERROR, $3 . ' ');
 		$exception_isolated = 1;
 	}
 
@@ -347,7 +347,7 @@ sub lex_next_line {
 		push @output, Token->new(T_MESSAGE, $message);
 		push @output, striphttpstatus($info)  if $info;
 		push @output, Token->new(T_INFO, $info)  if $info;
-		push @output, Token->new([T_ERROR, T_STACK], $stack)  if $stack;
+		push @output, Token->new(T_STACK, $stack)  if $stack;
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
 		$text_isolated = 1;
 	} elsif ($message_isolated && s#^(.+?)( (?:in|at) $re_abspath(?:$re_lineno)?\b)(\s*$)##) {
@@ -367,7 +367,7 @@ sub lex_next_line {
 	} elsif ($message_isolated && s#("[A-Z]\w* [^"]+?") (\d+)( .*)$##) {
 		# Apache2 log
 		push @output, Token->new(T_MESSAGE, $1 . ' ');
-		push @output, Token->new([T_MESSAGE, T_HTTP_STATUS], $2);
+		push @output, Token->new(T_HTTP_STATUS, $2);
 		push @output, Token->new(T_INFO, $3);
 		$text_isolated = 1;
 	} elsif ($message_isolated && $is_postfix) {
@@ -375,7 +375,7 @@ sub lex_next_line {
 			push @output, Token->new(T_MESSAGE, $1);
 			while (s/^(, ?)?($re_kv)//) {
 				push @output, Token->new(T_MESSAGE, $1)  if $1;
-				push @output, Token->new([T_MESSAGE, T_KV], $2, k => $+{'k'}, src => 'postfix');
+				push @output, Token->new(T_KV, $2, k => $+{'k'}, src => 'postfix');
 			}
 		}
 	}
@@ -408,13 +408,13 @@ sub lex_next_line {
 	# Trailing Symfony JSON data:
 	if ($message_isolated && s/((?=\{")$re_json) (?<rest>\[[^\]]*\] *$)//) {
 		unshift @suffix,
-			Token->new([T_INFO, T_JSON], $1),
+			Token->new(T_JSON, $1),
 			Token->new(T_INFO, ' ' . $+{'rest'});
 	}
 
 #	# JSON-only line:
 #	if (!$message_isolated && s/^((?=\{")$re_json)$//) {
-#		push @output, Token->new([T_MESSAGE, T_JSON], $1);
+#		push @output, Token->new(T_JSON, $1);
 #	}
 
 	if ($message_isolated && $is_postfix && s/(\s*\(.+\))$//) {
