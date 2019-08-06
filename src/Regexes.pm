@@ -33,7 +33,7 @@ our $re_continuation_line = qr/(?:^\s*(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
-our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+)/;
+our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+|, line \d+)/;
 
 our $re_loglevel = qr/(?:(?:PHP )?(?i:warn|warning|warnung|err|error|fehler|info|information|note|notice|hinweis|crit|critical|schwerwiegend|emerg|emergency|debug|dbg|alrt|alert|parse error|fatal error))/;
 
@@ -56,8 +56,8 @@ my  $re_excn      = qr/(?:(?:[A-Z][A-Za-z0-9_]*)?(?:[Ee]xception|[Ee]rror)|Excep
 my  $re_ex_code   = qr/(?:\/\d+|\(code:? \d+\))/;
 our $re_exception = qr/(?:(?:$re_fqcn|$re_excn)$re_ex_code?)/;
 
-our $re_abspath = qr/(?:\/[a-z]+[a-z0-9]+(?:\/[a-zA-Z0-9\-_\.\$]+)+)/;
-my  $re_relpath = qr/(?:(?:[A-Za-z0-9\-_\.\$]+\/)*[A-Za-z0-9\-_\.\$]+)/;
+our $re_abspath = qr/(?:\/[a-z]+[a-z0-9]+(?:\/[a-zA-Z0-9\-_\.\+\$]+)+)/;
+my  $re_relpath = qr/(?:(?:[A-Za-z0-9\-_\.\+\$]+\/)*[A-Za-z0-9\-_\.\+\$]+)/;
 our $re_path    = qr/(?:$re_abspath|$re_relpath)/;
 
 our $re_time   = qr/(?:\d\d:\d\d:\d\d)/;
