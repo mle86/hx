@@ -317,7 +317,7 @@ sub lex_next_line {
 		push @output, Token->new(T_INFO, $1 . ' ');
 	}
 
-	if ($message_isolated && !$loglevel_isolated && s/^(<$re_loglevel>  ?|$re_loglevel:  ?)//) {
+	if ($message_isolated && !$loglevel_isolated && s/^(<$re_loglevel>  ?|$re_loglevel:  ?|$re_loglevel - )//) {
 		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
 		$loglevel_isolated = 1;
 	}
