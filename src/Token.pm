@@ -144,12 +144,12 @@ sub serialize ($) {
 
 sub is ($$) {
 	my ($self, $type) = @_;
-	return 1 if $self->{'type'} eq $type;
+	return ($self->{'type'} eq $type)
 }
 
 sub is_line ($) {
 	my $t = $_[0]->{'type'};
-	return 1 if ($t eq T_LINE || $t eq T_METALINE || $t eq T_EMPTYLINE || $t eq T_CONTLINE)
+	return ($t eq T_LINE || $t eq T_METALINE || $t eq T_EMPTYLINE || $t eq T_CONTLINE)
 }
 
 sub attr ($$) {
