@@ -1,4 +1,4 @@
-.PHONY : all install
+.PHONY : all install test
 
 BIN=src/hx
 DEST=/usr/local/bin/hx
@@ -19,4 +19,8 @@ install: $(BIN)
 	cp doc/hx.1 /usr/local/share/man/man1/
 	chmod 0644 /usr/local/share/man/man1/hx.1
 	gzip -f /usr/local/share/man/man1/hx.1
+
+test:
+	git submodule update --init test/framework/
+	test/run-all-tests.sh
 

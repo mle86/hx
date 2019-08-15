@@ -1,3 +1,6 @@
 [submodule "doc/man-to-md"]
 	path = doc/man-to-md
 	url = https://github.com/mle86/man-to-md.git
+[submodule "test/framework"]
+	path = test/framework
+	url = https://github.com/mle86/sh-tests.git
