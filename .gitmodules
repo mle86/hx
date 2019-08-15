@@ -1,0 +1,3 @@
+[submodule "doc/man-to-md"]
+	path = doc/man-to-md
+	url = https://github.com/mle86/man-to-md.git
