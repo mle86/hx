@@ -35,6 +35,17 @@ or a trailing error source filename.
 It is well suited for handling running logs
 such as returned by “**tail&nbsp;-f /var/log/syslog**”.
 
+# Installation
+
+```
+# make install
+```
+
+This will copy the hx script to <code>/usr/local/bin/<b>hx</b></code>
+and the man page to <code>/usr/local/share/man/man1/<b>hx.1</b>.gz</code>.
+
+
+
 # Options
 
 
