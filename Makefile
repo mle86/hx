@@ -7,6 +7,10 @@ CHOWN=root:root
 
 all: ;
 
+README.md: doc/hx.1
+	git submodule update --init doc/man-to-md/
+	perl doc/man-to-md.pl --word hx --formatted-code --comment <$< >$@
+
 install: $(BIN)
 	cp $(BIN) $(DEST)
 	chown $(CHOWN) $(DEST)
