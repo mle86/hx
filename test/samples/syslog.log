@@ -1,0 +1,10 @@
+Jun 16 10:27:20 test-pc rsyncd[31755]: sent 63 bytes  received 100688092 bytes  total size 100663296
+Jun 16 10:27:20 test-pc kernel: [ 2961.795960] TCP: request_sock_TCP: Possible SYN flooding on port 4444. Sending cookies.  Check SNMP counters.
+Jun  3 16:35:31 hostname2 kernel: [269611.241825] IN= OUT=eth0 SRC=2a00:1111:1111:1111:1111:0000:0000:0001 DST=ff02:0000:0000:0000:0000:0000:0000:0001 LEN=72 TC=0 HOPLIMIT=255 FLOWLBL=0 PROTO=ICMPv6 TYPE=135 CODE=0 
+Jun 16 04:47:07 hostname2 postfix/qmgr[26782]: 832F1251C46: removed
+Jul 17 18:52:43 hostname1 gnome-software[12960]: message repeated 5 times: [ Failed to load snap icon: local snap has no icon]
+Aug  6 11:15:00 hostname1 org.gnome.Shell.desktop[19986]: [Parent 25206, Gecko_IOThread] WARNING: pipe error (47): Connection reset by peer: file /build/firefox-tGfEvD/firefox-68.0.1+build1/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 358
+Aug  6 11:15:01 hostname1 org.gnome.Shell.desktop[19986]: ###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+Aug  6 11:15:01 hostname1 CRON[16964]: (root) CMD (   test -x /etc/cron.daily/popularity-contest && /etc/cron.daily/popularity-contest --crond)
+Aug  6 11:19:25 hostname1 50-motd-news[17327]:  * Keen to learn Istio? It's included in the single-package MicroK8s.
+Jun 11 14:17:10 hostname1 dd.collector[38772]: WARNING (__init__.py:717): No matching process 'mysql' was found
