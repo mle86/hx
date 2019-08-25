@@ -2,9 +2,9 @@
 . $(dirname "$0")/init.sh
 
 
-SYSLOGLINE="$(head -n1 -- "$SYSLOG" | "$HX")"
-KERNELLINE="$(grep -m1 'OUT=eth0' -- "$SYSLOG" | "$HX")"
-REPEATLINE="$(grep -m1 'repeated 5 times' -- "$SYSLOG" | "$HX")"
+SYSLOGLINE="$(syslogline 1 | HX)"
+KERNELLINE="$(sysloggrep 'OUT=eth0' | HX)"
+REPEATLINE="$(sysloggrep 'repeated 5 times' | HX)"
 
 color_date='33'
 color_host="$color_date"

@@ -1,8 +1,13 @@
 #!/bin/sh
 
 HX="$HERE/../src/hx"
+HX () { "$HX" "$@" ; }
+
 
 SYSLOG="$HERE/samples/syslog.log"
+
+syslogline () { tail -n "+${1:-1}" -- "$SYSLOG" | head -n 1 ; }
+sysloggrep () { grep -m 1 -e "$@" -- "$SYSLOG" ; }
 
 
 # re_b
