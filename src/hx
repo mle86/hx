@@ -394,6 +394,10 @@ sub lex_next_line {
 		unshift @suffix,
 			Token->new(T_INFO, $+{'suffix'});
 		$_ = $+{'cmd'}
+	} elsif ($message_isolated && s#^((?:file )?$re_abspath(?:$re_lineno)?)(:)##) {
+		push @output,
+			Token->new(T_TRACE, $1),
+			Token->new(T_INFO, $2);
 	}
 
 

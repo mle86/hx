@@ -27,7 +27,8 @@ sub format_token ($;%) {
 	return format_loglevel($token)  if $token->is(T_LOGLEVEL);
 
 	return format_stack($token->content())  if $token->is(T_STACK);
-	return format_trace($token->content())  if $token->is(T_TRACE);
+	return format_trace($token->content())  if ($token->is(T_TRACE) && $opt{'had_message'});
+	return format_trace($token->content(), $c_info_prefix)  if $token->is(T_TRACE);
 	return format_trace($token->content())  if $token->is(T_FILENAME);
 	return format_exception($token->content())  if $token->is(T_ERROR);
 	return format_fncall($token->content())  if $token->is(T_FNCALL);
