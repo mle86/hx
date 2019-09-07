@@ -72,7 +72,7 @@ sub format_meta ($) { $c_meta . $_[0] . $c0 }
 sub _format_tracefile ($$) {
 	my ($file, $lineno) = (@_);
 	my ($c_hi, $c_lo) = ($c_bold, $c_unbold);
-	my $include_lineno_in_bold = ($lineno !~ m/(?:on line|in line)/);
+	my $include_lineno_in_bold = ($lineno !~ m/(?:on line|in line| line)/);
 
 	$c_hi . $file .
 	(($include_lineno_in_bold)
