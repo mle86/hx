@@ -348,8 +348,13 @@ sub lex_next_line {
 	if ($message_isolated && s#^(.+?)(  ?\(stack: .+\))?( \($re_exception (?:@|at|in) $re_path$re_lineno?\))##) {
 		# AEH format
 		my ($message, $stack, $rest, $info) = ($1, $2, $3, undef);
-		if ($message =~ s/((?: $re_info_brackets)+)$//) { $info = $1; }
+		if ($message =~ s/((?:  ?$re_info_brackets)+)$//) { $info = $1; }
 		push @output, Token->new(T_MESSAGE, $message);
+		if ($info =~ m/^(?<prefix>.* )(?<rest>${re_http} *)$/) {
+			# striphttpstatus only works on prefixes, but here we might have http suffixes as well:
+			push @output, Token->new(T_INFO, $+{'prefix'})  if $+{'prefix'};
+			$info = $+{'rest'};
+		}
 		push @output, striphttpstatus($info)  if $info;
 		push @output, Token->new(T_INFO, $info)  if $info;
 		push @output, Token->new(T_STACK, $stack)  if $stack;
