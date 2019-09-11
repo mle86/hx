@@ -82,7 +82,7 @@ our $re_a2date = qr/(?:\[ ?\d{1,2}\/\w{3}\/\d{4}[ :T]$re_time(?: ?$re_tz)?\])/;
 our $re_a2clnt = qr/(?:(?:\[(?:client )?$re_client(?::\d+)?\]))/;
 our $re_a2err  = qr/(?:AH\d+)/;
 
-our $re_http = qr/(?:(?<hs0> *\[)(?<hs>\d\d\d)(?<hs1>\])$)/;
+our $re_http = qr/(?:(?<hs0> *\[)(?<hs>\d\d\d)(?<hs1>\]))/;
 
 our $re_dmesg_ts  = qr/(?:\[\d+${re_ms}?\])/;
 our $re_dmesg_app = qr/(?:[A-Za-z0-9][\w\-\.]*(?: [\w\-\.:]+)?)/;

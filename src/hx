@@ -110,7 +110,7 @@ if ($mode == M_LEXER) {
 
 sub striphttpstatus ($;$) {
 	my $type = $_[1] // T_INFO;
-	return unless ($_[0] =~ s/^$re_http//);
+	return unless ($_[0] =~ s/^$re_http$//);
 	return (
 		$+{'hs0'} ? Token->new($type, $+{'hs0'}) : undef,
 		Token->new(T_HTTP_STATUS, $+{'hs'}),
