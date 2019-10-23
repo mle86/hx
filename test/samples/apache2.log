@@ -1,0 +1,1 @@
+[Tue Mar 26 20:49:29.019045 2019] [:error] [pid 54] [client 172.30.0.1:60248] PHP Warning:  mysql_free_result() expects parameter 1 to be resource, null given in /srv/db.php on line 85
