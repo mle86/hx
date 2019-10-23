@@ -35,7 +35,7 @@ our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
 our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+|, line \d+| line \d+)/;
 
-our $re_loglevel = qr/(?:(?:PHP )?(?i:warn|warning|warnung|err|error|fehler|info|information|note|notice|hinweis|crit|critical|schwerwiegend|emerg|emergency|debug[123]?|dbg|alrt|alert|parse error|fatal error))/;
+our $re_loglevel = qr/(?:(?:PHP )?(?i:warn|warning|warnung|err|error|fehler|info|information|note|notice|hinweis|crit|critical|schwerwiegend|emerg|emergency|debug[123]?|dbg|fine|alrt|alert|parse error|fatal error))/;
 
 my $re_loglevel_warn = qr/\b(?:warn|warning|warnung)\b/i;
 my $re_loglevel_err  = qr/\b(?:err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency)\b/i;
