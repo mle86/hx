@@ -11,20 +11,17 @@ strip_linesym () { perl -pe "s/^● *//g"; }
 
 assertSameTextContent () {
 	local inputLine="$1"
-	local source="$3"
+	local source="$2"
 
-	local cmp="$(
-		printf '%s' "$actualInput" |
+	local strippedOutput="$(
+		printf '%s' "$inputLine" |
 		"$HX" |
 		strip_ansi | strip_linesym )"
 
-	assertEq "$cmp" "$expectedPlainText" \
+	assertEq "$strippedOutput" "$inputLine" \
 		"hx changed its plain text input! (source: $source)"
 }
 
-
-all_lines="$(cat -- "$HERE/samples/"*)"
-n_lines="$(printf '%s' "$all_lines" | wc -l)"
 
 for logfile in "$HERE/samples/"*.log; do
 	lineno=0
