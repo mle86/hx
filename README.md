@@ -278,7 +278,7 @@ Multiple option keywords must be separated by one or more spaces.
   Default: disabled.
 * **pausewait**[**=**_delay_], **pw**  
   Enables printing the separator line once
-  as soon as the input pauses for as least _delay_ milliseconds.
+  as soon as the input pauses for at least _delay_ milliseconds.
   (The _delay_ default is **200** if missing.)
   Has no effect if **pausesep** is unset.  
   Default: enabled, 200ms.
