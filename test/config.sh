@@ -106,3 +106,9 @@ re_ztok () {
 	re_xtok "$1" "$re_content" yes
 }
 
+# re_optbrk
+#  Matches an optional linebreak.
+re_optbrk () {
+	printf '%s\n' "(?:\\\\n)?"
+}
+
