@@ -76,6 +76,12 @@ re_xtok () {
 			opt=
 		fi
 	fi
+
+	# Token contents cannot contain plain closing parentheses.
+	# To avoid cluttering all regexes in the test scripts,
+	# let's make sure our patterns match the actually expected contents:
+	re_content="$(printf '%s' "$re_content" | sed 's/\\)/\\\\\\)/g')"
+
 #	printf '%s' "(?:^|\\s)(?:$1)${re_attr}(?:\\(${re_content}\\))${opt}${RW}"
 	printf '%s' "(?:$1)${re_attr}(?:\\(${re_content}\\))${opt}${RW}"
 }
