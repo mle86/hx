@@ -24,6 +24,7 @@ assertContainsOnlyAllowedAnsiSequences () {
 assertContainsOnlyAllowedAnsiSequences "$HERE/samples/syslog.log"
 assertContainsOnlyAllowedAnsiSequences "$HERE/samples/apache2.log"
 assertContainsOnlyAllowedAnsiSequences "$HERE/samples/mysqld.log"
+assertContainsOnlyAllowedAnsiSequences "$HERE/samples/syslog-postfix.log"
 
 
 success
