@@ -292,6 +292,11 @@ sub lex_next_line {
 		push @output, Token->new(T_APP, $2 . ' ');
 		push @output, Token->new(T_INFO, $3)  if $3;
 		$loglevel_isolated = 1;
+	} elsif ($message_isolated && !$loglevel_isolated && s/^($re_loglevel) (\w[\w\.]*: )//) {
+		# LOGLEVEL componentname:
+		push @output, Token->new(T_LOGLEVEL, $1 . ' ', read_loglevel($1));
+		push @output, Token->new(T_APP, $2);
+		$loglevel_isolated = 1;
 	} elsif ($message_isolated && !$loglevel_isolated && s/^($re_loglevel) (\($re_path$re_lineno?\): )//) {
 		# LOGLEVEL (FILENAME.PY:LINENO):
 		push @output, Token->new(T_LOGLEVEL, $1 . ' ', read_loglevel($1));
