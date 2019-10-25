@@ -1,1 +1,9 @@
 [Tue Mar 26 20:49:29.019045 2019] [:error] [pid 54] [client 172.30.0.1:60248] PHP Warning:  mysql_free_result() expects parameter 1 to be resource, null given in /srv/db.php on line 85
+[Fri May 31 15:34:11.711154 2019] [proxy:warn] [pid 2197:tid 140111931162368] [client 127.0.0.1:24124] AH01144: No protocol handler was valid for the URL /foo/bar/test.php (scheme 'http'). If you are using a DSO version of mod_proxy, make sure the proxy submodules are included in the configuration using LoadModule.
+[Thu Jun 06 18:59:35.966014 2019] [authn_file:error] [pid 29838:tid 140111088789248] (13)Permission denied: [client 127.0.0.1:8092] AH01620: Could not open password file: /home/confluence/htpasswd
+[Thu Jun 06 19:00:41.796992 2019] [proxy:error] [pid 30098:tid 140111080396544] (111)Connection refused: AH00957: HTTP: attempt to connect to 127.0.0.1:8090 (localhost) failed
+[Thu Jun 06 19:00:41.797050 2019] [proxy_http:error] [pid 30098:tid 140111080396544] [client 127.0.0.1:2617] AH01114: HTTP: failed to make connection to backend: localhost
+server.hostname:80 client.addr - - [31/Mar/2019:12:45:28 +0000] "GET / HTTP/1.1" 200 228 "-" "curl/7.58.0"
+www.hostname.tld:80 127.0.50.33 - - [28/Apr/2019:15:28:14 +0200] "GET / HTTP/1.1" 302 452 "-" "Monitoring Bot"
+bb.hostname.tld:80 127.0.0.1 identUser basicUser [01/Apr/2019:17:22:03 +0200] "GET /img/upload/wf1.png HTTP/1.1" 304 165 "http://bb.hostname.tld/profile.php?UID=1&edit=1" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0"
+bb.hostname.tld:80 - - - [14/May/2019:22:17:53 +0200] "GET /bb/thread.php?TID=1&temp=1&PID=1 HTTP/1.1" 200 68449 "http://bb.hostname.tld/bb/editreply.php" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36"
