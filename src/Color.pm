@@ -71,6 +71,8 @@ sub use_ecma48_colors () {
 	$c_loglevel_err  = $c_sym . $c_bold;
 	$c_info          = '[37m' . $c_faint;
 	$c_info_prefix   = $c_info;
+	$c_trace         = $c_info;
+	$c_stack         = $c_info;
 
 	$c_http_success        = '[32m';
 	$c_http_redir          = '[33m';
