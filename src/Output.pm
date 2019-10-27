@@ -70,10 +70,10 @@ sub format_app  ($) { $c_app . $_[0] . $c0 }
 sub format_rpt ($) { $c_rpt . $_[0] . $c0 }
 sub format_meta ($) { $c_meta . $_[0] . $c0 }
 
-sub _format_tracefile ($$) {
-	my ($file, $lineno) = (@_);
-	my ($c_hi, $c_lo) = ($c_bold, $c_unbold);
+sub _format_tracefile ($$$) {
+	my ($file, $lineno, $c_context) = (@_);
 	my $include_lineno_in_bold = ($lineno !~ m/(?:on line|in line| line)/);
+	my ($c_hi, $c_lo) = _color_hi_lo($c_file_location, $c_context);
 
 	$c_hi . $file .
 	(($include_lineno_in_bold)
@@ -91,36 +91,39 @@ sub format_exception ($) {
 
 sub format_trace ($;$) {
 	my ($out, $c_base) = ($_[0], ($_[1] // $c_trace));
-	my ($c_hi, $c_lo) = ($c_bold, $c_unbold);
 
-	$out =~ s/\b([\w\-\.\$]+)($re_lineno)?(,|\)|\s*$)/ _format_tracefile($1, $2) . $3 /ge;
+	$out =~ s/\b([\w\-\.\$]+)($re_lineno)?(,|\)|\s*$)/ _format_tracefile($1, $2, $c_base) . $3 /ge;
 
 	$c_base . $out . $c0
 }
 
 sub format_fncall ($) {
 	my ($out) = ($_[0]);
-	my ($c_hi, $c_lo) = ($c_bold, $c_unbold);
+
+	my $c_context = $c_message;
+	my ($c_hi, $c_lo) = _color_hi_lo($c_function, $c_context);
 
 	$out =~ s#$re_fncall# $+{'class'} . $+{'fnp'} . $c_hi . $+{'fn'}.$+{'fn2'} . $c_lo . format_info( $+{'args'} ) #gem;
 
-	$c_message . $out
+	$c_context . $out
 }
 
 sub format_json ($) {
 	my ($out, $in, $had_message) = ('', $_[0], $_[1]);
-	my ($c_hi, $c_lo, $c_json) = ($c_bold, $c_unbold, $had_message ? $c_info : $c_message);
+	my $c_json = $had_message ? $c_info : $c_message;
+	my ($c_key_hi, $c_key_lo) = _color_hi_lo($c_key, $c_json);
+	my ($c_wrap_hi, $c_wrap_lo) = _color_hi_lo($c_json_wrap, $c_json);
 
 	while ($in ne '') {
 		if ($in =~ s/^$re_json_string(?<rest>\s*:\s*)//) {
-			$out .= $+{'jstr0'} . $c_hi . $+{'jstr'} . $c_lo . $+{'jstr1'} . $+{'rest'};
+			$out .= $+{'jstr0'} . $c_key_hi . $+{'jstr'} . $c_key_lo . $+{'jstr1'} . $+{'rest'};
 		} elsif ($in =~ s/^($re_json_string|[^\\"]+)//) {
 			$out .= $1;
 		}
 	}
 
 	if ($out =~ m/^(\s*\{)(.+)(\}\s*)\s*$/ || $out =~ m/^(\s*\[)(.+)(\]\s*)\s*$/) {
-		$out = $c_hi . $1 . $c_lo . $2 . $c_hi . $3 . $c_lo;
+		$out = $c_wrap_hi . $1 . $c_wrap_lo . $2 . $c_wrap_hi . $3 . $c_wrap_lo;
 	}
 
 	$c_json . $out . $c0
@@ -171,10 +174,10 @@ sub format_info_prefix ($;$) {
 	format_info($in, $c_info_prefix)
 }
 
-sub format_rfc5424_sd ($) {
-	my ($in, $out) = ($_[0], '');
-	my ($c_id_hi, $c_id_lo) = ($c_bold, $c_unbold);
-	my ($c_pn_hi, $c_pn_lo) = ($c_bold, $c_unbold);
+sub format_rfc5424_sd ($;$) {
+	my ($in, $out, $c_context) = ($_[0], '', $_[1]//'');
+	my ($c_id_hi, $c_id_lo) = _color_hi_lo($c_key, $c_context);
+	my ($c_pn_hi, $c_pn_lo) = _color_hi_lo($c_key, $c_context);
 
 	while ($in =~ s/^(\[)([^\s\]]+)((?: [^=]+=\"[^"]*\")*)(\] ?)//) {
 		my ($prefix, $id, $params, $suffix) = ($1, $2, $3, $4);
@@ -187,7 +190,7 @@ sub format_rfc5424_sd ($) {
 		$out .= $prefix . $c_id_hi . $id . $c_id_lo . $params_out . $suffix;
 	}
 
-	$out . $in
+	$c_context . $out . $in
 }
 
 sub format_loglevel ($) {
@@ -227,6 +230,8 @@ sub format_wrapend ($) {
 
 sub format_kv ($) {
 	my ($token, $content, $k, $is_boring_keyword) = ($_[0], $_[0]->content(), $_[0]->attr('k'));
+	my $c_context = $c_message;
+	my ($c_key_hi, $c_key_lo) = _color_hi_lo($c_key, $c_context);
 
 	if ($token->attr('src') eq 'postfix') {
 		if ($k eq 'dsn' && $content =~ m/^${re_kv}$/) {
@@ -235,8 +240,22 @@ sub format_kv ($) {
 		$is_boring_keyword = ($k =~ m/^(?:delays?|size|nrcpt)$/);
 	}
 
-	$content =~ s/\b($k)\b/${c_bold}$1${c_unbold}/  unless $is_boring_keyword;
-	return $c_message . $content
+	$content =~ s/\b($k)\b/${c_key_hi}$1${c_key_lo}/  unless $is_boring_keyword;
+	return $c_context . $content
+}
+
+# _color_hilo $hiColor $contextColor
+#  Returns a 'high' color code (unchanged)
+#  and a corresponding 'low' color code.
+#  If the 'high' color code was $c_bold, 'low' will simply be $c_unbold;
+#  in all other cases, 'low' will be SGR0 + $contextColor.
+sub _color_hi_lo ($;$) {
+	return (
+		$_[0],
+		(($_[0] eq $c_bold)
+			? $c_unbold
+			: (($_[1] eq $c0) ? $c0 : $c0.$_[1])
+		))
 }
 
 

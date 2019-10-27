@@ -217,6 +217,14 @@ to all sections not previously assigned in the variable.
   Exception stacks.
 * **sm**  
   Exception stack single messages (only if more than one).
+* **fl**  
+  File basenames and/or line numbers.
+* **fn**  
+  Function names (in stack traces).
+* **jw**  
+  Top-level JSON enclosure characters ([] or {}).
+* **ke**  
+  Keys in key—value structures such as JSON.
 * **h1**  
   HTTP&nbsp;1xx status codes (Informational).
 * **h2**  
@@ -240,13 +248,13 @@ By default,
 as if it had been given
 this _HX_COLORS_ value:
 
-**SY**=33:​**CL**=38;2;113;97;25:​**ML**=38;2;114;204;204:​**FS**=32;2:​**RP**=34:​**dt**=SY:​**hn**=SY:​**ap**=SY:​**ms**=0:​**ll**=SY:​**lw**=38;5;220:​**le**=38;2;255;145;36:​**in**=38;5;243:​**ix**=38;2;125;117;83:​**tr**=in:​**st**=in:​**sm**=ms:​**eq**=ms:​**er**=1:​**h1**=38;2;202;214;98:​**h2**=38;2;98;214;113:​**h3**=h1:​**h4**=38;2;235;41;41:​**h5**=38;5;199;1:​**h6**=38;2;155;72;72
+**SY**=33:​**CL**=38;2;113;97;25:​**ML**=38;2;114;204;204:​**FS**=32;2:​**RP**=34:​**dt**=SY:​**hn**=SY:​**ap**=SY:​**ms**=0:​**ll**=SY:​**lw**=38;5;220:​**le**=38;2;255;145;36:​**in**=38;5;243:​**ix**=38;2;125;117;83:​**tr**=in:​**st**=in:​**sm**=ms:​**eq**=ms:​**er**=1:​**fl**=1:​**fn**=1:​**jw**=1:​**ke**=1:​**h1**=38;2;202;214;98:​**h2**=38;2;98;214;113:​**h3**=h1:​**h4**=38;2;235;41;41:​**h5**=38;5;199;1:​**h6**=38;2;155;72;72
 
 When using the **--ecma48** option,
 **hx** uses output settings
 equivalent to these _HX_COLORS_ settings:
 
-**SY**=33:​**CL**=33;2:​**ML**=36:​**FS**=32;2:​**RP**=34:​**dt**=SY:​**hn**=SY:​**ap**=SY:​**ms**=0:​**ll**=33:​**lw**=33;1:​**le**=33;1:​**in**=37;2:​**ix**=in:​**tr**=in:​**st**=in:​**sm**=ms:​**eq**=ms:​**er**=1:​**h1**=33:​**h2**=32:​**h3**=h1:​**h4**=31;1:​**h5**=31;1:​**h6**=31
+**SY**=33:​**CL**=33;2:​**ML**=36:​**FS**=32;2:​**RP**=34:​**dt**=SY:​**hn**=SY:​**ap**=SY:​**ms**=0:​**ll**=33:​**lw**=33;1:​**le**=33;1:​**in**=37;2:​**ix**=in:​**tr**=in:​**st**=in:​**sm**=ms:​**eq**=ms:​**er**=1:​**fl**=1:​**fn**=1:​**jw**=1:​**ke**=1:​**h1**=33:​**h2**=32:​**h3**=h1:​**h4**=31;1:​**h5**=31;1:​**h6**=31
 
 # hx_Settings Environment Variable
 

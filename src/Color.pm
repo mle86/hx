@@ -13,6 +13,7 @@ use vars qw(
 	$c_exception_fqcn $c_exception_scn $c_exception_code
 	$c_message
 	$c_http_info $c_http_success $c_http_redir $c_http_client_error $c_http_client_failure $c_http_server_error
+	$c_file_location $c_function $c_json_wrap $c_key
 );
 
 
@@ -53,6 +54,10 @@ our $c_stack_msg = $c0;
 our $c_exception_fqcn = $c_message;
 our $c_exception_scn  = $c_bold;
 our $c_exception_code = $c_bold;
+our $c_file_location  = $c_bold;
+our $c_function       = $c_bold;
+our $c_json_wrap      = $c_bold;
+our $c_key            = $c_bold;
 
 our $c_http_success        = '[38;2;98;214;113m';
 our $c_http_redir          = '[38;2;202;214;98m';
@@ -108,6 +113,11 @@ sub read_color_defs ($) {
 		tr => \$c_trace,
 		st => \$c_stack,
 		sm => \$c_stack_msg,
+
+		fl => \$c_file_location,
+		fn => \$c_function,
+		jw => \$c_json_wrap,
+		ke => \$c_key,
 
 		ll => \$c_loglevel,
 		lw => \$c_loglevel_warn,

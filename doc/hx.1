@@ -206,6 +206,18 @@ Exception stacks.
 .B sm
 Exception stack single messages (only if more than one).
 .TP
+.B fl
+File basenames and/or line numbers.
+.TP
+.B fn
+Function names (in stack traces).
+.TP
+.B jw
+Top-level JSON enclosure characters ([] or {}).
+.TP
+.B ke
+Keys in key\(emvalue structures such as JSON.
+.TP
 .B h1
 HTTP\ 1xx status codes (Informational).
 .TP
@@ -254,6 +266,10 @@ this \fIHX_COLORS\fR value:
 \fBsm\fR=ms:\:\
 \fBeq\fR=ms:\:\
 \fBer\fR=1:\:\
+\fBfl\fR=1:\:\
+\fBfn\fR=1:\:\
+\fBjw\fR=1:\:\
+\fBke\fR=1:\:\
 \fBh1\fR=38;2;202;214;98:\:\
 \fBh2\fR=38;2;98;214;113:\:\
 \fBh3\fR=h1:\:\
@@ -288,6 +304,10 @@ equivalent to these \fIHX_COLORS\fR settings:
 \fBsm\fR=ms:\:\
 \fBeq\fR=ms:\:\
 \fBer\fR=1:\:\
+\fBfl\fR=1:\:\
+\fBfn\fR=1:\:\
+\fBjw\fR=1:\:\
+\fBke\fR=1:\:\
 \fBh1\fR=33:\:\
 \fBh2\fR=32:\:\
 \fBh3\fR=h1:\:\
