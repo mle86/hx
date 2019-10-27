@@ -19,6 +19,8 @@ sysloggrep () { grep -m 1 -e "$@" -- "$SYSLOG" ; }
 RE_CONTENT="(?:\\\\.|[^\\\\)])"
 # RW:  Matches the whitespace before, between, and after tokens.
 RW="(?:^| +|\$|\\n)"
+# RE_SGR0:  Matches the ANSI SGR0 sequence.
+RE_SGR0='(?:\x1b\[0(?:;0)*m)'
 
 
 # copied from Token.pm:
@@ -113,5 +115,11 @@ re_ztok () {
 #  Matches an optional linebreak.
 re_optbrk () {
 	printf '%s\n' "(?:\\\\n)?"
+}
+
+# assertContainsNoAnsiSequences STRING [ERRMSG]
+assertContainsNoAnsiSequences () {
+	assertRegex "$1" "!/\x1b\[/" \
+		"${2:-"String '$1' contained ANSI sequences when it shouldn't!"}"
 }
 

@@ -1,0 +1,4 @@
+ML M(==> ) FN(/tmp/logfile) M( <==\n)
+L D(date ) H(host ) UN(user1 ) A(appname: ) I(infoprefix ) RP(repeat[) M( ) G([loglevel] ) X(errorcode: ) M(message) RE( ]repeatend ) I(infosuffix ) T(in /tmp/12345, line 1) M(\n)
+CL M I(contline) Z
+L M KV[k=kv](kv=1000) M( ) JS({"k1":[2,3,4],"k2":{"y1":"json"}]}) M( ) Z
