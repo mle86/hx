@@ -6,7 +6,6 @@
 # and compare its output (sans ansi sequences and line symbol) with the original input.
 
 
-strip_ansi () { perl -pe "s/\\x1b\\[\\d+(?:;\\d+)*m//g"; }
 strip_linesym () { perl -pe "s/^● *//g"; }
 
 assertSameTextContent () {

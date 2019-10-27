@@ -48,6 +48,9 @@ T_JSON='JS'
 T_FILENAME='FN'
 T_HTTP_STATUS='HS'
 
+
+strip_ansi () { perl -pe "s/\\x1b\\[\\d+(?:;\\d+)*m//g"; }
+
 # re_b
 #  Regex to match the sequence which turns text bold.
 re_b () { printf '%s' "\\x1b\\[(?:(?:\\d\\+;)*0;)?1m"; }
