@@ -222,7 +222,7 @@ sub format_wrapbegin ($) {
 	$in
 }
 
-sub format_wrapend ($) {
+sub format_wrapend ($;$) {
 	my ($in, $c0) = ($_[0], $_[1]//'');
 	$in =~ s/^($re_ansi_color)?(")/$c_bold$c_info_prefix$2$c_unbold$1/;
 	$in
