@@ -1,0 +1,5 @@
+==> /var/log/auth.log <==
+Jun 24 01:37:40 myhost CRON[17920]: pam_unix(cron:session): session opened for user root by (uid=0)
+
+==> /var/log/auth.log.1 <==
+Jun 24 01:37:40 myhost CRON[17921]: pam_unix(cron:session): session closed for user root
