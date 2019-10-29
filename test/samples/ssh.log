@@ -1,0 +1,3 @@
+Sep  7 13:53:43 myhost1 ssh[11000]: debug3: hostkeys_foreach: reading file "/home/me/.ssh/known_hosts"
+Sep  7 13:53:43 myhost1 ssh[11000]: debug3: record_hostkey: found key type ECDSA in file /home/me/.ssh/known_hosts:16
+Sep  7 13:53:38 myhost1 ssh[11000]: debug1: /home/me/.ssh/config line 22: Applying options for myhost6
