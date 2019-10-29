@@ -135,9 +135,20 @@ sub read_color_defs ($) {
 		my ($k, $v) = split /=/, $assignment;
 
 		my $setto;
-		if    ($v =~ m/^\d/)                  { $setto = "\033[${v}m" }
-		elsif (defined(my $ref = $map{ $v })) { $setto = $$ref }
-		else { die "invalid assignment value: '${k}=${v}'" }
+		if ($v =~ m/^\d/) {
+			# simple "31"- or "31;1"-style color code assignment
+			$setto = "\033[${v}m"
+		} elsif (defined(my $ref = $map{ $v })) {
+			# simple "aa"-style reference assignment
+			$setto = $$ref
+		} elsif ($v =~ m/([a-z][a-z0-9]*)((?:;\d+)+)/ && defined(my $ref = $map{ $1 })) {
+			# "aa;22;1"-style appending reference assignment
+			my $add = $2;
+			my $base = (($$ref =~ m/^(.+)m$/) && $1);
+			$setto = $base . $add . 'm';
+		} else {
+			die "invalid assignment value: '${k}=${v}'"
+		}
 
 		if ($k eq '*') {
 			foreach $k (keys %map) {
