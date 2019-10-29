@@ -44,5 +44,13 @@ assertRegex "$output" "/$(re_col  '2;37')message/"
 output="$(PRN 'jw=33:ke=34:*=0' <"$input")"
 assertRegex "$output" "/$(re_col 33)\{$(re_col 0)\"$(re_col 34)k1$(re_col 0)\":\[2.*\"$(re_col 34)y1$(re_col 0)\":\"json\"[^\x1b]*\}\]$(re_col 33)\}$(re_col 0)/"
 
+# test "aa=bb"-style reference color assignment:
+input="L D(2019 ) I(- ) A(appname ) M(msg ) Z"
+colors="*=35:dt=34:ap=dt"  # date in blue, appname same but also bold+italic (!), everything else violet
+output="$(printf '%s\n' "$input" | PRN "$colors")"
+assertRegex "$output" "/$(re_col 34 "2019")/"
+assertRegex "$output" "/$(re_col 34 "appname")/"
+assertRegex "$output" "/$(re_col 35 "msg")/"
+
 
 success
