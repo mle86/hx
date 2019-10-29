@@ -1,0 +1,4 @@
+2019-10-24 14:31:18.484 FINE MyUtil: moved /tmp/file1 to /tmp/file2 [info]
+2019-10-24 14:31:18.487 ERROR DbTrackingModule: Database error: The database is read only
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:357)
+	at org.h2.message.DbException.get(DbException.java:179)
