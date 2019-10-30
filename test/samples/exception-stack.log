@@ -1,0 +1,2 @@
+May  7 13:41:07 myhost myapp: ExceptionStack: could not validate 'known_prop': 'UNKNOWNVAL123'    (stack: ValidationException: could not validate 'known_prop': 'UNKNOWNVAL123') (ErrorPkg\ExceptionStack @ src/Validation/Validator:161) (trace: src/Controller/UpdateController:59, src/RequestDispatch:134, public/index:18)
+2019-02-12 11:05:52 ExceptionStack: foo  bar    (stack: InvalidArgumentException: foo; LogicException; RuntimeException/223: bar) (ErrorPkg\ExceptionStack @ TEST:37) (trace: aa, bb, cc)
