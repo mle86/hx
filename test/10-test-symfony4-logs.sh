@@ -29,5 +29,17 @@ assertRegex "$line" "/$reHttp/"
 assertRegex "$line" "/$(re_tok $T_TRACE "\(MyApp${re_backslash}Services${re_backslash}Exceptions${re_backslash}TemporaryErrorException @ vendor\/myapp\/svc\/src\/Exceptions\/WrapMethod:25\)")/"
 assertRegex "$line" "/$(re_tok $T_JSON "\{\"exception\":\"\[object\].*?:185\)\"\}")/"
 
+# [2019-02-12 11:05:52] app.ERROR: ValidationException: foo bar  [context: YYYYY] [500] (MyApp\Exceptions\ValidationException @ vendor/myapp/src/Validator:33)
+line="$(logline "$logfile" 4 | LEX)"
+reExceptionName="$(re_tok $T_ERROR "ValidationException:?")"
+reExceptionMsg1="$(re_tok $T_MESSAGE ":")"
+reExceptionMsg2="$(re_tok $T_MESSAGE ":? ?foo bar\s*")"
+reInfo="$(re_tok $T_INFO "\s*\[context: YYYYY\]")"
+reHttp1="$(re_tok $T_INFO "\[")"
+reHttp2="$(re_tok $T_HTTP_STATUS "500")"
+reHttp3="$(re_tok $T_INFO "\]")"
+reTrace="$(re_tok $T_TRACE "\(MyApp.+:33\)")"
+assertRegex "$line" "/${reExceptionName}(?:${reExceptionMsg1})?${reExceptionMsg2}${reInfo}${reHttp1}${reHttp2}${reHttp3}${reTrace}/"
+
 
 success
