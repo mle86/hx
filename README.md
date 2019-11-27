@@ -154,7 +154,7 @@ and
 * The syslog prefix “message repeated N times: [”
   will be colored _blue_.
 
-# hx_Colors Environment Variable
+# HX_COLORS Environment Variable
 
 The _HX_COLORS_ environment variable, if set and non-empty,
 is read on start-up for color definitions
@@ -256,7 +256,7 @@ equivalent to these _HX_COLORS_ settings:
 
 **SY**=33:​**CL**=33;2:​**ML**=36:​**FS**=32;2:​**RP**=34:​**dt**=SY:​**hn**=SY:​**ap**=SY:​**ms**=0:​**ll**=33:​**lw**=33;1:​**le**=33;1:​**in**=37;2:​**ix**=in:​**tr**=in:​**st**=in:​**sm**=ms:​**eq**=ms:​**er**=1:​**fl**=1:​**fn**=1:​**jw**=1:​**ke**=1:​**h1**=33:​**h2**=32:​**h3**=h1:​**h4**=31;1:​**h5**=31;1:​**h6**=31
 
-# hx_Settings Environment Variable
+# HX_SETTINGS Environment Variable
 
 The _HX_SETTINGS_ environment variable,
 if set and non-empty,

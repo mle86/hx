@@ -9,7 +9,7 @@ all: ;
 
 README.md: doc/hx.1 doc/*.md
 	git submodule update --init doc/man-to-md/
-	perl doc/man-to-md.pl --word hx --formatted-code --comment --paste-section-after DESCRIPTION:'Installation.md' <$< >$@
+	perl doc/man-to-md.pl --word hx --word HX_COLORS --word HX_SETTINGS --formatted-code --comment --paste-section-after DESCRIPTION:'Installation.md' <$< >$@
 
 install: $(BIN)
 	cp    $(BIN)   $(DEST)
