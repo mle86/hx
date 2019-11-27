@@ -72,7 +72,7 @@ to manually set all coloring to compatible sequences.
 
 The default colors are optimized for a black terminal background.
 
-## Coloring Rationale
+### Coloring Rationale
 
 Generally the program tries to identify to the main log message part
 and print it in the terminal's _default color_ (white).
@@ -88,7 +88,7 @@ The following sections
 list typical log line parts
 and how they fit into these broader categories.
 
-## Metadata Prefix
+### Metadata Prefix
 
 Most log lines start with metadata.
 The program will color all of it _yellow_.
@@ -105,7 +105,7 @@ the
 and the
 **log level**.
 
-## Informational Prefix
+### Informational Prefix
 
 This is log metadata considered non-essential
 or additional information
@@ -117,7 +117,7 @@ or
 RFC-5424 **structured data**.
 It'll be colored _yellowish-grey_.
 
-## Log Message
+### Log Message
 
 The only part which will be printed in the terminal's
 _standard&nbsp;color_ (usually _white_),
@@ -128,7 +128,7 @@ or
 **error code** prefix
 will also be _bolded_.
 
-## Informational Suffix
+### Informational Suffix
 
 This is data considered non-essential to the log message,
 including 
@@ -138,7 +138,7 @@ error source **file/lineno**,
 and
 **JSON error data**.
 
-## Others
+### Others
 
 
 * Additionally, all “informational” sections
@@ -174,7 +174,7 @@ The special section name “<b>\*</b>”
 assigns a color definition
 to all sections not previously assigned in the variable.
 
-## Valid sections:
+### Valid sections:
 
 
 * **SY**  
@@ -241,7 +241,7 @@ to all sections not previously assigned in the variable.
 * <b>*</b>  
   All sections not previously assigned.
 
-## Defaults
+### Defaults
 
 By default,
 **hx** produces output
@@ -277,7 +277,7 @@ This is required for values which contain spaces or doublequotes
 (which must be escaped with backslashes).
 Multiple option keywords must be separated by one or more spaces.
 
-## Supported options:
+### Supported options:
 
 
 * **ecma48**, **48**  
@@ -314,7 +314,7 @@ Multiple option keywords must be separated by one or more spaces.
   Line prefix string for meta lines.
   (See **lineprefix**.)
 
-## Defaults:
+### Defaults:
 
 By default,
 **hx** produces output
