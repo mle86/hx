@@ -50,7 +50,7 @@ and the man page to <code>/usr/local/share/man/man1/<b>hx.1</b>.gz</code>.
 
 
 * **--ecma48**  
-  Forces the program to output only basic, ECMA-48-compatbile ANSI coloring codes.
+  Forces the program to output only basic, ECMA-48-compatible ANSI coloring codes.
   This will lead to less colorful output
   but should increase compatibility
   in case your terminal does not support the extended coloring sequences.
