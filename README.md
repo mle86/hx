@@ -2,7 +2,7 @@
 
 # hx(1) - log files highlighter
 
-Version 0.13.0, July 2019
+Version 0.16.0, November 2019
 
 <pre><code><b>hx</b> [<i>OPTIONS</i>] [<i>LOGFILE</i>...]</code></pre>
 
