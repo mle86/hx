@@ -1,0 +1,8 @@
+language: perl
+
+perl:
+  - 5.26
+  - 5.30
+
+script:
+  - make test
