@@ -9,7 +9,11 @@ all: ;
 
 README.md: doc/hx.1 doc/*.md
 	git submodule update --init doc/man-to-md/
-	perl doc/man-to-md.pl --word hx --word HX_COLORS --word HX_SETTINGS --formatted-code --comment --paste-section-after DESCRIPTION:'Installation.md' <$< >$@
+	perl doc/man-to-md.pl \
+		--formatted-code --comment \
+		--word hx --word HX_COLORS --word HX_SETTINGS \
+		--paste-section-after DESCRIPTION:'Installation.md' --paste-after HEADLINE:'Badges.md' \
+		<$< >$@
 
 dep: cpanfile
 	cpanm --installdeps .

@@ -2,6 +2,9 @@
 
 # hx(1) - log files highlighter
 
+[![Build Status](https://travis-ci.org/mle86/hx.svg?branch=master)](https://travis-ci.org/mle86/hx)
+
+
 Version 0.16.1, November 2019
 
 <pre><code><b>hx</b> [<i>OPTIONS</i>] [<i>LOGFILE</i>...]</code></pre>
