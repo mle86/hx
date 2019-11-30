@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use Time::HiRes qw(ualarm);
 use Term::ReadKey qw(GetTerminalSize);
 use strict;
