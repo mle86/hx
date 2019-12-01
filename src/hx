@@ -5,7 +5,7 @@ use strict;
 
 BEGIN {
 	$0 =~ m#^(.*/)[^/]+$#;
-	unshift @INC, $1
+	unshift @INC, $1, '/usr/local/lib/hx-modules/';
 }
 
 use Const;
