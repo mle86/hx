@@ -9,6 +9,23 @@ Version 0.16.2, November 2019
 
 <pre><code><b>hx</b> [<i>OPTIONS</i>] [<i>LOGFILE</i>...]</code></pre>
 
+#### Screenshots
+
+**Apache logs,** before and after:
+
+[<img alt="Apache2 logs, original" src="/doc/img/apache0.png" width="49%">](/doc/img/apache0.png)
+[<img alt="Apache2 logs using hx" src="/doc/img/apache1.png" width="49%">](/doc/img/apache1.png)
+
+**Syslog:**
+
+[<img alt="Syslog, original" src="/doc/img/syslog0.png" width="49%">](/doc/img/syslog0.png)
+[<img alt="Syslog using hx" src="/doc/img/syslog1.png" width="49%">](/doc/img/syslog1.png)
+
+
+→ [More Screenshots](/doc/Screenshots.md)
+
+
+
 # Description
 
 **hx** is a log files highlighter.

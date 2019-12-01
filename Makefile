@@ -14,7 +14,9 @@ README.md: doc/hx.1 doc/*.md
 	perl doc/man-to-md.pl \
 		--formatted-code --comment \
 		--word hx --word HX_COLORS --word HX_SETTINGS \
-		--paste-section-after DESCRIPTION:'Installation.md' --paste-after HEADLINE:'Badges.md' \
+		--paste-after HEADLINE:'Badges.md' \
+		--paste-after SYNOPSIS:'Some Screenshots.md' \
+		--paste-section-after DESCRIPTION:'Installation.md' \
 		<$< >$@
 
 dep: cpanfile
