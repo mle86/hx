@@ -1,7 +1,7 @@
 
 #### Screenshots
 
-**Apache logs,** before and after:
+**Apache logs,** original vs. colored with hx:
 
 [<img alt="Apache2 logs, original" src="/doc/img/apache0.png" width="49%">](/doc/img/apache0.png)
 [<img alt="Apache2 logs using hx" src="/doc/img/apache1.png" width="49%">](/doc/img/apache1.png)
