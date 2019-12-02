@@ -267,6 +267,11 @@ sub lex_next_line {
 			# end of fastcgi message should not affect main message parsing, it's a mostly boring wrapper -- so cut it out and put it into $suffix
 			unshift @suffix, Token->new(T_WRAPEND, $1 . $2);
 		}
+	} elsif (s/^($re_loglevel:? )(<[^>]+>,? ?)(\[(?:Error|Errno) [^\]]+\] )?//) {
+		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
+		push @output, Token->new(T_APP, $2);
+		push @output, Token->new(T_ERROR, $3)  if $3;
+		$message_isolated = 1;
 	} elsif (s/^($re_ymd $re_time$re_ms?|($re_ts8601)|$re_tsw|$re_sects|\[$re_ymd $re_time$re_ms?\])( |:|$)//) {
 		my %attr = ($2) ? (type => '8601') : ();
 		push @output, Token->new(T_DATE, $1 . $3);
@@ -366,8 +371,8 @@ sub lex_next_line {
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
 		$text_isolated = 1;
 	} elsif ($message_isolated &&
-			(s#^(.+?)( (?:in|at)(?: file)? $re_abspath(?:$re_lineno)?\b)(\s*$)## ||
-			 s#^(.+?)([:,\.] [Ff]ile $re_abspath(?:$re_lineno)?)(\s*$)##)) {
+			(s#^(.+?)( (?:in|at)(?: file:?)? $re_abspath(?:$re_lineno)?\b)(\s*$)## ||
+			 s#^(.+?)([:,\.] [Ff]ile:? $re_abspath(?:$re_lineno)?)(\s*$)##)) {
 		# "MESSAGE in FILE:LINE" format
 		# "MESSAGE: file FILE:LINE" format
 		push @output, Token->new(T_MESSAGE, $1);

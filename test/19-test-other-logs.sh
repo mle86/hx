@@ -24,5 +24,14 @@ assertRegex "$line" "/$(re_tok $T_APP "__init__\.py")/"
 assertRegex "$line" "/$(re_tok $T_LOGLEVEL "\[WARN\]:?")/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "Attempting .*")/"
 
+# error: <class 'socket.error'>, [Errno 99] Cannot assign requested address: file: /usr/lib/python2.7/socket.py line: 571
+line="$(logline "$logfile" 4 | LEX)"
+reError="$(re_tok $T_LOGLEVEL "error:?")"
+reType="$(re_tok $T_APP ":? ?<class 'socket\.error'>,?")"
+reErrno="$(re_tok $T_ERROR ",? ?\[Errno 99\]")"
+reMsg="$(re_tok $T_MESSAGE "Cannot assign requested address:?")"
+reSource="$(re_tok $T_TRACE ":? ?file: \/usr\/lib\/python2\.7\/socket\.py line: 571")"
+assertRegex "$line" "/${reError}${reType}${reErrno}${reMsg}${reSource}/"
+
 
 success

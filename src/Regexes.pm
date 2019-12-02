@@ -33,7 +33,7 @@ our $re_continuation_line = qr/(?:^\s*(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
-our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+|, line \d+| line \d+)/;
+our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+|, line:? \d+| line:? \d+)/;
 
 our $re_loglevel = qr/(?:(?:PHP )?(?i:warn|warning|warnung|err|error|fehler|info|information|note|notice|hinweis|crit|critical|schwerwiegend|emerg|emergency|debug[123]?|dbg|fine|alrt|alert|parse error|fatal error))/;
 
