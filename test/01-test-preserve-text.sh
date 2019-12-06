@@ -6,7 +6,7 @@
 # and compare its output (sans ansi sequences and line symbol) with the original input.
 
 
-strip_linesym () { perl -pe "s/^● *//g"; }
+strip_linesym () { perl -pe "s/^● *//"; }
 
 assertSameTextContent () {
 	local inputLine="$1"
