@@ -317,7 +317,7 @@ Multiple option keywords must be separated by one or more spaces.
   as soon as the input pauses for several milliseconds.
   The line will consist of this _char_,
   repeated until the terminal line is filled.
-  (The _char_ default is â**⁻**â if missing.)
+  (The _char_ default is "**⁻**" if missing.)
   Has no effect if **pausewait** is unset.
 * **lineprefix**=_symbol_, **px**  
   Enables or disables line prefixes
