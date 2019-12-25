@@ -22,7 +22,7 @@ README.md: doc/hx.1 doc/*.md
 dep: cpanfile
 	cpanm --installdeps .
 
-install: $(BIN)
+install: $(BIN) dep
 	cp    $(BIN)   $(DEST)
 	chown $(CHOWN) $(DEST)
 	
