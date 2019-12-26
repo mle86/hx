@@ -26,6 +26,8 @@ Version 0.16.2, November 2019
 
 
 
+<a name="description"></a>
+
 # Description
 
 **hx** is a log files highlighter.
@@ -55,6 +57,8 @@ or a trailing error source filename.
 It is well suited for handling running logs
 such as returned by “**tail&nbsp;-f /var/log/syslog**”.
 
+<a name="installation"></a>
+
 # Installation
 
 ```
@@ -68,6 +72,8 @@ will be copied to `/usr/local/lib/hx-modules/`.
 
 
 
+<a name="options"></a>
+
 # Options
 
 
@@ -76,6 +82,8 @@ will be copied to `/usr/local/lib/hx-modules/`.
   This will lead to less colorful output
   but should increase compatibility
   in case your terminal does not support the extended coloring sequences.
+
+<a name="output"></a>
 
 # Output
 
@@ -89,10 +97,14 @@ Use the **--ecma48** option
 if you want **hx** to use ECMA-48-compatible ANSI sequences only.
 This will lead to less colorful output
 but should increase compatibility.
-Alternatively, the _HX_COLORS_ environment variable can be used
+Alternatively, the
+[_HX_COLORS_ environment variable](#hx_colors-environment-variable)
+can be used
 to manually set all coloring to compatible sequences.
 
 The default colors are optimized for a black terminal background.
+
+<a name="coloring-rationale"></a>
 
 ### Coloring Rationale
 
@@ -109,6 +121,8 @@ will be _yellowish-grey_.
 The following sections
 list typical log line parts
 and how they fit into these broader categories.
+
+<a name="metadata-prefix"></a>
 
 ### Metadata Prefix
 
@@ -127,6 +141,8 @@ the
 and the
 **log level**.
 
+<a name="informational-prefix"></a>
+
 ### Informational Prefix
 
 This is log metadata considered non-essential
@@ -139,6 +155,8 @@ or
 RFC-5424 **structured data**.
 It'll be colored _yellowish-grey_.
 
+<a name="log-message"></a>
+
 ### Log Message
 
 The only part which will be printed in the terminal's
@@ -150,6 +168,8 @@ or
 **error code** prefix
 will also be _bolded_.
 
+<a name="informational-suffix"></a>
+
 ### Informational Suffix
 
 This is data considered non-essential to the log message,
@@ -159,6 +179,8 @@ error source **file/lineno**,
 **stack traces**,
 and
 **JSON error data**.
+
+<a name="others"></a>
 
 ### Others
 
@@ -176,12 +198,16 @@ and
 * The syslog prefix “message repeated N times: [”
   will be colored _blue_.
 
+<a name="hx_colors-environment-variable"></a>
+
 # HX_COLORS Environment Variable
 
 The _HX_COLORS_ environment variable, if set and non-empty,
 is read on start-up for color definitions
 which will overwrite the default colors
-(described in the “Output” section above).
+(described in the
+“[Output](#output)”
+section above).
 
 The variable supports section—color assignments
 like this: “**ap=38;5;90**”.
@@ -195,6 +221,8 @@ for example, “**ap=hn**” assigns the _hn_ (hostname) color to _ap_ (app/PID)
 The special section name “<b>\*</b>”
 assigns a color definition
 to all sections not previously assigned in the variable.
+
+<a name="valid-sections"></a>
 
 ### Valid sections:
 
@@ -263,6 +291,8 @@ to all sections not previously assigned in the variable.
 * <b>*</b>  
   All sections not previously assigned.
 
+<a name="defaults"></a>
+
 ### Defaults
 
 By default,
@@ -277,6 +307,8 @@ When using the **--ecma48** option,
 equivalent to these _HX_COLORS_ settings:
 
 **SY**=33:​**CL**=33;2:​**ML**=36:​**FS**=32;2:​**RP**=34:​**dt**=SY:​**hn**=SY:​**ap**=SY:​**ms**=0:​**ll**=33:​**lw**=33;1:​**le**=33;1:​**in**=37;2:​**ix**=in:​**tr**=in:​**st**=in:​**sm**=ms:​**eq**=ms:​**er**=1:​**fl**=1:​**fn**=1:​**jw**=1:​**ke**=1:​**h1**=33:​**h2**=32:​**h3**=h1:​**h4**=31;1:​**h5**=31;1:​**h6**=31
+
+<a name="hx_settings-environment-variable"></a>
 
 # HX_SETTINGS Environment Variable
 
@@ -298,6 +330,8 @@ Option values may be enclosed with doublequotes (**"**).
 This is required for values which contain spaces or doublequotes
 (which must be escaped with backslashes).
 Multiple option keywords must be separated by one or more spaces.
+
+<a name="supported-options"></a>
 
 ### Supported options:
 
@@ -336,6 +370,8 @@ Multiple option keywords must be separated by one or more spaces.
   Line prefix string for meta lines.
   (See **lineprefix**.)
 
+<a name="defaults"></a>
+
 ### Defaults:
 
 By default,
@@ -346,11 +382,15 @@ this _HX_SETTINGS_ value:
 **px**="● " **ps**="⁻" **pw**=200 **no48** 
 
 
+<a name="standards"></a>
+
 # Standards
 
 _Control Functions for Character-Imaging I/O Devices_,
 [Standard ECMA-48](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-48,%202nd%20Edition,%20August%201979.pdf),
 August 1979.
+
+<a name="see-also"></a>
 
 # See Also
 
