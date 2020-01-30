@@ -1,4 +1,4 @@
-.PHONY : all install test
+.PHONY : all install test dep
 
 BIN=src/hx
 DEST=/usr/local/bin/hx
