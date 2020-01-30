@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 use Time::HiRes qw(ualarm);
-use Term::ReadKey qw(GetTerminalSize);
 use strict;
 
 BEGIN {
@@ -61,7 +60,7 @@ my $rpt_linesep;
 	local $str_linesep = $str_linesep;
 	utf8::decode($str_linesep);
 	my $len_linesep = length $str_linesep;
-	my $width = nowarn{ (GetTerminalSize())[0] // 80 };
+	my $width = int(`tput cols 2>/dev/null` || 80);
 	$rpt_linesep = $width / $len_linesep;
 }
 

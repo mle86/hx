@@ -19,8 +19,7 @@ README.md: doc/hx.1 doc/*.md
 		--paste-section-after DESCRIPTION:'Installation.md' \
 		<$< >$@
 
-dep: cpanfile
-	cpanm --installdeps .
+dep:
 
 install: $(BIN) dep
 	cp    $(BIN)   $(DEST)
