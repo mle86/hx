@@ -230,7 +230,7 @@ sub lex_next_line {
 			Token->new(T_ERROR, $2),
 			Token->new(T_MESSAGE, $3);
 		$message_isolated = 1;
-	} elsif (s/^(PHP Fatal error: )( ?Uncaught )($re_exception)//) {
+	} elsif (s/^(PHP Fatal error: )( ?Uncaught (?:PHP Exception )?)($re_exception)//) {
 		push @output,
 			Token->new(T_APP, $1),
 			Token->new(T_MESSAGE, $2),
@@ -331,7 +331,7 @@ sub lex_next_line {
 		$loglevel_isolated = 1;
 	}
 
-	if ($message_isolated && s/^( *(?:PHP message:  ?)?(?:PHP Fatal error:  ?)?(?:Uncaught )?)($re_exception)(: +)//) {
+	if ($message_isolated && s/^( *(?:PHP message:  ?)?(?:PHP Fatal error:  ?)?(?:Uncaught (?:PHP )?(?:Exception )?)?)($re_exception)(: +)//) {
 		push @output, Token->new(T_MESSAGE, $1)  if $1;
 		push @output, Token->new(T_ERROR, $2);
 		push @output, Token->new(T_MESSAGE, $3);
