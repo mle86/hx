@@ -175,7 +175,7 @@ sub lex_next_line {
 		push @output,
 			Token->new(T_DATE, $1 . ' '),
 			Token->new(T_APP, $2);
-	} elsif (s/^(\[$re_ymd $re_time\]) ($re_app)(\.[A-Z]+)?(: *)//) {
+	} elsif (s/^(\[(?:$re_ymd $re_time|$re_ts8601)\]) ($re_app)(\.[A-Z]+)?(: *)//) {
 		# symfony format
 		push @output,
 			Token->new(T_DATE, $1 . ' '),

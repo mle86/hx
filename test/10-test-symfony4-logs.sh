@@ -41,5 +41,13 @@ reHttp3="$(re_tok $T_INFO "\]")"
 reTrace="$(re_tok $T_TRACE "\(MyApp.+:33\)")"
 assertRegex "$line" "/${reExceptionName}(?:${reExceptionMsg1})?${reExceptionMsg2}${reInfo}${reHttp1}${reHttp2}${reHttp3}${reTrace}/"
 
+# [2020-03-17T17:02:57.978098+01:00] request.CRITICAL: Uncaught PHP Exception GuzzleHttp\Exception\ServerException: "Server error: `GET http://micro/ent/1020` resulted in a `500 Internal Server Error` response: <!DOCTYPE html> <html>     <head>         <meta charset="UTF-8" />         <meta name="robots" content="noindex,nofollow (truncated...) " at /var/www/project/vendor/guzzlehttp/guzzle/src/Exception/RequestException.php line 113 {"exception":"[object] (GuzzleHttp\\Exception\\ServerException(code: 500): Server error: `GET http://micro/ent/2010` resulted in a `500 Internal Server Error` response:\n<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"UTF-8\" />\n        <meta name=\"robots\" content=\"noindex,nofollow (truncated...)\n at /var/www/project/vendor/guzzlehttp/guzzle/src/Exception/RequestException.php:113)"} []
+line="$(logline "$logfile" 5 | LEX)"
+reDate="$(re_tok "$T_DATE" "\[2020-03-17T17:02:57\.978098\+01:00\]")"
+reMsg="$(re_tok "$T_ERROR|$T_MESSAGE" "Uncaught PHP Exception")"
+reExceptionName="$(re_tok $T_ERROR "GuzzleHttp${re_backslash}Exception${re_backslash}ServerException")"
+reExceptionMsg="$(re_tok $T_MESSAGE "\"?Server error:.*")"
+assertRegex "$line" "/${reDate}.*${reMsg}.*${reExceptionName}.*${reExceptionMsg}.*/"
+
 
 success
