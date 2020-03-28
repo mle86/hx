@@ -9,7 +9,7 @@ use Exporter 'import';
 
 my @types = qw(
 	T_APP T_DATE T_HOST T_LOGLEVEL
-	T_LINE T_EMPTYLINE T_METALINE T_CONTLINE T_EOL
+	T_LINE T_EMPTYLINE T_METALINE T_CONTLINE T_PACKEDLINE T_EOL
 	T_CLIENT T_USERNAME T_FNCALL T_INFO T_STACK T_TRACE
 	T_REPEAT T_REPEATEND T_WRAP T_WRAPEND
 	T_ERROR T_MESSAGE T_KV T_JSON T_FILENAME T_HTTP_STATUS
@@ -23,11 +23,12 @@ sub T_DATE     () { 'D' }
 sub T_HOST     () { 'H' }
 sub T_LOGLEVEL () { 'G' }
 
-sub T_LINE      () { 'L' }
-sub T_EMPTYLINE () { 'EL' }
-sub T_METALINE  () { 'ML' }
-sub T_CONTLINE  () { 'CL' }
-sub T_EOL       () { 'Z' }
+sub T_LINE       () { 'L' }
+sub T_EMPTYLINE  () { 'EL' }
+sub T_METALINE   () { 'ML' }
+sub T_CONTLINE   () { 'CL' }
+sub T_PACKEDLINE () { 'PKL' }
+sub T_EOL        () { 'Z' }
 
 sub T_CLIENT   () { 'C' }
 sub T_USERNAME () { 'UN' }

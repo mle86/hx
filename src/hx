@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use Time::HiRes qw(ualarm);
+use Scalar::Util qw(blessed);
 use strict;
 
 BEGIN {
@@ -126,6 +127,8 @@ sub lex_next_line {
 		return Token->new(T_EMPTYLINE, $_);
 	}
 
+	my @packedlines;
+
 	if (s/^$re_tail_filename//) {
 		# `tail` file header
 		return
@@ -137,9 +140,14 @@ sub lex_next_line {
 
 	my $T_REST = T_MESSAGE;
 
-	my $is_continuation_line = m/$re_continuation_line/;
-	my @output = ( Token->new(($is_continuation_line) ? T_CONTLINE : T_LINE) );
 	my @suffix;
+	my @output;
+
+ restofline:
+
+	my $is_continuation_line = m/$re_continuation_line/;
+
+	@output = ( Token->new(($is_continuation_line) ? T_CONTLINE : T_LINE) )  if !@output;
 
 	my $is_apache;
 	my $is_postfix;
@@ -460,6 +468,19 @@ sub lex_next_line {
 
 	if (s/([\r\n]+)$//) { push @suffix, Token->new(T_EOL, $1) }
 	push @output, Token->new($T_REST, $_)  unless $_ eq '';
+
+	if (@packedlines) {
+		# The line is not actually finished now,
+		# we've previously detected that this is a packed line.
+		# Get the next part and prepare to format that:
+		$_ = shift @packedlines;
+		while (blessed($_) eq 'Token') {
+			push @output, $_;
+			$_ = shift @packedlines
+		}
+		goto restofline;  # continue collecting @output and @suffix...
+	}
+
 	( @output, @suffix )
 }
 
@@ -469,14 +490,15 @@ sub lex_next_line {
 sub print_tokens (@) {
 	return unless defined $_[0];
 
-	my ($last_line_token, $had_message);
+	my ($last_line_token, $had_message, $is_packedline);
 	foreach my $token (@_) {
 
 		if ($raw) {
 			print $token->content();
 		} else {
-			print format_token($token, line => $last_line_token, had_message => $had_message);
+			print format_token($token, line => $last_line_token, had_message => $had_message, packedline => $is_packedline);
 			$had_message = 1  if (!$had_message && $token->is(T_MESSAGE));
+			$is_packedline = 1  if (!$is_packedline && $token->is(T_PACKEDLINE));
 		}
 
 		$had_output = 1;
