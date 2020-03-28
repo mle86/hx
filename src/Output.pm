@@ -31,7 +31,7 @@ sub format_token ($;%) {
 	return format_trace($token->content(), $c_info_prefix)  if $token->is(T_TRACE);
 	return format_trace($token->content())  if $token->is(T_FILENAME);
 	return format_exception($token->content())  if $token->is(T_ERROR);
-	return format_fncall($token->content())  if $token->is(T_FNCALL);
+	return format_fncall($token->content(), $opt{'packedline'})  if $token->is(T_FNCALL);
 	return format_rpt($token->content())  if $token->is(T_REPEAT);
 	return format_rpt($token->content())  if $token->is(T_REPEATEND);
 	return format_http($token->content())  if $token->is(T_HTTP_STATUS);
@@ -97,10 +97,10 @@ sub format_trace ($;$) {
 	$c_base . $out . $c0
 }
 
-sub format_fncall ($) {
-	my ($out) = ($_[0]);
+sub format_fncall ($$) {
+	my ($out, $is_packedline) = (@_);
 
-	my $c_context = $c_message;
+	my $c_context = ($is_packedline) ? $c_info : $c_message;
 	my ($c_hi, $c_lo) = _color_hi_lo($c_function, $c_context);
 
 	$out =~ s#$re_fncall# $+{'class'} . $+{'fnp'} . $c_hi . $+{'fn'}.$+{'fn2'} . $c_lo . format_info( $+{'args'} ) #gem;
