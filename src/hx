@@ -420,6 +420,9 @@ sub lex_next_line {
 		push @output, Token->new(T_TRACE, $2);
 		push @output, Token->new(T_MESSAGE, $3);
 		push @output, Token->new(T_FNCALL, $4);
+	} elsif ($is_continuation_line && s/^(#\d+ )?(main|[\{\[<]main[>\]\}])//) {
+		push @output, Token->new(T_INFO, $1)  if $1;
+		push @output, Token->new(T_INFO, $2);
 	} elsif ($is_continuation_line) {
 		# all continuation lines get info-colored:
 		push @output, Token->new(T_MESSAGE);
