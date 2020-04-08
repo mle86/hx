@@ -386,15 +386,15 @@ sub lex_next_line {
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
 		$text_isolated = 1;
 	} elsif ($message_isolated &&
-			(s#^(.+?)( (?:in|at)(?: file:?)? $re_path(?:$re_lineno)?\b)(\s*$)## ||
-			 s#^(.+?)([:,\.] [Ff]ile:? $re_path(?:$re_lineno)?)(\s*$)##)) {
+			(s#^(.+?)( (?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*$)## ||
+			 s#^(.+?)([:,\.] [Ff]ile:? ${re_path}${re_lineno}?)(\s*$)##)) {
 		# "MESSAGE in FILE:LINE" format
 		# "MESSAGE: file FILE:LINE" format
 		push @output, Token->new(T_MESSAGE, $1);
 		push @output, Token->new(T_TRACE, $2);
 		push @output, Token->new(T_MESSAGE, $3)  if $3;
 		$text_isolated = 1;
-	} elsif ($message_isolated && s#^(.+?)(?:(  ?)($re_info_brackets))?(  ?(?:in|at) $re_abspath(?:$re_lineno)?\b {1,2})(?=[\(\[])##) {
+	} elsif ($message_isolated && s#^(.+?)(?:(  ?)($re_info_brackets))?(  ?(?:in|at) ${re_abspath}${re_lineno}?\b {1,2})(?=[\(\[])##) {
 		# mini-api format
 		my ($prefix, $info, $trace) = ($1 . $2, $3, $4);
 		push @output, Token->new(T_MESSAGE, $prefix);
@@ -424,14 +424,14 @@ sub lex_next_line {
 		unshift @suffix,
 			Token->new(T_INFO, $+{'suffix'});
 		$_ = $+{'cmd'}
-	} elsif ($message_isolated && s#^((?:file )?$re_abspath(?:$re_lineno)?)(:)##) {
+	} elsif ($message_isolated && s#^((?:file )?${re_abspath}${re_lineno}?)(:)##) {
 		push @output,
 			Token->new(T_TRACE, $1),
 			Token->new(T_INFO, $2);
 	}
 
 
-	if ($is_continuation_line && s/^(#\d+ )?(?:($re_abspath(?:$re_lineno)?|\[internal function\])(: ))?($re_fncall|\{main\})//) {
+	if ($is_continuation_line && s/^(#\d+ )?(?:(${re_abspath}${re_lineno}?|\[internal function\])(: ))?($re_fncall|\{main\})//) {
 		push @output, Token->new(T_INFO, $1)  if $1;
 		push @output, Token->new(T_TRACE, $2)  if $2;
 		push @output, Token->new(T_INFO, $3)  if $3;
