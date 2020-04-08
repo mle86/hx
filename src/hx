@@ -428,6 +428,11 @@ sub lex_next_line {
 		push @output,
 			Token->new(T_TRACE, $1),
 			Token->new(T_INFO, $2);
+	} elsif ($message_isolated && s/^(\s*#\d+ $re_memaddr [IiBb]  +)(?:($re_path$re_lineno)(?:( \(0x[0-9a-f]{6,} ?@ ?\d+\))?))?//) {
+		push @output, Token->new(T_INFO, $1);
+		push @output, Token->new(T_MESSAGE);
+		push @output, Token->new(T_TRACE, $2)  if $2;
+		push @suffix, Token->new(T_INFO, $3)  if $3;
 	}
 
 

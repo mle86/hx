@@ -4,7 +4,7 @@ use vars qw(
 	$re_json $re_json_string
 	$re_continuation_line $re_repeat_begin $re_repeat_end
 	$re_lineno $re_loglevel
-	$re_fncall
+	$re_fncall $re_memaddr
 	$re_exception
 	$re_path $re_abspath
 	$re_app $re_host $re_client
@@ -50,6 +50,7 @@ my  $re_classname = qr/(?:$re_nsname?[A-Za-z]\w+)/;
 my  $re_fnname    = qr/(?:[A-Za-z_]\w*|\{closure\})/;
 my  $re_fnprefix  = qr/(?:->|::)/;
 our $re_fncall    = qr/(?:(?<class>${re_nsname}(?=\{)|${re_classname}(?=${re_fnprefix})|${re_classname}::${re_nsname})?(?<fnp>${re_fnprefix})?(?<fn>${re_fnname})(?<args> ?\(.*\)))/;
+our $re_memaddr   = qr/(?:0x[0-9a-fA-F]{6,})/;
 
 my  $re_fqcn      = qr/(?:(?:[A-Za-z][A-Za-z0-9_]+\\)+[A-Za-z][A-Za-z0-9_]*\b)/;  # fqcn must contain backslashes
 my  $re_excn      = qr/(?:(?:[A-Z][A-Za-z0-9_]*)?(?:[Ee]xception|[Ee]rror|Fault)|ExceptionStack)/;  # short exception class name must end in "exception" or "error"

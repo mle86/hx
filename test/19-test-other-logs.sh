@@ -38,5 +38,13 @@ line="$(logline "$logfile" 5 | LEX)"
 reSource="$(re_tok $T_TRACE "(?:in )?file:\/\/\/usr\/lib\/python2\.7\/socket\.py:571")"
 assertRegex "$line" "/${reMsg}${reSource}/"
 
+# Apr  1 10:00:00 mysys org.gnome.Shell.desktop[4600]: #2 0x7ffd00007d22 I   resource:///org/gnome/gjs/modules/_legacy.js:82 (0x7ffd00007d30 @ 71)
+line="$(logline "$logfile" 6 | LEX)"
+reStack="$(re_tok $T_INFO "#2 0x7ffd00007d22 I +")"
+reMsg="(?:$(re_tok $T_MESSAGE)|$(re_tok $T_MESSAGE " +"))"
+reSource="$(re_tok $T_TRACE " *resource:\/\/\/org\/gnome\/gjs\/modules\/_legacy.js:82")"
+reInfo="$(re_tok $T_INFO "\(0x7ffd00007d30 @ 71\)")"
+assertRegex "$line" "/${reStack}${reMsg}${reSource}${reInfo}/"
+
 
 success
