@@ -7,7 +7,7 @@ use vars qw(
 	$re_fncall $re_memaddr
 	$re_exception
 	$re_path $re_abspath
-	$re_app $re_host $re_client
+	$re_app $re_ip $re_host $re_client
 	$re_word
 	$re_time $re_ddd $re_ms $re_ymd $re_ts8601 $re_tsw $re_sects
 	$re_a2date $re_a2clnt $re_a2err $re_http
@@ -74,7 +74,7 @@ our $re_sects  = qw/(?:\[\s*\d+\.\d+\])/;  # [   16.082998]
 our $re_app    = qr/(?:[A-Za-z0-9\/][A-Za-z0-9_\-\.\/]+?(?:\[\d+\]|\])?)/;
 our $re_word   = qr/(?:[A-Z][a-z]+)/;
 
-my  $re_ip     = qr/(?:\[(?:[0-9a-fA-F]{1,4})?(?:::?[0-9a-fA-F]{1,4}){1,7}\]|(?:[0-9a-fA-F]{1,4})?(?:::?[0-9a-fA-F]{1,4}){1,7}|\d{1,3}(?:\.\d{1,3}){3})/;
+our $re_ip     = qr/(?:\[(?:[0-9a-fA-F]{1,4})?(?:::?[0-9a-fA-F]{1,4}){1,7}\]|(?:[0-9a-fA-F]{1,4})?(?:::?[0-9a-fA-F]{1,4}){1,7}|\d{1,3}(?:\.\d{1,3}){3})/;
 our $re_host   = qr/(?:[A-Za-z][A-Za-z0-9_\-\.]+)/;
 our $re_client = qr/(?:$re_ip|$re_host)/;
 

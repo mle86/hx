@@ -154,6 +154,7 @@ sub lex_next_line {
 	my $is_rfc5424;
 	my $is_dmesg;
 	my $is_nginx_fastcgi;
+	my $client_follows;
 
 	my ($message_isolated, $loglevel_isolated, $exception_isolated, $text_isolated);
 
@@ -164,6 +165,7 @@ sub lex_next_line {
 			Token->new(T_DATE, $1 . ' ', format => 'syslog'),
 			Token->new(T_HOST, $2 . ' '),
 			Token->new(T_APP, $3 . $4);
+		$client_follows = 1  if ($3 =~ m/^(?:named|bind9?)\b/);
 		$is_postfix = 1  if ($3 =~ m/^postfix/);
 		$message_isolated = 1;
 	} elsif (s/^($re_ddd {1,2}$re_time) ($re_host) (\d+) ($re_ts8601) ($re_host) ($re_app|-) (\d+|-) (\S+) //) {
@@ -319,6 +321,14 @@ sub lex_next_line {
 	if (s/^(###!!! *)//) {
 		# gnome error info prefix
 		push @output, Token->new(T_INFO, $1);
+	}
+
+	if ($message_isolated && $client_follows && s/^( *(?:client )?$re_ip(?:[:#]\d{1,5})?(?:[:,] ?)?)//) {
+		push @output, Token->new(T_CLIENT, $1);
+
+		if (s/(^ \([^\]]*\)[:,] ?)//) {
+			push @output, Token->new(T_INFO, $1);
+		}
 	}
 
 	my $re_info_brackets = '(?:\\[[^\\]]+\\])';
