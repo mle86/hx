@@ -33,5 +33,10 @@ reMsg="$(re_tok $T_MESSAGE "Cannot assign requested address:?")"
 reSource="$(re_tok $T_TRACE ":? ?file: \/usr\/lib\/python2\.7\/socket\.py line: 571")"
 assertRegex "$line" "/${reError}${reType}${reErrno}${reMsg}${reSource}/"
 
+# error: <class 'socket.error'>, [Errno 99] Cannot assign requested address in file:///usr/lib/python2.7/socket.py:571
+line="$(logline "$logfile" 5 | LEX)"
+reSource="$(re_tok $T_TRACE "(?:in )?file:\/\/\/usr\/lib\/python2\.7\/socket\.py:571")"
+assertRegex "$line" "/${reMsg}${reSource}/"
+
 
 success
