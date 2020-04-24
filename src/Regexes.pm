@@ -59,7 +59,7 @@ our $re_exception = qr/(?:(?:$re_fqcn|$re_excn)$re_ex_code?)/;
 
 my  $re_pathchr = qr/[A-Za-z0-9\-_\.\+\$@]/;
 our $re_abspath = qr/(?:\/[a-z]+[a-z0-9]+(?:\/+${re_pathchr}+)+)/;
-my  $re_relpath = qr/(?:(?:${re_pathchr}+:?\/+)*[A-Za-z0-9\-_\.\+\$]+)/;
+my  $re_relpath = qr/(?:(?!use(?:$|\s))(?:${re_pathchr}+:?\/+)*[A-Za-z0-9\-_\.\+\$]+)/;
 our $re_path    = qr/(?:$re_abspath|$re_relpath)/;
 
 our $re_time   = qr/(?:\d\d:\d\d:\d\d)/;
