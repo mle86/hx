@@ -46,5 +46,10 @@ reSource="$(re_tok $T_TRACE " *resource:\/\/\/org\/gnome\/gjs\/modules\/_legacy.
 reInfo="$(re_tok $T_INFO "\(0x7ffd00007d30 @ 71\)")"
 assertRegex "$line" "/${reStack}${reMsg}${reSource}${reInfo}/"
 
+# [Sun, Apr 26th, 13:49:59 2020] msg
+line="$(logline "$logfile" 7 | LEX)"
+assertRegex "$line" "/$(re_tok $T_DATE "\[Sun, Apr 26th, 13:49:59 2020\]")/"
+assertRegex "$line" "/$(re_tok $T_MESSAGE "msg")/"
+
 
 success
