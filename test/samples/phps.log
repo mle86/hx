@@ -1,0 +1,6 @@
+[Sun Apr 26 13:49:55 2020] 127.0.0.1:36726 Accepted
+[Sun Apr 26 13:49:55 2020] 127.0.0.1:36726 [404]: POST /favicon.ico - No such file or directory
+[Sun Apr 26 13:49:55 2020] 127.0.0.1:36726 Closing
+[Sun Apr 26 13:49:58 2020] 127.0.0.1:36728 Accepted
+[Sun Apr 26 13:49:58 2020] 127.0.0.1:36728 [200]: POST /send-update.php
+[Sun Apr 26 13:49:58 2020] 127.0.0.1:36728 Closing

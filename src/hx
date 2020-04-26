@@ -276,6 +276,14 @@ sub lex_next_line {
 			# end of fastcgi message should not affect main message parsing, it's a mostly boring wrapper -- so cut it out and put it into $suffix
 			unshift @suffix, Token->new(T_WRAPEND, $1 . $2);
 		}
+	} elsif (s/^(\[$re_dmdty\] )($re_client(?::\d+)? )(?:($re_http)(?<suffix>: ))?//) {
+		# "php -S" log format
+		my ($info, $suffix) = ($3, $+{'suffix'});
+		push @output,
+			Token->new(T_DATE, $1),
+			Token->new(T_CLIENT, $2);
+		push @output, striphttpstatus($info)  if $info;
+		push @output, Token->new(T_INFO, ($info . $suffix))  if ($info || $suffix);
 	} elsif (s/^($re_loglevel:? )(<[^>]+>,? ?)(\[(?:Error|Errno) [^\]]+\] )?//) {
 		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
 		push @output, Token->new(T_APP, $2);
