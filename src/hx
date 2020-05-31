@@ -293,6 +293,9 @@ sub lex_next_line {
 		my %attr = ($2) ? (type => '8601') : ();
 		push @output, Token->new(T_DATE, $1 . $3);
 		$message_isolated = 1;
+	} elsif (s/^($re_app: )(?=(?:\[.*\] )*$re_exception)//) {
+		push @output, Token->new(T_APP, $1);
+		$message_isolated = 1;
 	}
 
 	if ($is_dmesg && s/^((-{3,}) ?[\[\(].+[\]\)] ?-{3,}\s*)//) {
