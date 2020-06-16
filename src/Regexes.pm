@@ -49,7 +49,7 @@ my  $re_nsname    = qr/(?:\\?(?:[A-Za-z]\w*\\)+)/;
 my  $re_classname = qr/(?:$re_nsname?[A-Za-z]\w+)/;
 my  $re_fnname    = qr/(?:[A-Za-z_]\w*|\{closure\})/;
 my  $re_fnprefix  = qr/(?:->|::)/;
-our $re_fncall    = qr/(?:(?<class>${re_nsname}(?=\{)|${re_classname}(?=${re_fnprefix})|${re_classname}::${re_nsname})?(?<fnp>${re_fnprefix})?(?<fn>${re_fnname})(?<args> ?\(.*\)))/;
+our $re_fncall    = qr/(?:(?<class>${re_nsname}(?=\{)|${re_classname}(?=${re_fnprefix})|${re_classname}::${re_nsname})?(?<fnp>${re_fnprefix}${re_nsname}?)?(?<fn>${re_fnname})(?<args> ?\(.*\)))/;
 our $re_memaddr   = qr/(?:0x[0-9a-fA-F]{6,})/;
 
 my  $re_fqcn      = qr/(?:(?:[A-Za-z][A-Za-z0-9_]+\\)+[A-Za-z][A-Za-z0-9_]*\b)/;  # fqcn must contain backslashes
