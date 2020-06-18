@@ -153,6 +153,7 @@ sub lex_next_line {
 	my $is_postfix;
 	my $is_rfc5424;
 	my $is_dmesg;
+	my $is_ps;
 	my $is_nginx_fastcgi;
 	my $client_follows;
 
@@ -306,6 +307,17 @@ sub lex_next_line {
 		if (s/($re_repeat_end)$//) {
 			unshift @suffix, Token->new(T_REPEATEND, $1);
 		}
+	} elsif (s/^([\w\-\+]+ +)(\d+)( +${re_percentage} +${re_percentage} +\d+ +\d+ +(?:\?|\w+\/?\d+) +[A-Za-z]+[<\+]* +)(${re_psstime} +)(\d+:\d+ +)//) {
+		# `ps aux` output format
+		$output[0]->set(ps => 'aux');
+		$message_isolated = 1;
+		$is_ps = 1;
+		push @output,
+			Token->new(T_USERNAME, $1),
+			Token->new(T_APP, $2),  # pid
+			Token->new(T_INFO, $3),  # cpu%, mem%, vsz, rss, tty, stat
+			Token->new(T_DATE, $4),  # start
+			Token->new(T_INFO, $5);  # time
 	}
 
 	if ($message_isolated && !$loglevel_isolated && s/^(<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:  ?)//) {
@@ -340,13 +352,17 @@ sub lex_next_line {
 		if (s/(^ \([^\]]*\)[:,] ?)//) {
 			push @output, Token->new(T_INFO, $1);
 		}
+	} elsif ($message_isolated && $is_ps && s/^(\[-?$re_path\]|\(-?$re_path\)|-?$re_path)//) {
+		push @output,
+			Token->new(T_MESSAGE),
+			Token->new(T_FILENAME, $1);
 	}
 
 	my $re_info_brackets = '(?:\\[[^\\]]+\\])';
 	if (s/^((?=\[?\{")$re_json)$//) {
 		# JSON-only line:
 		push @output, Token->new(T_JSON, $1);
-	} elsif ($message_isolated && s/^($re_info_brackets(?: *$re_info_brackets)*)( *)//) {
+	} elsif ($message_isolated && !$is_ps && s/^($re_info_brackets(?: *$re_info_brackets)*)( *)//) {
 		my %attr = ($is_rfc5424) ? (type => 'rfc-5424-sd') : ();
 		push @output, Token->new(T_INFO, $1, %attr);
 		push @output, Token->new(T_MESSAGE, $2);
@@ -468,7 +484,7 @@ sub lex_next_line {
 		$T_REST = T_INFO;
 	}
 
-	if ($message_isolated && s/^($re_info_brackets(?: +$re_info_brackets)*)//) {
+	if ($message_isolated && !$is_ps && s/^($re_info_brackets(?: +$re_info_brackets)*)//) {
 		my $info = $1;
 		push @output, striphttpstatus($info)  if $info;
 		push @output, Token->new(T_INFO, $info)  if $info;

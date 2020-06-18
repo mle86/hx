@@ -8,11 +8,12 @@ use vars qw(
 	$re_exception
 	$re_path $re_abspath
 	$re_app $re_ip $re_host $re_client
-	$re_word
+	$re_word $re_percentage
 	$re_time $re_ddd $re_ms $re_ymd $re_dmdty $re_ts8601 $re_tsw $re_sects
 	$re_a2date $re_a2clnt $re_a2err $re_http
 	$re_mysqld
 	$re_dmesg_ts $re_dmesg_app
+	$re_psstime
 	$re_tail_filename
 	$re_cron_cmd
 	$re_kv
@@ -58,7 +59,7 @@ my  $re_ex_code   = qr/(?:\/\d+|\(code:? \d+\))/;
 our $re_exception = qr/(?:(?:$re_fqcn|$re_excn)$re_ex_code?)/;
 
 my  $re_pathchr = qr/[A-Za-z0-9\-_\.\+\$@]/;
-our $re_abspath = qr/(?:\/[a-z]+[a-z0-9]+(?:\/+${re_pathchr}+)+)/;
+our $re_abspath = qr/(?:\/[a-z]+[a-z\-0-9]+(?:\/+${re_pathchr}+)+)/;
 my  $re_relpath = qr/(?:(?!use(?:$|\s))(?:${re_pathchr}+:?\/+)*[A-Za-z0-9\-_\.\+\$]+)/;
 my  $re_url     = qr/[a-z]+:\/{2,3}+(?:[^@]+@)?+[\w\-]+(?:\.[\w\-]+)*(?::\d+)?(?:\/${re_pathchr}*)*/;
 our $re_path    = qr/(?:$re_abspath|$re_relpath|$re_url)/;
@@ -75,6 +76,7 @@ our $re_sects  = qw/(?:\[\s*\d+\.\d+\])/;  # [   16.082998]
 
 our $re_app    = qr/(?:[A-Za-z0-9\/][A-Za-z0-9_\-\.\/]+?(?:\[\d+\]|\])?)/;
 our $re_word   = qr/(?:[A-Z][a-z]+)/;
+our $re_percentage = qr/(?:(?:\.\d+|\d+(?:\.\d+)?)%?)/;
 
 our $re_ip     = qr/(?:\[(?:[0-9a-fA-F]{1,4})?(?:::?[0-9a-fA-F]{1,4}){1,7}\]|(?:[0-9a-fA-F]{1,4})?(?:::?[0-9a-fA-F]{1,4}){1,7}|\d{1,3}(?:\.\d{1,3}){3})/;
 our $re_host   = qr/(?:[A-Za-z][A-Za-z0-9_\-\.]+)/;
@@ -90,6 +92,8 @@ our $re_http = qr/(?:(?<hs0> *\[)(?<hs>\d\d\d)(?<hs1>\]))/;
 
 our $re_dmesg_ts  = qr/(?:\[\d+${re_ms}?\])/;
 our $re_dmesg_app = qr/(?:[A-Za-z0-9][\w\-\.]*(?: [\w\-\.:]+)?)/;
+
+our $re_psstime = qr/(?:\d{4}|\w+\d{1,2}|\d{1,2}:\d{2})/;
 
 our $re_tail_filename = qr/(?:(?<prefix>==+> +)(?<filename>$re_path)(?<suffix> +<==+\s*$))/;
 
