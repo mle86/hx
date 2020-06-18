@@ -318,6 +318,17 @@ sub lex_next_line {
 			Token->new(T_INFO, $3),  # cpu%, mem%, vsz, rss, tty, stat
 			Token->new(T_DATE, $4),  # start
 			Token->new(T_INFO, $5);  # time
+	} elsif (s/^([\w\-\+]+ +)(\d+)( +\d+ +\d+ +)(${re_psstime} +)((?:\?|\w+\/?\d+) +\d+(?::\d+){1,2} +)//) {
+		# `ps -ef` output format
+		$output[0]->set(ps => 'ef');
+		$message_isolated = 1;
+		$is_ps = 1;
+		push @output,
+			Token->new(T_USERNAME, $1),
+			Token->new(T_APP, $2),  # pid
+			Token->new(T_INFO, $3),  # ppid, c
+			Token->new(T_DATE, $4),  # stime
+			Token->new(T_INFO, $5);  # tty, time
 	}
 
 	if ($message_isolated && !$loglevel_isolated && s/^(<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:  ?)//) {
