@@ -158,6 +158,13 @@ sub attr ($$) {
 	$self->{'attributes'}->{$key}
 }
 
+sub set ($@) {
+	my ($self, $k) = (shift, undef);
+	while (defined($k = shift)) {
+		$self->{'attributes'}->{$k} = shift
+	}
+}
+
 sub content ($) {
 	my ($self) = ($_[0]);
 
