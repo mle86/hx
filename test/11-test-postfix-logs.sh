@@ -26,5 +26,8 @@ line_dsn_error="$(logline "$logfile" 2 | HX_COLORS="$dsn_colors" "$HX" )"
 assertRegex "$line_dsn_success" "/$(re_col $dsn_color_success)[\d\.]+$(re_col 0)/"
 assertRegex "$line_dsn_error" "/$(re_col $dsn_color_error)[\d\.]+$(re_col 0)/"
 
+line_dsn_error="$(logline "$logfile" 4 | HX_COLORS="$dsn_colors" "$HX" )"
+assertRegex "$line_dsn_error" "/$(re_col $dsn_color_error)[\d\.]+$(re_col 0)/"
+
 
 success

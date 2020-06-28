@@ -464,6 +464,20 @@ sub lex_next_line {
 				push @output, Token->new(T_KV, $2, k => $+{'k'}, src => 'postfix');
 			}
 		}
+		if (s/(^.*: (?:\d{3} )?)(\d\.\d\.\d)(?= )//) {
+			push @output,
+				Token->new(T_MESSAGE, $1),
+				Token->new(T_MESSAGE, $2, type => 'dsn');
+		}
+		if (s/(; )($re_kv(?:[, ]+$re_kv)*\.?\s*)$//) {
+			my ($sep, $rest) = ($1, $2);
+			push @suffix, Token->new(T_MESSAGE, $sep);
+			while ($rest =~ s/^([, ]+)?($re_kv)//) {
+				push @suffix, Token->new(T_MESSAGE, $1)  if $1;
+				push @suffix, Token->new(T_KV, $2, k => $+{'k'}, src => 'postfix');
+			}
+			push @suffix, Token->new(T_MESSAGE, $rest);
+		}
 	} elsif ($message_isolated && s#^$re_cron_cmd##) {
 		# Cron syslog entry: (username) CMD ( cmd)
 		push @output,

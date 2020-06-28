@@ -40,6 +40,7 @@ sub format_token ($;%) {
 	return format_http($content)  if $token->is(T_HTTP_STATUS);
 	return format_json($content, $opt{'had_message'})  if $token->is(T_JSON);
 	return format_kv($token, $opt{'line'})  if $token->is(T_KV);
+	return format_postfix_status($content)  if ($token->is(T_MESSAGE) && $token->attr('type') eq 'dsn');
 
 	if ($token->is(T_INFO) || $token->is(T_CLIENT) || $token->is(T_USERNAME) || $token->is(T_WRAP) || $token->is(T_WRAPEND)) {
 
