@@ -21,25 +21,25 @@ sub format_token ($;%) {
 		return format_meta($token->content())  if $token->is(T_MESSAGE);
 	}
 
-	return format_date($token->content())  if $token->is(T_DATE);
-	return format_app($token->content())  if $token->is(T_APP);
-	return format_host($token->content())  if $token->is(T_HOST);
+	my $content = $token->content();
+
+	return format_date($content)  if $token->is(T_DATE);
+	return format_app($content)  if $token->is(T_APP);
+	return format_host($content)  if $token->is(T_HOST);
 	return format_loglevel($token)  if $token->is(T_LOGLEVEL);
 
-	return format_stack($token->content())  if $token->is(T_STACK);
-	return format_trace($token->content())  if ($token->is(T_TRACE) && $opt{'had_message'});
-	return format_trace($token->content(), $c_info_prefix)  if $token->is(T_TRACE);
-	return format_trace($token->content(), $c_message)  if $token->is(T_FILENAME) && $opt{'line'}->attr('ps');
-	return format_trace($token->content())  if $token->is(T_FILENAME);
-	return format_exception($token->content())  if $token->is(T_ERROR);
-	return format_fncall($token->content(), $opt{'packedline'})  if $token->is(T_FNCALL);
-	return format_rpt($token->content())  if $token->is(T_REPEAT);
-	return format_rpt($token->content())  if $token->is(T_REPEATEND);
-	return format_http($token->content())  if $token->is(T_HTTP_STATUS);
-	return format_json($token->content(), $opt{'had_message'})  if $token->is(T_JSON);
+	return format_stack($content)  if $token->is(T_STACK);
+	return format_trace($content)  if ($token->is(T_TRACE) && $opt{'had_message'});
+	return format_trace($content, $c_info_prefix)  if $token->is(T_TRACE);
+	return format_trace($content, $c_message)  if $token->is(T_FILENAME) && $opt{'line'}->attr('ps');
+	return format_trace($content)  if $token->is(T_FILENAME);
+	return format_exception($content)  if $token->is(T_ERROR);
+	return format_fncall($content, $opt{'packedline'})  if $token->is(T_FNCALL);
+	return format_rpt($content)  if $token->is(T_REPEAT);
+	return format_rpt($content)  if $token->is(T_REPEATEND);
+	return format_http($content)  if $token->is(T_HTTP_STATUS);
+	return format_json($content, $opt{'had_message'})  if $token->is(T_JSON);
 	return format_kv($token, $opt{'line'})  if $token->is(T_KV);
-
-	my $content = $token->content();
 
 	if ($token->is(T_INFO) || $token->is(T_CLIENT) || $token->is(T_USERNAME) || $token->is(T_WRAP) || $token->is(T_WRAPEND)) {
 
