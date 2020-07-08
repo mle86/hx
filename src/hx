@@ -373,7 +373,7 @@ sub lex_next_line {
 	if (s/^((?=\[?\{")$re_json)$//) {
 		# JSON-only line:
 		push @output, Token->new(T_JSON, $1);
-	} elsif ($message_isolated && !$is_ps && s/^($re_info_brackets(?: *$re_info_brackets)*)( *)//) {
+	} elsif ($message_isolated && !$is_ps && s/^($re_info_brackets(?: *$re_info_brackets)*(?:: )?)( *)//) {
 		my %attr = ($is_rfc5424) ? (type => 'rfc-5424-sd') : ();
 		push @output, Token->new(T_INFO, $1, %attr);
 		push @output, Token->new(T_MESSAGE, $2);
