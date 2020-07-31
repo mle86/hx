@@ -89,7 +89,7 @@ re_xtok () {
 	re_content="$(printf '%s' "$re_content" | sed 's/\\)/\\\\\\)/g')"
 
 #	printf '%s' "(?:^|\\s)(?:$1)${re_attr}(?:\\(${re_content}\\))${opt}${RW}"
-	printf '%s' "(?:$1)${re_attr}(?:\\(${re_content}\\))${opt}${RW}"
+	printf '%s' "(?:(?:$1)${re_attr}(?:\\(${re_content}\\))${opt}${RW})"
 }
 
 # re_tok TOKENTYPE CONTENT
