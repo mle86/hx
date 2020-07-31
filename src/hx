@@ -394,12 +394,11 @@ sub lex_next_line {
 		$exception_isolated = 1;
 	}
 
-	if ($message_isolated && s/^(.*? )(Stack trace: .*)$/$1/s) {
+	if ($message_isolated && s/^(.*?(?: |\\n))(Stack trace:(?: |\\n).*)$/$1/s) {
 		my $rest = $2;
 		@packedlines =
 			map { (Token->new(T_PACKEDLINE), $_) }
-				split(/(?=#\d+ |Stack trace: |Next $re_exception)/, $rest);
-		$T_REST = T_INFO;
+				split(/(?=#\d+ |Stack trace: |Next $re_exception|\\n)/, $rest);
 	}
 
 	if ($message_isolated && $is_apache && s/^($re_a2err:) //) {
@@ -434,13 +433,13 @@ sub lex_next_line {
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
 		$text_isolated = 1;
 	} elsif ($message_isolated &&
-			(s#^(.+?)( (?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*$)## ||
-			 s#^(.+?)([:,\.] [Ff]ile:? ${re_path}${re_lineno}?)(\s*$)##)) {
+			(s#^(.+?)((?:\\n)? (?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*(?:\\n)?$)## ||
+			 s#^(.+?)([:,\.] [Ff]ile:? ${re_path}${re_lineno}?)(\s*(?:\\n)?$)##)) {
 		# "MESSAGE in FILE:LINE" format
 		# "MESSAGE: file FILE:LINE" format
 		push @output, Token->new(T_MESSAGE, $1);
 		push @output, Token->new(T_TRACE, $2);
-		push @output, Token->new(T_MESSAGE, $3)  if $3;
+		push @output, Token->new(T_INFO, $3)  if $3;
 		$text_isolated = 1;
 	} elsif ($message_isolated && s#^(.+?)(?:(  ?)($re_info_brackets))?(  ?(?:in|at) ${re_abspath}${re_lineno}?\b {1,2})(?=[\(\[])##) {
 		# mini-api format
@@ -542,6 +541,8 @@ sub lex_next_line {
 	push @output, Token->new($T_REST, $_)  unless $_ eq '';
 
 	if (@packedlines) {
+		$T_REST = T_INFO;
+
 		# The line is not actually finished now,
 		# we've previously detected that this is a packed line.
 		# Get the next part and prepare to format that:

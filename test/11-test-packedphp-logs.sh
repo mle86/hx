@@ -8,10 +8,9 @@ re_backslash='(?:\\)'
 
 line="$(logline "$logfile" 1 | LEX)"
 rePart1="$(re_tok $T_ERROR "SoapFault:?")"
- rePart1="$(re_tok $T_ERROR "SoapFault:?")"
  rePart1="${rePart1}$(re_tok $T_MESSAGE ":")?$(re_tok $T_MESSAGE ":? ?Could not connect to host")"
  rePart1="${rePart1}$(re_tok $T_TRACE "in \/var\/myproj\/Import.php:20")"
- rePart1="${rePart1}$(re_tok $T_MESSAGE)?"
+ rePart1="${rePart1}$(re_tok "$T_MESSAGE|$T_INFO")?"
 rePart2="$(re_tok $T_PACKEDLINE)$(re_tok $T_INFO "Stack trace:")"
 rePart3="$(re_tok $T_PACKEDLINE)"
  rePart3="${rePart3}$(re_tok $T_INFO "#0")"
