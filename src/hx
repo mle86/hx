@@ -433,7 +433,7 @@ sub lex_next_line {
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
 		$text_isolated = 1;
 	} elsif ($message_isolated &&
-			(s#^(.+?)((?:\\n)? (?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*(?:\\n)?$)## ||
+			(s#^(.*?)((?:\\n)?  ?(?:thrown )?(?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*(?:\\n)?$)## ||
 			 s#^(.+?)([:,\.] [Ff]ile:? ${re_path}${re_lineno}?)(\s*(?:\\n)?$)##)) {
 		# "MESSAGE in FILE:LINE" format
 		# "MESSAGE: file FILE:LINE" format
