@@ -2,3 +2,4 @@
 2019-10-24 14:31:18.487 ERROR DbTrackingModule: Database error: The database is read only
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:357)
 	at org.h2.message.DbException.get(DbException.java:179)
+2020-09-17 11:00:22.367 INFO  (commitScheduler-10-thread-1) [   x:core] o.a.s.u.DirectUpdateHandler2 end_commit_flush
