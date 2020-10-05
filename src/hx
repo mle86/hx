@@ -297,6 +297,14 @@ sub lex_next_line {
 	} elsif (s/^($re_app: )(?=(?:\[.*\] )*$re_exception)//) {
 		push @output, Token->new(T_APP, $1);
 		$message_isolated = 1;
+	} elsif (s/^(\[$re_ts8601\])(\[\s*$re_loglevel\s*\])(\[[a-z]+(?:\.\w+)+ *\] *)//) {
+		# [yyyy-mm-ddThh:mm:ss,sss][loglevel][org.java.classname]
+		push @output,
+			Token->new(T_DATE, $1, format => '8601'),
+			Token->new(T_LOGLEVEL, $2, read_loglevel($2)),
+			Token->new(T_INFO, $3);
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	}
 
 	if ($is_dmesg && s/^((-{3,}) ?[\[\(].+[\]\)] ?-{3,}\s*)//) {

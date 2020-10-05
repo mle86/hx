@@ -17,5 +17,15 @@ line="$(logline "$logfile" 3 | LEX)"
 assertRegex "$line" "/^$(re_tok $T_CONTLINE)/"
 assertRegex "$line" "/$(re_tok $T_INFO "\s+at org\.h2\.message.*")/"
 
+#[2020-09-20T06:20:47,942][INFO ][o.e.x.m.p.l.CppLogMessageHandler] [0a0359200001] [controller/100] init
+line="$(logline "$logfile" 6 | LEX)"
+re=
+re="${re}$(re_tok $T_DATE '\[.*\]')"
+re="${re}$(re_tok $T_LOGLEVEL '\[INFO \]')"
+re="${re}$(re_tok $T_INFO '\[.+CppLogMessageHandler\]')"
+re="${re}$(re_tok $T_INFO '\[0a0359200001\].*')"
+re="${re}$(re_tok $T_MESSAGE 'init')"
+assertRegex "$line" "/$re/"
+
 
 success
