@@ -51,5 +51,12 @@ line="$(logline "$logfile" 7 | LEX)"
 assertRegex "$line" "/$(re_tok $T_DATE "\[Sun, Apr 26th, 13:49:59 2020\]")/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "msg")/"
 
+# 2020-10-14 12:45:23 Platform HTTP 500: array_key_exists() expects parameter 2 to be array, null given [:, Import.php:300, Application.php:200, index.php:33]
+line="$(logline "$logfile" 8 | LEX)"
+assertRegex "$line" "/$(re_tok $T_APP "Platform( HTTP)?")/"
+assertRegex "$line" "/$(re_tok $T_HTTP_STATUS "(HTTP )?500")/"
+assertRegex "$line" "/$(re_tok $T_MESSAGE "array_key_exists\(\) expects parameter 2 to be array, null given")/"
+assertRegex "$line" "/$(re_tok "$T_TRACE|$T_INFO" "\[.*33\](\\\\n)?")/"
+
 
 success
