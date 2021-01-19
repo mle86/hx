@@ -168,6 +168,11 @@ sub set ($@) {
 	}
 }
 
+sub set_type ($$) {
+	my ($self, $type) = (@_);
+	$self->{'type'} = $type
+}
+
 sub content ($) {
 	my ($self) = ($_[0]);
 

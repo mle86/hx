@@ -7,6 +7,7 @@ logfile="$HERE/samples/sym4-packed.log"
 re_backslash='(?:\\)'
 
 line="$(logline "$logfile" 1 | LEX)"
+rePart0="^$(re_tok $T_LINE).*"  # make sure it's not a CONTLINE (some of the packed parts look like a contline, but that should have no visible effect in a packed line)
 rePart1="$(re_tok $T_ERROR "SoapFault:?")"
  rePart1="${rePart1}$(re_tok $T_MESSAGE ":")?$(re_tok $T_MESSAGE ":? ?Could not connect to host")"
  rePart1="${rePart1}$(re_tok $T_TRACE "in \/var\/myproj\/Import.php:20")"
@@ -28,7 +29,7 @@ rePart5="$(re_tok $T_PACKEDLINE)"
  rePart5="${rePart5}.*"
 rePart6="$(re_tok $T_PACKEDLINE)$(re_tok $T_INFO "Stack trace:")"
 rePart7="$(re_tok $T_PACKEDLINE)$(re_tok $T_INFO "#0")"
-assertRegex "$line" "/$rePart1$rePart2$rePart3$rePart4$rePart5$rePart6$rePart7/"
+assertRegex "$line" "/$rePart0$rePart1$rePart2$rePart3$rePart4$rePart5$rePart6$rePart7/"
 
 
 logfile="$HERE/samples/apache2-php-packed.log"

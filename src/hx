@@ -142,12 +142,16 @@ sub lex_next_line {
 
 	my @suffix;
 	my @output;
+	my $linetok;
 
  restofline:
 
 	my $is_continuation_line = m/$re_continuation_line/;
 
-	@output = ( Token->new(($is_continuation_line) ? T_CONTLINE : T_LINE) )  if !@output;
+	if (!@output) {
+		$linetok = Token->new(($is_continuation_line) ? T_CONTLINE : T_LINE);
+		@output = ( $linetok );
+	}
 
 	my $is_apache;
 	my $is_postfix;
@@ -161,7 +165,7 @@ sub lex_next_line {
 	my $re_info_brackets = qr/(?:\[[^\]]+\])/;
 
 	# The start is probably the timestamp:
-	if (s/^($re_ddd {1,2}$re_time) ($re_host) ($re_app)(: *)//) {
+	if (s/^($re_ddd {1,2}$re_time) ($re_host) ($re_app)(: )//) {
 		# syslog format
 		push @output,
 			Token->new(T_DATE, $1 . ' ', format => 'syslog'),
@@ -420,6 +424,7 @@ sub lex_next_line {
 
 	if ($message_isolated && s/^.*?(?: |\\n)\K(Stack trace:(?: |\\n).*)$//s) {
 		my $rest = $1;
+		$linetok->set('packed' => 1)  if $linetok;
 		@packedlines =
 			map { (Token->new(T_PACKEDLINE), $_) }
 				split(/(?=#\d+ |Stack trace: |Next $re_exception|\\n)/, $rest);
@@ -518,6 +523,9 @@ sub lex_next_line {
 		push @output, Token->new(T_MESSAGE);
 		push @output, Token->new(T_TRACE, $2)  if $2;
 		push @suffix, Token->new(T_INFO, $3)  if $3;
+	} elsif ($message_isolated && m/$re_continuation_line/) {
+		$is_continuation_line = 1;
+		$linetok->set_type(T_CONTLINE)  if $linetok && !$linetok->attr('packed');
 	}
 
 
