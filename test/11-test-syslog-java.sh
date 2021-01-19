@@ -26,6 +26,7 @@ assertRegex "$line" "/$(re_tok $T_TRACE "\W*\.\/proj\/helper\/test\.js:31:34\W*"
 # Jan 19 18:12:16 mypc myapp[100]: stderr: /home/me/proj/src/test.js:44
 line="$(logline "$logfile" 5 | LEX)"
 assertRegex "$line" "/$(re_tok $T_LOGLEVEL "stderr:?")/"
+assertRegex "$line" "/$(re_tok "$T_TRACE|$T_FILENAME" "\/home\/me\/proj\/src\/test\.js:44")/"
 
 
 success
