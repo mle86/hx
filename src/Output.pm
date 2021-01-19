@@ -86,7 +86,7 @@ sub _format_tracefile ($$$) {
 sub format_exception ($) {
 	my ($in) = @_;
 	my ($prefix, $suffix) = ('', '');
-	if ($in =~ s/^((?:[^\\]+\\)+)//) { $prefix = $c_exception_fqcn . $1; }
+	if ($in =~ s/^((?:[^\\\.]+[\\\.])+)//) { $prefix = $c_exception_fqcn . $1; }
 	if ($in =~ s/(\/\d+)$//) { $suffix = $c_exception_code . $1; }
 	$prefix . $c_exception_scn . $in . $suffix . $c0
 }

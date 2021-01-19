@@ -53,10 +53,11 @@ my  $re_fnprefix  = qr/(?:->|::)/;
 our $re_fncall    = qr/(?:(?<class>${re_nsname}(?=\{)|${re_classname}(?=${re_fnprefix})|${re_classname}::${re_nsname})?(?<fnp>${re_fnprefix}${re_nsname}?)?(?<fn>${re_fnname})(?<args> ?\(.*\)))/;
 our $re_memaddr   = qr/(?:0x[0-9a-fA-F]{6,})/;
 
-my  $re_fqcn      = qr/(?:(?:[A-Za-z][A-Za-z0-9_]+\\)+[A-Za-z][A-Za-z0-9_]*\b)/;  # fqcn must contain backslashes
 my  $re_excn      = qr/(?:(?:[A-Z][A-Za-z0-9_]*)?(?:[Ee]xception|[Ee]rror|Fault)|ExceptionStack)/;  # short exception class name must end in "exception" or "error"
+my  $re_fqcn_php  = qr/(?:(?:[A-Za-z][A-Za-z0-9_]+\\)+[A-Za-z][A-Za-z0-9_]*\b)/;  # fqcn must contain backslashes
+my  $re_fqcn_java = qr/(?:(?=[a-z])(?:[a-zA-Z0-9\_]+\.)+$re_excn)/;  # fqcn must contain backslashes
 my  $re_ex_code   = qr/(?:\/\d+|\(code:? \d+\))/;
-our $re_exception = qr/(?:(?:$re_fqcn|$re_excn)$re_ex_code?)/;
+our $re_exception = qr/(?:(?:$re_fqcn_php|$re_fqcn_java|$re_excn)$re_ex_code?)/;
 
 my  $re_pathchr = qr/[A-Za-z0-9\-_\.\+\$@]/;
 our $re_abspath = qr/(?:\/[a-z]+[a-z\-0-9]+(?:\/+${re_pathchr}+)+)/;
