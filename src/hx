@@ -351,6 +351,10 @@ sub lex_next_line {
 			Token->new(T_INFO, $5);  # tty, time
 	}
 
+	if ($message_isolated && s/^((?:$re_ymdts|\[$re_ymdts\])[ :])//) {
+		push @output, Token->new(T_DATE, $1);
+	}
+
 	if ($message_isolated && !$loglevel_isolated && s/^(<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:  ?)//) {
 		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
 		$loglevel_isolated = 1;
