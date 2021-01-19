@@ -1,1 +1,4 @@
 Jan 19 18:10:07 mypc myapp[100]: 2021-01-19 18:10:07,591 [1234567]   WARN - my.app.name - failed to boot
+Jan 19 18:12:15 mypc myapp[100]: Error: Not acceptable.
+Jan 19 18:12:15 mypc myapp[100]:     at Object.method (./proj/helper/test.js:31:34)
+Jan 19 18:12:15 mypc myapp[100]:     at [eval]:15

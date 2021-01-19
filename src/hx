@@ -526,6 +526,16 @@ sub lex_next_line {
 	} elsif ($message_isolated && m/$re_continuation_line/) {
 		$is_continuation_line = 1;
 		$linetok->set_type(T_CONTLINE)  if $linetok && !$linetok->attr('packed');
+		if ($message_isolated && s/^( {4,}at (?:\S+\s+)??\(?)($re_path$re_lineno{1,2})(\)?)//) {
+			# looks like a stacktrace msg
+			push @output,
+				Token->new(T_INFO, $1),
+				Token->new(T_TRACE, $2),
+				Token->new(T_INFO, $3);
+		} elsif ($message_isolated && s/^( {4,}at .+)$//) {
+			# looks like a stacktrace msg but without filename
+			push @output, Token->new(T_INFO, $1);
+		}
 	}
 
 
