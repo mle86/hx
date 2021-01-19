@@ -264,7 +264,7 @@ sub lex_next_line {
 			Token->new(T_LOGLEVEL, $4, read_loglevel($4));
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
-	} elsif (s/^($re_ymd $re_time$re_ms? )(\[$re_loglevel\] )?(\d+(?:#\d+)?: )(\*\d+ ?)?(FastCGI sent in (?:stderr|stdout): )(")//i) {
+	} elsif (s/^($re_ymdts )(\[$re_loglevel\] )?(\d+(?:#\d+)?: )(\*\d+ ?)?(FastCGI sent in (?:stderr|stdout): )(")//i) {
 		# nginx + fastcgi
 		push @output, Token->new(T_DATE, $1);
 		push @output, Token->new(T_LOGLEVEL, $2, read_loglevel($2))  if $2;
@@ -291,7 +291,7 @@ sub lex_next_line {
 		push @output, Token->new(T_APP, $2);
 		push @output, Token->new(T_ERROR, $3)  if $3;
 		$message_isolated = 1;
-	} elsif (s/^($re_ymd $re_time$re_ms?|\[$re_ymd $re_time$re_ms?\])(:? )(\w+ )(HTTP )(\d\d\d)(: )//) {
+	} elsif (s/^($re_ymdts|\[$re_ymdts\])(:? )(\w+ )(HTTP )(\d\d\d)(: )//) {
 		push @output,
 			Token->new(T_DATE, $1 . $2),
 			Token->new(T_APP, $3),
@@ -302,7 +302,7 @@ sub lex_next_line {
 		if (s/((?:\s*$re_info_brackets)+[\r\n]*$)//) {
 			push @suffix, Token->new(T_INFO, $1);
 		}
-	} elsif (s/^($re_ymd $re_time$re_ms?|($re_ts8601)|$re_tsw|\[$re_tsw\]|$re_sects|\[$re_ymd $re_time$re_ms?\]|$re_dmdty|\[$re_dmdty\])( |:|$)//) {
+	} elsif (s/^($re_ymdts|($re_ts8601)|$re_tsw|\[$re_tsw\]|$re_sects|\[$re_ymdts\]|$re_dmdty|\[$re_dmdty\])( |:|$)//) {
 		my %attr = ($2) ? (type => '8601') : ();
 		push @output, Token->new(T_DATE, $1 . $3);
 		$message_isolated = 1;
@@ -414,8 +414,8 @@ sub lex_next_line {
 		$exception_isolated = 1;
 	}
 
-	if ($message_isolated && s/^(.*?(?: |\\n))(Stack trace:(?: |\\n).*)$/$1/s) {
-		my $rest = $2;
+	if ($message_isolated && s/^.*?(?: |\\n)\K(Stack trace:(?: |\\n).*)$//s) {
+		my $rest = $1;
 		@packedlines =
 			map { (Token->new(T_PACKEDLINE), $_) }
 				split(/(?=#\d+ |Stack trace: |Next $re_exception|\\n)/, $rest);
