@@ -70,6 +70,10 @@ my $re_token_serialization = qr/
 	(?: \( (?<text> ${re_text}) \) )?
 	(?:\s|$)/x;
 
+my %UNESCAPE = (
+	'n' => "\n",
+);
+
 
 ## Constructors:
 
@@ -99,8 +103,7 @@ sub unserialize ($$) {
 
 	if (defined $text) {
 		local $1;
-		$text =~ s/\\n/\n/g;
-		$text =~ s/\\(.)/$1/g;
+		$text =~ s#\\(.)# $UNESCAPE{$1} // $1 #ge;
 	}
 
 	return new($class, $type, $text, %attributes);
