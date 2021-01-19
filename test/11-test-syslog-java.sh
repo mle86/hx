@@ -27,6 +27,10 @@ assertRegex "$line" "/^$(re_tok $T_CONTLINE)/"
 assertRegex "$line" "/$(re_tok $T_INFO "\s*at Object\.method\W*")/"
 assertRegex "$line" "/$(re_tok $T_TRACE "\W*\.\/proj\/helper\/test\.js:31:34\W*")/"
 
+# Jan 19 18:12:15 mypc myapp[100]: #011at [eval]:15
+line="$(logline "$logfile" 4 | LEX)"
+assertRegex "$line" "/^$(re_tok $T_CONTLINE).*$(re_tok $T_INFO "(?:#011)?at .*")/"
+
 # Jan 19 18:12:16 mypc myapp[100]: stderr: /home/me/proj/src/test.js:44
 line="$(logline "$logfile" 5 | LEX)"
 assertRegex "$line" "/$(re_tok $T_LOGLEVEL "stderr:?")/"
