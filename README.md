@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.org/mle86/hx.svg?branch=master)](https://travis-ci.org/mle86/hx)
 
 
-Version 0.19.0, October 2020
+Version 0.20.0, January 2021
 
 <pre><code><b>hx</b> [<i>OPTIONS</i>] [<i>LOGFILE</i>...]</code></pre>
 
