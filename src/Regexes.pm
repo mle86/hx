@@ -30,7 +30,7 @@ my  $re_json_array      = "\\s*\\[(?:(?&json)(?:,(?&json))*|\\s*)\\]\\s*";
 my  $re_json_object     = "\\s*\\{(?:$re_json_string:(?&json)(?:,$re_json_string:(?&json))*|\\s*)?\\}\\s*";
 our $re_json            = qr/(?<json>$re_json_number|$re_json_const|$re_json_string|$re_json_array|$re_json_object)/;
 
-our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,}|(?:\t|#011)at| {4,}at|$))/;
+our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$))/;
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
