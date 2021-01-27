@@ -1,0 +1,5 @@
+[2018-01-01 10:00:00] php.CRITICAL: Uncaught Exception: An exception occurred in driver: SQLSTATE[HY000] [2002] Connection refused {"json":["data"]} []
+
+[2021-01-01 10:00:00] request.CRITICAL: Uncaught PHP Exception Doctrine\DBAL\Exception\InvalidFieldNameException: "An exception occurred while executing 'SELECT t0.id AS id_1, t0.access AS access_2 FROM MyTbl t0 WHERE t0.id = ?' with params ["H90"]:  SQLSTATE[42S22]: Column not found: 1054 Unknown column 't0.access' in 'field list'" at /proj/AbstractMySQLDriver.php line 60 {"json":["data"]} []
+
+[2021-01-01T10:00:00.000000+01:00] console.ERROR: Error thrown while running command "'doct:migr:migr'". Message: "An exception occurred while executing 'INSERT INTO mytable (id, name) VALUES (?, ?)' with params ["ID1", "val1"]:  SQLSTATE[22007]: Invalid datetime format: 1366 Incorrect integer value: 'ID1' for column `mydb`.`mytable`.`id` at row 1" {"json":["data"]} []

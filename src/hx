@@ -422,6 +422,14 @@ sub lex_next_line {
 		$exception_isolated = 1;
 	}
 
+	if ($message_isolated && s/(^['"]?+(?:.*?Message: )??['"]?(?:An )?(?:exception|error) occurred (?:in driver|while executing $re_qstr)(?: with (?:params|arguments|args) (?=\[)$re_json)?+: ++)((?:\w+|$re_exception)(?:\[[^\]]*\])?(?=:|\s))//) {
+		# There's another exception name/error code in the message
+		push @output,
+			Token->new(T_MESSAGE, $1),
+			# re_json always uses a numbered capture group
+			Token->new(T_ERROR, $3);
+	}
+
 	if ($message_isolated && s/^.*?(?: |\\n)\K(Stack trace:(?: |\\n).*)$//s) {
 		my $rest = $1;
 		$linetok->set('packed' => 1)  if $linetok;
