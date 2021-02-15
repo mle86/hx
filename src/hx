@@ -572,7 +572,7 @@ sub lex_next_line {
 	}
 
 	# Trailing Symfony JSON data:
-	if ($message_isolated && s/((?=\{")$re_json) (?<rest>\[[^\]]*\] *$)//) {
+	if ($message_isolated && s/((?=\{")$re_json|\[\]|\{\}) (?<rest>\[[^\]]*\] *$)//) {
 		unshift @suffix,
 			Token->new(T_JSON, $1),
 			Token->new(T_INFO, ' ' . $+{'rest'});
