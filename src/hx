@@ -471,9 +471,10 @@ sub lex_next_line {
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
 		$text_isolated = 1;
 	} elsif ($message_isolated &&
-			(s#^(.*?)((?:\\n)?  ?(?:thrown )?(?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*(?:\\n)?)(?=$)## ||
+			(s#^(.*?)((?:\\n)?  ?(?:thrown |called )?(?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*(?:\\n)?)(?=${re_symfony_info}?$)## ||
 			 s#^(.+?)([:,\.] [Ff]ile:? ${re_path}${re_lineno}?)(\s*(?:\\n)?$)##)) {
 		# "MESSAGE in FILE:LINE" format
+		# "MESSAGE in FILE:LINE" format with trailing json data
 		# "MESSAGE: file FILE:LINE" format
 		push @output, Token->new(T_MESSAGE, $1);
 		push @output, Token->new(T_TRACE, $2);

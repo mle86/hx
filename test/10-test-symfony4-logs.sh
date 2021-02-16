@@ -50,5 +50,12 @@ reExceptionMsg="$(re_tok $T_MESSAGE "\"?Server error:.*")"
 reJson="$(re_tok "$T_JSON|$T_INFO" "(?:\[\]\s*){1,2}"){1,2}"
 assertRegex "$line" "/${reDate}.*${reMsg}.*${reExceptionName}.*${reExceptionMsg}.*${reJson}/"
 
+# [2021-01-01 10:20:30] php.CRITICAL: Uncaught Error: Argument 1 passed to App\Entity\MyEntity::setProp() must be of the type int, null given, called in /proj/test.php on line 100 {"exception":"..."} []
+line="$(logline "$logfile" 6 | LEX)"
+reMsg="$(re_tok "$T_MESSAGE" "Argument 1 .* null given,?")"
+reSoure="$(re_tok "$T_TRACE" ",? ?called in /proj/test.php on line 100")"
+reJson="$(re_tok "$T_JSON|$T_INFO" "\{\"exception.*")"
+assertRegex "$line" "/${reMsg}${reSource}.*${reJson}/"
+
 
 success
