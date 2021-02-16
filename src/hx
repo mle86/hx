@@ -163,6 +163,7 @@ sub lex_next_line {
 
 	my ($message_isolated, $loglevel_isolated, $exception_isolated, $text_isolated);
 	my $re_info_brackets = qr/(?:\[[^\]]+\])/;
+	my $re_symfony_info = qr/(?:(?<sjdata>(?=\{")$re_json|\[\]|\{\}) (?<sjrest>\[[^\]]*\] *$))/;
 
 	# The start is probably the timestamp:
 	if (s/^($re_ddd {1,2}$re_time) ($re_host) ($re_app)(: )//) {
@@ -454,7 +455,7 @@ sub lex_next_line {
 #		push @output, Token->new(T_INFO, $1);
 #	}
 
-	if ($message_isolated && s#^(.+?)(  ?\(stack: .+\))?( \($re_exception (?:@|at|in) $re_path$re_lineno?\))##) {
+	if ($message_isolated && s#^(.+?)(  ?\(stack: .+\))?( \($re_exception (?:in|at|@) $re_path$re_lineno?\))##) {
 		# AEH format
 		my ($message, $stack, $rest, $info) = ($1, $2, $3, undef);
 		if ($message =~ s/((?:  ?$re_info_brackets)+)$//) { $info = $1; }
@@ -470,7 +471,7 @@ sub lex_next_line {
 		push @output, Token->new(T_TRACE, $rest)  if $rest;
 		$text_isolated = 1;
 	} elsif ($message_isolated &&
-			(s#^(.*?)((?:\\n)?  ?(?:thrown )?(?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*(?:\\n)?$)## ||
+			(s#^(.*?)((?:\\n)?  ?(?:thrown )?(?:in|at)(?: file:?)? ${re_path}${re_lineno}?\b)(\s*(?:\\n)?)(?=$)## ||
 			 s#^(.+?)([:,\.] [Ff]ile:? ${re_path}${re_lineno}?)(\s*(?:\\n)?$)##)) {
 		# "MESSAGE in FILE:LINE" format
 		# "MESSAGE: file FILE:LINE" format
@@ -572,10 +573,10 @@ sub lex_next_line {
 	}
 
 	# Trailing Symfony JSON data:
-	if ($message_isolated && s/((?=\{")$re_json|\[\]|\{\}) (?<rest>\[[^\]]*\] *$)//) {
+	if ($message_isolated && s/$re_symfony_info//) {
 		unshift @suffix,
-			Token->new(T_JSON, $1),
-			Token->new(T_INFO, ' ' . $+{'rest'});
+			Token->new(T_JSON, $+{'sjdata'}),
+			Token->new(T_INFO, ' ' . $+{'sjrest'});
 	}
 
 #	# JSON-only line:
