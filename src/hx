@@ -322,6 +322,14 @@ sub lex_next_line {
 			Token->new(T_INFO, $3);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^(\[$re_app\] )(\(\d?\.\d+\) )($re_path$re_lineno?)(\s*\| ?+)//) {
+		# "[app] (0.123456) source.h:100   | Message"
+		$message_isolated = 1;
+		push @output,
+			Token->new(T_APP, $1),
+			Token->new(T_DATE, $2),
+			Token->new(T_INFO, $3),
+			Token->new(T_INFO, $4);
 	}
 
 	if ($is_dmesg && s/^((-{3,}) ?[\[\(].+[\]\)] ?-{3,}\s*)//) {

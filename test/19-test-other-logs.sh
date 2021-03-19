@@ -58,5 +58,12 @@ assertRegex "$line" "/$(re_tok $T_HTTP_STATUS "(HTTP )?500")/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "array_key_exists\(\) expects parameter 2 to be array, null given")/"
 assertRegex "$line" "/$(re_tok "$T_TRACE|$T_INFO" "\[.*33\](\\\\n)?")/"
 
+# [myapp] (0.262733) init.c:105     | Start-up complete
+line="$(logline "$logfile" 9 | LEX)"
+assertRegex "$line" "/$(re_tok $T_APP "\[myapp\]")/"
+assertRegex "$line" "/$(re_tok $T_DATE "\(?0\.262733\)?")/"
+assertRegex "$line" "/$(re_tok "$T_TRACE|$T_INFO" "init\.c:105\s*")/"
+assertRegex "$line" "/$(re_tok $T_MESSAGE "Start-up complete")/"
+
 
 success

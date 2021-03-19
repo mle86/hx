@@ -6,3 +6,4 @@ error: <class 'socket.error'>, [Errno 99] Cannot assign requested address in fil
 Apr  1 10:00:00 mysys org.gnome.Shell.desktop[4600]: #2 0x7ffd00007d22 I   resource:///org/gnome/gjs/modules/_legacy.js:82 (0x7ffd00007d30 @ 71)
 [Sun, Apr 26th, 13:49:59 2020] msg
 2020-10-14 12:45:23 Platform HTTP 500: array_key_exists() expects parameter 2 to be array, null given [:, Import.php:300, Application.php:200, index.php:33]
+[myapp] (0.262733) init.c:105     | Start-up complete
