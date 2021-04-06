@@ -247,11 +247,12 @@ sub lex_next_line {
 			Token->new(T_ERROR, $2),
 			Token->new(T_MESSAGE, $3);
 		$message_isolated = 1;
-	} elsif (s/^(PHP Fatal error: )( ?Uncaught (?:PHP Exception )?)($re_exception)//) {
+	} elsif (s/^(?:(PHP Fatal error: )|((?=PHP)$re_loglevel: ))( ?Uncaught (?:PHP Exception )?)($re_exception)//) {
+		push @output, Token->new(T_APP, $1)  if $1;
+		push @output, Token->new(T_LOGLEVEL, $2, read_loglevel($2))  if $2;
 		push @output,
-			Token->new(T_APP, $1),
-			Token->new(T_MESSAGE, $2),
-			Token->new(T_ERROR, $3);
+			Token->new(T_MESSAGE, $3),
+			Token->new(T_ERROR, $4);
 		$message_isolated = 1;
 	} elsif (s/^($re_ymd $re_time(?:,\d+)?:)($re_loglevel:)([^:]+:)//) {
 		# LetsEncrypt/certbot
