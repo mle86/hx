@@ -331,6 +331,14 @@ sub lex_next_line {
 			Token->new(T_DATE, $2),
 			Token->new(T_INFO, $3),
 			Token->new(T_INFO, $4);
+	} elsif (s/^((?:$re_time|$re_ymdts)\s+)($re_loglevel\s+)((?:\[$re_app\]:?|$re_app:) +)//) {
+		# 12:00:00 ERROR     [app] message
+		push @output,
+			Token->new(T_DATE, $1),
+			Token->new(T_LOGLEVEL, $2, read_loglevel($2)),
+			Token->new(T_APP, $3);
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	}
 
 	if ($is_dmesg && s/^((-{3,}) ?[\[\(].+[\]\)] ?-{3,}\s*)//) {
