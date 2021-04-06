@@ -36,7 +36,7 @@ my  $re_json_object     = "\\s*\\{(?:$re_json_string_nc:(?&json)(?:,$re_json_str
 our $re_json            = qr/(?<json>$re_json_number|$re_json_const|$re_json_string_nc|$re_json_array|$re_json_object)/;
   # NB: the $re_json pattern captures into the <json> group. This means it uses one numbered capture group too.
 
-our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$))/;
+our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+))/;
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
