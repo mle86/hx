@@ -310,7 +310,7 @@ sub lex_next_line {
 		}
 	} elsif (s/^($re_ymdts|($re_ts8601)|$re_tsw|\[$re_tsw\]|$re_sects|\[$re_ymdts\]|$re_dmdty|\[$re_dmdty\])( |:|$)//) {
 		my %attr = ($2) ? (type => '8601') : ();
-		push @output, Token->new(T_DATE, $1 . $3);
+		push @output, Token->new(T_DATE, $1 . $3, %attr);
 		$message_isolated = 1;
 	} elsif (s/^($re_app: )(?=(?:\[.*\] )*$re_exception)//) {
 		push @output, Token->new(T_APP, $1);
