@@ -33,5 +33,12 @@ assertRegex "$phpErrorLine" "/${rePhp1}${rePhp2}${rePhp3}${rePhp4}/"
 assertRegex "$phpErrorLine" "/$(re_tok $T_TRACE "in /var/www/myapp/classes/actions/custom/lookup/MyCustomLookupAction\.php on line 12")/"
 assertRegex "$phpErrorLine" "/$(re_tok $T_WRAPEND "\" while reading.*")/"
 
+# 2021/05/31 12:00:00 [error] 60#60: *3 FastCGI sent in stderr: "PHP message: 2021-05-30T12:00:00+02:00 [critical] Uncaught Exception: Cache::__construct(/proj/tmp): failed to open dir: Permission denied" while reading upstream, client: 127.0.0.1, server: test.tld, request: "GET /my/test HTTP/1.1", upstream: "fastcgi://127.0.0.1:9000", host: "test.tld"
+phpErrorLine="$(logline "$logfile" 3 | LEX)"
+reWrapBegin="$(re_tok $T_WRAP ".*stderr: \"")"
+rePhp="$(re_tok $T_MESSAGE "PHP message: .* Permission denied")"
+reWrapEnd=""$(re_tok $T_WRAPEND "\" while reading upstream.*")
+assertRegex "$phpErrorLine" "/${reWrapBegin}${rePhp}${reWrapEnd}/"
+
 
 success

@@ -280,7 +280,7 @@ sub lex_next_line {
 		$is_nginx_fastcgi = 1;
 		$message_isolated = 1;
 		$loglevel_isolated = 1  if $2;
-		if (s/(")((?: while reading response header from upstream)?, client: ${re_client}, (?:server:|request:).*)$//s) {
+		if (s/(")((?: while reading(?:(?: response| header){0,2} from)? upstream)?, client: ${re_client}, (?:server:|request:).*)$//s) {
 			# end of fastcgi message should not affect main message parsing, it's a mostly boring wrapper -- so cut it out and put it into $suffix
 			unshift @suffix, Token->new(T_WRAPEND, $1 . $2);
 		}
