@@ -70,7 +70,7 @@ our $re_abspath = qr/(?:\/[a-z]+[a-z\-0-9]+(?:\/+${re_pathchr}+)+)/;
 my  $re_relpath = qr/(?:(?!use(?:$|\s))(?:${re_pathchr}+:?\/+)*[A-Za-z0-9\-_\.\+\$]+)/;
 my  $re_url     = qr/[a-z]+:\/{2,3}+(?:[^@]+@)?+[\w\-]+(?:\.[\w\-]+)*(?::\d+)?(?:\/${re_pathchr}*)*/;
 our $re_path    = qr/(?:$re_abspath|$re_relpath|$re_url)/;
-our $re_source  = qr/(?:(?:thrown |called )?(?:in|at|@)(?: file:?)? ${re_path}${re_lineno}?\b|(?<=[:,\.] )[Ff]ile:? ${re_path}${re_lineno}?)/;
+our $re_source  = qr/(?:(?:thrown |called )?(?:in|at|@)(?: file:?)? \[?${re_path}${re_lineno}?\b\]?|(?<=[:,\.] )[Ff]ile:? ${re_path}${re_lineno}?)/;
 
 our $re_time   = qr/(?:\d\d:\d\d:\d\d)/;
 our $re_ms     = qr/(?:[\.,]\d{1,6})/;

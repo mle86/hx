@@ -94,7 +94,7 @@ sub format_exception ($) {
 sub format_trace ($;$) {
 	my ($out, $c_base) = ($_[0], ($_[1] // $c_trace));
 
-	$out =~ s/\b([\w\-\.\$]+)($re_lineno)?(,|\)|\s*$)/ _format_tracefile($1, $2, $c_base) . $3 /ge;
+	$out =~ s/\b([\w\-\.\$]+)($re_lineno)?(,|\)|\s*$|\])/ _format_tracefile($1, $2, $c_base) . $3 /ge;
 
 	$c_base . $out . $c0
 }
