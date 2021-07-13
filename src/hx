@@ -580,11 +580,12 @@ sub lex_next_line {
 	}
 
 
-	if ($is_continuation_line && s/^(#\d+ )?(?:(${re_abspath}${re_lineno}?|\[internal function\])(: ))?($re_fncall|\{main\})//) {
+	if ($is_continuation_line && s/^(#\d+ )?(?:(${re_abspath}${re_lineno}?|\[internal function\])(: ))?($re_fncall|\{main\})(?<src> $re_source)?//) {
 		push @output, Token->new(T_INFO, $1)  if $1;
 		push @output, Token->new(T_TRACE, $2)  if $2;
 		push @output, Token->new(T_INFO, $3)  if $3;
 		push @output, Token->new(T_FNCALL, $4);
+		push @output, Token->new(T_TRACE, $+{'src'})  if $+{'src'};
 	} elsif ($is_continuation_line) {
 		# all continuation lines get info-colored:
 		push @output, Token->new(T_MESSAGE);
