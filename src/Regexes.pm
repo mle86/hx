@@ -83,7 +83,7 @@ our $re_ymdts  = qr/(?:$re_ymd $re_time$re_ms?)/;  # 2021-01-19 17:47:31.416
 our $re_tsw    = qr/(?:\d{1,2}-\w{2,4}-\d{4} ${re_time}${re_ms}?)/;  # 07-Jun-2019 11:36:20.106
 our $re_sects  = qw/(?:\[\s*\d+\.\d+\])/;  # [   16.082998]
 
-our $re_app    = qr/(?:[A-Za-z0-9\/][A-Za-z0-9_\-\.\/]+?(?:\[\d+\]|\])?)/;
+our $re_app    = qr/(?:[A-Za-z0-9\/][A-Za-z0-9_\-\.\/]+?(?:\[\d+\]|\]| ?\(pid \d+\))?)/;
 our $re_word   = qr/(?:[A-Z][a-z]+)/;
 our $re_percentage = qr/(?:(?:\.\d+|\d+(?:\.\d+)?)%?)/;
 

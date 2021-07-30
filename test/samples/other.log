@@ -8,3 +8,4 @@ Apr  1 10:00:00 mysys org.gnome.Shell.desktop[4600]: #2 0x7ffd00007d22 I   resou
 2020-10-14 12:45:23 Platform HTTP 500: array_key_exists() expects parameter 2 to be array, null given [:, Import.php:300, Application.php:200, index.php:33]
 [myapp] (0.262733) init.c:105     | Start-up complete
 12:00:00 ERROR     [app] message
+ERROR: app (pid 1000) Mon Jul 26 16:00:00 2021: message

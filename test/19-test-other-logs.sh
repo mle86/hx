@@ -69,5 +69,9 @@ assertRegex "$line" "/$(re_tok $T_MESSAGE "Start-up complete")/"
 line="$(logline "$logfile" 10 | LEX)"
 assertRegex "$line" "/$(re_tok $T_DATE "12:00:00")\s*$(re_tok $T_LOGLEVEL "ERROR\s*")\s*$(re_tok $T_APP '\[app\]')\s*$(re_tok $T_MESSAGE)/"
 
+# ERROR: app (pid 1000) Mon Jul 26 16:00:00 2021: message
+line="$(logline "$logfile" 11 | LEX)"
+assertRegex "$line" "/$(re_tok $T_LOGLEVEL "ERROR:?")\s*$(re_tok $T_APP "app \(pid 1000\)")\s*$(re_tok $T_DATE 'Mon Jul 26 16:00:00 2021:?')\s*$(re_tok $T_MESSAGE)/"
+
 
 success
