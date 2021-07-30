@@ -306,6 +306,7 @@ sub lex_next_line {
 		push @output, Token->new(T_APP, $2);
 		push @output, Token->new(T_ERROR, $3)  if $3;
 		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	} elsif (s/^($re_ymdts|\[$re_ymdts\])(:? )(\w+ )(HTTP )(\d\d\d)(: )//) {
 		push @output,
 			Token->new(T_DATE, $1 . $2),
