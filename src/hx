@@ -356,6 +356,12 @@ sub lex_next_line {
 			Token->new(T_APP, $1),
 			Token->new(T_DATE, $2, %attr);
 		$message_isolated = 1;
+	} elsif (s/^($re_abspath$re_lineno?: )($re_loglevel:?\s+)?+//) {
+		# /usr/bin/script.sh:50: Warning: Message
+		push @output, Token->new(T_APP, $1);
+		push @output, Token->new(T_LOGLEVEL, $2, read_loglevel($2))  if $2;
+		$message_isolated = 1;
+		$loglevel_isolated = 1  if $2;
 	} elsif (s/^((?:$re_time|$re_ymdts)\s+)($re_loglevel\s+)((?:\[$re_app\]:?|$re_app:) +)//) {
 		# 12:00:00 ERROR     [app] message
 		push @output,

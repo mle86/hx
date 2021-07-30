@@ -10,3 +10,4 @@ Apr  1 10:00:00 mysys org.gnome.Shell.desktop[4600]: #2 0x7ffd00007d22 I   resou
 12:00:00 ERROR     [app] message
 ERROR: app (pid 1000) Mon Jul 26 16:00:00 2021: message
 update-alternatives 2021-07-03 13:05:40: run with --install ...
+/usr/bin/script.sh:50: Warning: Message

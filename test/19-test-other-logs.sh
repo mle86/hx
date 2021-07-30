@@ -77,5 +77,9 @@ assertRegex "$line" "/$(re_tok $T_LOGLEVEL "ERROR:?")\s*$(re_tok $T_APP "app \(p
 line="$(logline "$logfile" 12 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "update-alternatives")\s*$(re_tok $T_DATE "2021-07-03 13:05:40:?")\s*$(re_tok $T_MESSAGE)/"
 
+# /usr/bin/script.sh:50: Warning: Message
+line="$(logline "$logfile" 13 | LEX)"
+assertRegex "$line" "/$(re_tok "$T_TRACE|$T_APP" "\\/usr\\/bin\\/script.sh:50:")\s*$(re_tok $T_LOGLEVEL "Warning:")\s*$(re_tok $T_MESSAGE)/"
+
 
 success
