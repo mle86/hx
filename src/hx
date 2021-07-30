@@ -349,6 +349,13 @@ sub lex_next_line {
 			Token->new(T_DATE, $3, %attr);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^((?=[A-Za-z])$re_app:? )((?:$re_dmdty|$re_ymdts|$re_time|($re_ts8601)):? )//) {
+		# app 2021-07-03 13:05:40: message
+		my %attr = ($3) ? (type => '8601') : ();
+		push @output,
+			Token->new(T_APP, $1),
+			Token->new(T_DATE, $2, %attr);
+		$message_isolated = 1;
 	} elsif (s/^((?:$re_time|$re_ymdts)\s+)($re_loglevel\s+)((?:\[$re_app\]:?|$re_app:) +)//) {
 		# 12:00:00 ERROR     [app] message
 		push @output,

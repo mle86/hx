@@ -73,5 +73,9 @@ assertRegex "$line" "/$(re_tok $T_DATE "12:00:00")\s*$(re_tok $T_LOGLEVEL "ERROR
 line="$(logline "$logfile" 11 | LEX)"
 assertRegex "$line" "/$(re_tok $T_LOGLEVEL "ERROR:?")\s*$(re_tok $T_APP "app \(pid 1000\)")\s*$(re_tok $T_DATE 'Mon Jul 26 16:00:00 2021:?')\s*$(re_tok $T_MESSAGE)/"
 
+# update-alternatives 2021-07-03 13:05:40: run with --install ...
+line="$(logline "$logfile" 12 | LEX)"
+assertRegex "$line" "/$(re_tok $T_APP "update-alternatives")\s*$(re_tok $T_DATE "2021-07-03 13:05:40:?")\s*$(re_tok $T_MESSAGE)/"
+
 
 success
