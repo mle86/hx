@@ -81,5 +81,9 @@ assertRegex "$line" "/$(re_tok $T_APP "update-alternatives")\s*$(re_tok $T_DATE 
 line="$(logline "$logfile" 13 | LEX)"
 assertRegex "$line" "/$(re_tok "$T_TRACE|$T_APP" "\\/usr\\/bin\\/script.sh:50:")\s*$(re_tok $T_LOGLEVEL "Warning:")\s*$(re_tok $T_MESSAGE)/"
 
+# 2021-07-26 15:00:00,000 INFO Starting unattended upgrades script
+line="$(logline "$logfile" 14 | LEX)"
+assertRegex "$line" "/$(re_tok "$T_DATA" "2021-07-26 15:00:00,000")\s*$(re_tok $T_LOGLEVEL "INFO")\s*$(re_tok $T_MESSAGE)/"
+
 
 success
