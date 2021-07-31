@@ -318,6 +318,13 @@ sub lex_next_line {
 		if (s/((?:\s*$re_info_brackets)+[\r\n]*$)//) {
 			push @suffix, Token->new(T_INFO, $1);
 		}
+	} elsif (s/^($re_ymdts) ($re_host) ($re_app(?: \2)?: )//) {
+		# similar to syslog, proftpd uses this
+		push @output,
+			Token->new(T_DATE, $1 . ' '),
+			Token->new(T_HOST, $2 . ' '),
+			Token->new(T_APP, $3);
+		$message_isolated = 1;
 	} elsif (s/^($re_ymdts|($re_ts8601)|$re_tsw|\[$re_tsw\]|$re_sects|\[$re_ymdts\]|$re_dmdty|\[$re_dmdty\])( |:|$)//) {
 		my %attr = ($2) ? (type => '8601') : ();
 		push @output, Token->new(T_DATE, $1 . $3, %attr);
