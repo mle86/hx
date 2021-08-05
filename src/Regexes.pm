@@ -3,7 +3,7 @@ use strict;
 use vars qw(
 	$re_json $re_json_string
 	$re_continuation_line $re_repeat_begin $re_repeat_end
-	$re_lineno $re_loglevel
+	$re_lineno $re_loglevel $re_loglevel_short
 	$re_fncall $re_memaddr
 	$re_exception
 	$re_path $re_abspath $re_source
@@ -43,9 +43,10 @@ our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+|, line:? \d+| line:? \d+)/;
 
 our $re_loglevel = qr/(?:(?:PHP )?(?i:warn|warning|warnung|err|error|fehler|info|information|note|notice|hinweis|crit|critical|schwerwiegend|emerg|emergency|debug[123]?|dbg|fine|alrt|alert|parse error|fatal error|stdout|stderr))/;
+our $re_loglevel_short = qr/(?:\b[EW]\b)/;
 
-my $re_loglevel_warn = qr/\b(?:warn|warning|warnung|stderr)\b/i;
-my $re_loglevel_err  = qr/\b(?:err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency)\b/i;
+my $re_loglevel_warn = qr/\b(?:W|warn|warning|warnung|stderr)\b/i;
+my $re_loglevel_err  = qr/\b(?:E|err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency)\b/i;
 sub read_loglevel ($) {
 	if    ($_[0] =~ m/$re_loglevel_warn/i) { return level => L_WARNING }
 	elsif ($_[0] =~ m/$re_loglevel_err/i)  { return level => L_ERROR }

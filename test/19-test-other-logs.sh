@@ -85,5 +85,9 @@ assertRegex "$line" "/$(re_tok "$T_TRACE|$T_APP" "\\/usr\\/bin\\/script.sh:50:")
 line="$(logline "$logfile" 14 | LEX)"
 assertRegex "$line" "/$(re_tok "$T_DATA" "2021-07-26 15:00:00,000")\s*$(re_tok $T_LOGLEVEL "INFO")\s*$(re_tok $T_MESSAGE)/"
 
+# E [01/Aug/2021:12:00:00 +0200] [cups-deviced] message
+line="$(logline "$logfile" 15 | LEX)"
+assertRegex "$line" "/$(re_tok $T_LOGLEVEL "E")\s*$(re_tok $T_DATE "\[01/Aug/2021:12:00:00 \+0200\]")\s*$(re_tok "$T_MESSAGE|$T_INFO" "\[cups.*")/"
+
 
 success

@@ -12,3 +12,4 @@ ERROR: app (pid 1000) Mon Jul 26 16:00:00 2021: message
 update-alternatives 2021-07-03 13:05:40: run with --install ...
 /usr/bin/script.sh:50: Warning: Message
 2021-07-26 15:00:00,000 INFO Starting unattended upgrades script
+E [01/Aug/2021:12:00:00 +0200] [cups-deviced] message

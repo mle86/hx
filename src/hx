@@ -377,6 +377,13 @@ sub lex_next_line {
 		push @output, Token->new(T_LOGLEVEL, $2, read_loglevel($2))  if $2;
 		$message_isolated = 1;
 		$loglevel_isolated = 1  if $2;
+	} elsif (s/^((?:$re_loglevel|$re_loglevel_short):? )(\[$re_dmyts\] )//) {
+		# E [01/Aug/2021:12:00:00 +0200] [cups-deviced] message
+		push @output,
+			Token->new(T_LOGLEVEL, $1, read_loglevel($1)),
+			Token->new(T_DATE, $2);
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	} elsif (s/^((?:$re_time|$re_ymdts|$re_dmyts)\s+)($re_loglevel\s+)((?:\[$re_app\]:?|$re_app:) +)//) {
 		# 12:00:00 ERROR     [app] message
 		push @output,
