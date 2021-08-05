@@ -164,7 +164,6 @@ sub lex_next_line {
 	my $client_follows;
 
 	my ($message_isolated, $loglevel_isolated, $exception_isolated, $text_isolated);
-	my $re_info_brackets = qr/(?:\[[^\]]+\])/;
 	my $re_symfony_info = qr/(?:(?<sjdata>(?=\{")$re_json|\[\]|\{\}) (?<sjrest>\[[^\]]*\] *$))/;
 
 	# The start is probably the timestamp:
@@ -482,10 +481,10 @@ sub lex_next_line {
 	if (s/^((?=\[?\{")$re_json)$//) {
 		# JSON-only line:
 		push @output, Token->new(T_JSON, $1);
-	} elsif ($message_isolated && !$is_ps && s/^($re_info_brackets(?: *$re_info_brackets)*(?:: )?)( *)//) {
+	} elsif ($message_isolated && !$is_ps && s/^(?<info>$re_info_brackets(?: *$re_info_brackets)*(?:: )?)(?<msg> *)//) {
 		my %attr = ($is_rfc5424) ? (type => 'rfc-5424-sd') : ();
-		push @output, Token->new(T_INFO, $1, %attr);
-		push @output, Token->new(T_MESSAGE, $2);
+		push @output, Token->new(T_INFO, $+{'info'}, %attr);
+		push @output, Token->new(T_MESSAGE, $+{'msg'});
 	} elsif ($message_isolated && $is_rfc5424 && s/^(-) //) {
 		# RFC5424 with empty Structured Data field
 		push @output, Token->new(T_INFO, $1 . ' ');
@@ -559,9 +558,9 @@ sub lex_next_line {
 		push @output, Token->new(T_TRACE, $2);
 		push @output, Token->new(T_INFO, $3)  if $3;
 		$text_isolated = 1;
-	} elsif ($message_isolated && s#^(.+?)(?:(  ?)($re_info_brackets))?(  ?(?:in|at) ${re_abspath}${re_lineno}?\b {1,2})(?=[\(\[])##) {
+	} elsif ($message_isolated && s#^(.+?)(?:(  ?)($re_info_brackets))?(?<trace>  ?(?:in|at) ${re_abspath}${re_lineno}?\b {1,2})(?=[\(\[])##) {
 		# mini-api format
-		my ($prefix, $info, $trace) = ($1 . $2, $3, $4);
+		my ($prefix, $info, $trace) = ($1 . $2, $3, $+{'trace'});
 		push @output, Token->new(T_MESSAGE, $prefix);
 		push @output, striphttpstatus($info)  if $info;
 		push @output, Token->new(T_INFO, $info)  if $info;

@@ -6,6 +6,7 @@ use vars qw(
 	$re_lineno $re_loglevel $re_loglevel_short
 	$re_fncall $re_memaddr
 	$re_exception
+	$re_info_brackets
 	$re_path $re_abspath $re_source
 	$re_app $re_ip $re_host $re_client
 	$re_word $re_percentage $re_qstr
@@ -112,6 +113,8 @@ our $re_tail_filename = qr/(?:(?<prefix>==+> +)(?<filename>$re_path)(?<suffix> +
 our $re_cron_cmd = qr/(?<user>\([\w\-]+\))(?<prefix> CMD \( +)(?<cmd>.+)(?<suffix>\)\s*$)/;
 
 our $re_kv = qr/(?<k>\w[\w\.\-]*)(?<s>[=:])(?<v>$re_dqstr|<[^>]*+>|[^\s,]*+)(?=\s|,|$)/;
+
+our $re_info_brackets = qr/(\[(?:[^\[\]]++|(?=\[)(?-1))+\])/;
 
 our $re_ansi_color = qr/(?:\e\[\d+(?:;\d+)*m)/;
 sub get_ansi_prefix ($) {
