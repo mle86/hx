@@ -9,7 +9,7 @@ use vars qw(
 	$re_path $re_abspath $re_source
 	$re_app $re_ip $re_host $re_client
 	$re_word $re_percentage $re_qstr
-	$re_time $re_ddd $re_ms $re_ymd $re_dmdty $re_ts8601 $re_tsw $re_sects $re_ymdts
+	$re_time $re_ddd $re_ms $re_dmy $re_ymd $re_dmdty $re_ts8601 $re_tsw $re_sects $re_dmyts $re_ymdts
 	$re_a2date $re_a2clnt $re_a2err $re_http
 	$re_mysqld
 	$re_dmesg_ts $re_dmesg_app
@@ -76,10 +76,12 @@ our $re_time   = qr/(?:\d\d:\d\d:\d\d)/;
 our $re_ms     = qr/(?:[\.,]\d{1,6})/;
 our $re_ddd    = qr/(?:[A-Za-z]{2,3} +\d+)/;
 our $re_ymd    = qr/(?:\d\d\d\d-\d\d-\d\d|\d\d\d\d\/\d\d\/\d\d|\d\d\d\d\.\d\d\.\d\d)/;
+our $re_dmy    = qr/(?:\d\d\/[A-Z][A-Za-z]{2}\/\d\d\d\d)/;
 my  $re_tz     = qr/(?:[\+\-]\d\d(?::?\d\d(?::\d\d)?)?|Z)/;
 our $re_dmdty  = qr/(?:[A-Z][A-Za-z]{2},? [A-Z][A-Za-z]{2} \d\d?(?:st|nd|rd|th)?,? ${re_time}${re_ms}?,? \d\d\d\d)/;  # Sun Apr 26 13:49:59 2020
 our $re_ts8601 = qr/(?:${re_ymd}T${re_time}${re_ms}?${re_tz}?)/;  # 2019-07-07T18:22:34.001Z
-our $re_ymdts  = qr/(?:$re_ymd $re_time$re_ms?)/;  # 2021-01-19 17:47:31.416
+our $re_ymdts  = qr/(?:$re_ymd $re_time$re_ms?(?: ?$re_tz)?)/;  # 2021-01-19 17:47:31.416
+our $re_dmyts  = qr/(?:(?:$re_dmy)[: ]$re_time$re_ms?(?: ?$re_tz)?)/;  # 01/Aug/2021:16:59:01 +0200
 our $re_tsw    = qr/(?:\d{1,2}-\w{2,4}-\d{4} ${re_time}${re_ms}?)/;  # 07-Jun-2019 11:36:20.106
 our $re_sects  = qw/(?:\[\s*\d+\.\d+\])/;  # [   16.082998]
 
