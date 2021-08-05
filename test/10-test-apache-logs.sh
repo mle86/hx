@@ -39,5 +39,8 @@ line="$(logline "$logfile" 8 | LEX)"
 assertRegex "$line" "/$(re_tok $T_USERNAME "identUser")/"
 assertRegex "$line" "/$(re_tok $T_USERNAME "basicUser")/"
 
+# AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globally to suppress this message
+line="$(logline "$logfile" 10 | LEX)"
+assertRegex "$line" "/$(re_tok $T_ERROR "AH00558:")$(re_tok $T_APP "apache2:")$(re_tok $T_MESSAGE)/"
 
 success

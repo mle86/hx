@@ -222,6 +222,13 @@ sub lex_next_line {
 			Token->new(T_DATE, $+{'ts'} . ' ', format => 'a2');
 		$is_apache = 1;
 		$message_isolated = 1;
+	} elsif (s/^($re_a2err: )(apache\d[\d\.\-]*: )//) {
+		# AH00000: apache2: message
+		push @output,
+			Token->new(T_ERROR, $1),
+			Token->new(T_APP, $2);
+		$is_apache = 1;
+		$message_isolated = 1;
 	} elsif (s/^($re_ts8601) (\d+) (\[\w+\]) ($re_mysqld)?// ||
 		 s/^(${re_ymd} ${re_time}) (\d+) (\[\w+\]) ($re_mysqld)?//) {
 		# mysqld error:
