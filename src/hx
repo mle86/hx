@@ -488,7 +488,7 @@ sub lex_next_line {
 	} elsif ($message_isolated && !$is_ps && s/^(?<info>$re_info_brackets(?: *$re_info_brackets)*(?:: )?)(?<msg> *)//) {
 		my %attr = ($is_rfc5424) ? (type => 'rfc-5424-sd') : ();
 		push @output, Token->new(T_INFO, $+{'info'}, %attr);
-		push @output, Token->new(T_MESSAGE, $+{'msg'});
+		push @output, Token->new(T_INFO, $+{'msg'});
 	} elsif ($message_isolated && $is_rfc5424 && s/^(-) //) {
 		# RFC5424 with empty Structured Data field
 		push @output, Token->new(T_INFO, $1 . ' ');
