@@ -598,6 +598,16 @@ sub lex_next_line {
 			}
 			push @suffix, Token->new(T_MESSAGE, $rest);
 		}
+	} elsif ($message_isolated && $is_kernel && s/^(audit: (?:type=\w+ audit\([^\)]*\): *)?+)//) {
+		push @output, Token->new(T_MESSAGE, $1);
+		while (s/^(?:(msg='\s*)|(?<kv>$re_kv)(?<sep>[, ]+)?)//) {
+			if ($1) {
+				push @output, Token->new(T_MESSAGE, $1);
+				next
+			}
+			push @output, Token->new(T_KV, $+{'kv'}, k => $+{'k'}, src => 'audit');
+			push @output, Token->new(T_MESSAGE, $+{'sep'})  if $+{'sep'};
+		}
 	} elsif ($message_isolated && s#^$re_cron_cmd##) {
 		# Cron syslog entry: (username) CMD ( cmd)
 		push @output,

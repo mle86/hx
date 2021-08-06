@@ -8,3 +8,4 @@ Aug  6 11:15:01 hostname1 org.gnome.Shell.desktop[19986]: ###!!! [Parent][RunMes
 Aug  6 11:15:01 hostname1 CRON[16964]: (root) CMD (   test -x /etc/cron.daily/popularity-contest && /etc/cron.daily/popularity-contest --crond)
 Aug  6 11:19:25 hostname1 50-motd-news[17327]:  * Keen to learn Istio? It's included in the single-package MicroK8s.
 Jun 11 14:17:10 hostname1 dd.collector[38772]: WARNING (__init__.py:717): No matching process 'mysql' was found
+Aug  1 12:00:00 hostname1 kernel: [   35.099202] audit: type=1400 audit(1000000000.008:38): apparmor="DENIED" operation="capable" profile="/snap/snapd/12704/usr/lib/snapd/snap-confine" pid=2000 comm="snap-confine" capability=4  capname="fsetid"

@@ -45,5 +45,9 @@ assertRegex "$line" "/$(re_tok $T_INFO "CMD \(\s*")/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "\s*test .* --crond")/"
 assertRegex "$line" "/$(re_tok $T_INFO "\)$(re_optbrk)")/"
 
+# Aug  1 12:00:00 hostname1 kernel: [   35.099202] audit: type=1400 audit(1000000000.008:38): apparmor="DENIED" operation="capable" profile="/snap/snapd/12704/usr/lib/snapd/snap-confine" pid=2000 comm="snap-confine" capability=4  capname="fsetid"
+line="$(syslogline 11 | LEX)"
+assertRegex "$line" "/(?=\S*?[\[,]src=audit\b)(?=\S*?[\[,]k=apparmor\b)$(re_tok $T_KV "apparmor=\"DENIED\"")/"
+
 
 success
