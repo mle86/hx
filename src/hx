@@ -335,13 +335,6 @@ sub lex_next_line {
 			Token->new(T_HOST, $2 . ' '),
 			Token->new(T_APP, $3);
 		$message_isolated = 1;
-	} elsif (s/^($re_ymdts|$re_dmyts|($re_ts8601)|$re_tsw|\[$re_tsw\]|$re_sects|\[$re_ymdts\]|\[$re_dmyts\]|$re_dmdty|\[$re_dmdty\])( |:|$)//) {
-		my %attr = ($2) ? (type => '8601') : ();
-		push @output, Token->new(T_DATE, $1 . $3, %attr);
-		$message_isolated = 1;
-	} elsif (s/^($re_app: )(?=(?:\[.*\] )*$re_exception)//) {
-		push @output, Token->new(T_APP, $1);
-		$message_isolated = 1;
 	} elsif (s/^(\[$re_ts8601\])(\[\s*$re_loglevel\s*\])(\[[a-z]+(?:\.\w+)+ *\] *)//) {
 		# [yyyy-mm-ddThh:mm:ss,sss][loglevel][org.java.classname]
 		push @output,
@@ -350,6 +343,13 @@ sub lex_next_line {
 			Token->new(T_INFO, $3);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^($re_ymdts|$re_dmyts|(?|($re_ts8601)|\[($re_ts8601)\])|$re_tsw|\[$re_tsw\]|$re_sects|\[$re_ymdts\]|\[$re_dmyts\]|$re_dmdty|\[$re_dmdty\])( |:|$|(?<=\]))//) {
+		my %attr = ($2) ? (type => '8601') : ();
+		push @output, Token->new(T_DATE, $1 . $3, %attr);
+		$message_isolated = 1;
+	} elsif (s/^($re_app: )(?=(?:\[.*\] )*$re_exception)//) {
+		push @output, Token->new(T_APP, $1);
+		$message_isolated = 1;
 	} elsif (s/^(\[$re_app\] )(\(\d?\.\d+\) )($re_path$re_lineno?)(\s*\| ?+)//) {
 		# "[app] (0.123456) source.h:100   | Message"
 		$message_isolated = 1;
