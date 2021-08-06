@@ -89,5 +89,9 @@ assertRegex "$line" "/$(re_tok "$T_DATA" "2021-07-26 15:00:00,000")\s*$(re_tok $
 line="$(logline "$logfile" 15 | LEX)"
 assertRegex "$line" "/$(re_tok $T_LOGLEVEL "E")\s*$(re_tok $T_DATE "\[01/Aug/2021:12:00:00 \+0200\]")\s*$(re_tok "$T_MESSAGE|$T_INFO" "\[cups.*")/"
 
+# Aug  1 12:00:00 hostname kernel: *ERROR* message
+line="$(logline "$logfile" 16 | LEX)"
+assertRegex "$line" "/$(re_tok $T_APP "kernel:")$(re_tok $T_LOGLEVEL "\*ERROR\*")$(re_tok $T_MESSAGE "message")/"
+
 
 success
