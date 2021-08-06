@@ -118,6 +118,10 @@ sub striphttpstatus ($;$) {
 	)
 }
 
+sub trim ($) {
+	$_[0] =~ s/^\s*|\s*$//gr
+}
+
 sub lex_next_line {
 	return unless defined $_[0];
 	local $_ = $_[0];
@@ -214,6 +218,17 @@ sub lex_next_line {
 		$is_apache = 1;
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^(\d:\w )?+($re_tsv )([^\w\s] )?+((?=[A-Z])$re_loglevel ?+)?+//) {
+		# 1:M 02 Aug 2021 12:34:56.194 * Running mode=standalone, port=6379.
+		my %redis_loglevel_map = (
+			'.' => 'debug',  '-' => 'verbose',  '*' => 'notice',  '#' => 'warning',
+		);
+		push @output, Token->new(T_INFO, $1)  if $1;
+		push @output, Token->new(T_DATE, $2);
+		push @output, Token->new(T_LOGLEVEL, $3, read_loglevel($redis_loglevel_map{trim $3}))  if $3;
+		push @output, Token->new(T_LOGLEVEL, $4, read_loglevel($4))  if $4;
+		$message_isolated = 1;
+		$loglevel_isolated = 1  if ($3 || $4);
 	} elsif (s/^(?<vh>$re_client(?::\d+)?) (?<cl>$re_client|-) (?<id>\S+) (?<un>\S+) (?<ts>$re_a2date) (?=")// ||
 	         s/^(?<cl>$re_client|-) (?<id>\S+) (?<un>\S+) (?<ts>$re_a2date) (?=")//) {
 		# Apache2 custom format
