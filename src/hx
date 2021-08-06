@@ -155,6 +155,7 @@ sub lex_next_line {
 
 	my $is_apache;
 	my $is_postfix;
+	my $is_kernel;
 	my $is_rfc5424;
 	my $is_dmesg;
 	my $is_ps;
@@ -174,6 +175,7 @@ sub lex_next_line {
 			Token->new(T_HOST, $2 . ' '),
 			Token->new(T_APP, $3 . $4);
 		$client_follows = 1  if ($3 =~ m/^(?:named|bind9?)\b/);
+		$is_kernel = 1  if ($3 =~ m/^kernel\b/);
 		$is_postfix = 1  if ($3 =~ m/^postfix/);
 		$message_isolated = 1;
 	} elsif (s/^($re_ddd {1,2}$re_time) ($re_host) (\d+) ($re_ts8601) ($re_host) ($re_app|-) (\d+|-) (\S+) //) {
@@ -193,6 +195,8 @@ sub lex_next_line {
 		push @output,
 			Token->new(T_DATE, $1 . ' '),
 			Token->new(T_APP, $2);
+		$is_kernel = 1  if ($2 =~ m/^kernel\b/);
+		$message_isolated = 1;
 	} elsif (s/^(\[(?:$re_ymd $re_time|$re_ts8601)\]) ($re_app)(\.[A-Z]+)?(: *)//) {
 		# symfony format
 		push @output,
