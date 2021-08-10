@@ -229,6 +229,14 @@ sub lex_next_line {
 		push @output, Token->new(T_LOGLEVEL, $4, read_loglevel($4))  if $4;
 		$message_isolated = 1;
 		$loglevel_isolated = 1  if ($3 || $4);
+	} elsif (s/^($re_sects )(\((?:--|\*\*|==|\+\+|!!|II||WW|EE|NI|\?\?)\) )//) {
+		my %xorg_loglevel_map = (
+			'(WW)' => 'warning', '(??)' => 'warning', '(EE)' => 'error', '(NI)' => 'error',
+		);
+		push @output, Token->new(T_DATE, $1);
+		push @output, Token->new(T_LOGLEVEL, $2, read_loglevel($xorg_loglevel_map{trim $2}));
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	} elsif (s/^(?<vh>$re_client(?::\d+)?) (?<cl>$re_client|-) (?<id>\S+) (?<un>\S+) (?<ts>$re_a2date) (?=")// ||
 	         s/^(?<cl>$re_client|-) (?<id>\S+) (?<un>\S+) (?<ts>$re_a2date) (?=")//) {
 		# Apache2 custom format

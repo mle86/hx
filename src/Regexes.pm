@@ -87,7 +87,7 @@ our $re_ymdts  = qr/(?:$re_ymd $re_time$re_ms?(?: ?$re_tz)?)/;  # 2021-01-19 17:
 our $re_dmyts  = qr/(?:(?:$re_dmy)[: ]$re_time$re_ms?(?: ?$re_tz)?)/;  # 01/Aug/2021:16:59:01 +0200
 our $re_tsw    = qr/(?:\d{1,2}-\w{2,4}-\d{4} ${re_time}${re_ms}?)/;  # 07-Jun-2019 11:36:20.106
 our $re_tsv    = qr/(?:\d{1,2} \w{2,4} \d{4} ${re_time}${re_ms}?)/;  # 07 Jun 2019 11:36:20.106
-our $re_sects  = qw/(?:\[\s*\d+\.\d+\])/;  # [   16.082998]
+our $re_sects  = qw/(?:\[\+?\s*\d+\.\d+s?\])/;  # [   16.082998]  or  [+146.12s]
 
 our $re_app    = qr/(?:[A-Za-z0-9\/][A-Za-z0-9_\-\.\/]+?(?:\[\d+\]|\]| ?\(pid \d+\))?)/;
 our $re_word   = qr/(?:[A-Z][a-z]+)/;
