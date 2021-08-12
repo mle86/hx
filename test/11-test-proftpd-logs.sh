@@ -14,5 +14,13 @@ assertRegex "$line" "/$(re_tok $T_HOST "mysys")/"
 assertRegex "$line" "/(?:$(re_tok $T_APP "proftpd\[20000\] mysys:?")|$(re_tok $T_APP "proftpd\[20000\]")$(re_tok "$T_APP|$T_HOST" "mysys:?"))/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "ProFTPD.*")/"
 
+# 2021-08-12 06:00:00,000 mysys proftpd[35000] mysys.hostname.fqdn: message
+line="$(logline "$logfile" 2 | LEX)"
+assertRegex "$line" "/(?:$(re_tok $T_APP "proftpd\[35000\] mysys\.hostname\.fqdn:?")|$(re_tok $T_APP "proftpd\[35000\]")$(re_tok "$T_APP|$T_HOST" "mysys\.hostname\.fqdn:?"))/"
+
+# 2021-08-12 11:00:00,000 mysys proftpd[46000] mysys.hostname.fqdn (127.0.0.1[127.0.0.1]): FTP session closed.
+line="$(logline "$logfile" 3 | LEX)"
+assertRegex "$line" "/(?:$(re_tok $T_APP "proftpd\[46000\] mysys\.hostname\.fqdn \(127\.0\.0\.1\[127\.0\.0\.1\]\):?")|$(re_tok $T_APP "proftpd\[46000\]")$(re_tok "$T_APP|$T_HOST" "mysys\.hostname\.fqdn \(127\.0\.0\.1\[127\.0\.0\.1\]\):?"))/"
+
 
 success

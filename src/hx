@@ -351,7 +351,7 @@ sub lex_next_line {
 		if (s/((?:\s*$re_info_brackets)+[\r\n]*$)//) {
 			push @suffix, Token->new(T_INFO, $1);
 		}
-	} elsif (s/^($re_ymdts) ($re_host) ($re_app(?: \2)?: )//) {
+	} elsif (s/^($re_ymdts) ($re_host) ($re_app(?: \2\S*(?: \($re_client(?:\[$re_client\])?\))?)?: )//) {
 		# similar to syslog, proftpd uses this
 		push @output,
 			Token->new(T_DATE, $1 . ' '),
