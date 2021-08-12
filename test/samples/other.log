@@ -14,3 +14,4 @@ update-alternatives 2021-07-03 13:05:40: run with --install ...
 2021-07-26 15:00:00,000 INFO Starting unattended upgrades script
 E [01/Aug/2021:12:00:00 +0200] [cups-deviced] message
 Aug  1 12:00:00 hostname kernel: *ERROR* message
+2021-08-12 11:00:00,000 UTC: message

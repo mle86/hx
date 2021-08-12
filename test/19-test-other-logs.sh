@@ -93,5 +93,9 @@ assertRegex "$line" "/$(re_tok $T_LOGLEVEL "E")\s*$(re_tok $T_DATE "\[01/Aug/202
 line="$(logline "$logfile" 16 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "kernel:")$(re_tok $T_LOGLEVEL "\*ERROR\*")$(re_tok $T_MESSAGE "message")/"
 
+# 2021-08-12 11:00:00,000 UTC: message
+line="$(logline "$logfile" 17 | LEX)"
+assertRegex "$line" "/$(re_tok $T_DATE "2021-08-12 11:00:00,000 UTC:")$(re_tok $T_MESSAGE)/"
+
 
 success
