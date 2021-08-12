@@ -180,7 +180,7 @@ sub lex_next_line {
 			Token->new(T_APP, $3 . $4);
 		$client_follows = 1  if ($3 =~ m/^(?:named|bind9?)\b/);
 		$is_kernel = 1  if ($3 =~ m/^kernel\b/);
-		$is_postfix = 1  if ($3 =~ m/^postfix/);
+		$is_postfix = 1  if ($3 =~ m/^postfix|^amavis/);
 		$message_isolated = 1;
 	} elsif (s/^($re_ddd {1,2}$re_time) ($re_host) (\d+) ($re_ts8601) ($re_host) ($re_app|-) (\d+|-) (\S+) //) {
 		# syslog RFC-5424 format
