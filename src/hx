@@ -358,6 +358,25 @@ sub lex_next_line {
 			Token->new(T_HOST, $2 . ' '),
 			Token->new(T_APP, $3);
 		$message_isolated = 1;
+	} elsif (s/^(?<ts>$re_ymdts|$re_dmdty )(?<dur>\d+ )(?<client>$re_client )(?<size>\d+ )(?<fn>$re_abspath )(?<info>(?:\w ){2})(?<dir>[iod] )(?<info2>\w )(?<user>$re_host )(?<svc>$re_host )(?<mode>\w+ )(?<id>\w+ |\* )(?<st>\w+\b\s*+)//) {
+		# proftpd xferlog
+		$output[0]->set(ftp => 'xferlog');
+		push @output,
+			Token->new(T_DATE, $+{'ts'}),
+			Token->new(T_INFO, $+{'dur'}),
+			Token->new(T_CLIENT, $+{'client'}),
+			Token->new(T_MESSAGE, $+{'size'}),
+			Token->new(T_FILENAME, $+{'fn'}),
+			Token->new(T_INFO, $+{'info'}),
+			Token->new(T_MESSAGE, $+{'dir'}),
+			Token->new(T_INFO, $+{'info2'}),
+			Token->new(T_USERNAME, $+{'user'}),
+#			Token->new(T_APP, $+{'svc'}),
+			Token->new(T_INFO, $+{'svc'}),
+			Token->new(T_INFO, $+{'mode'}),
+			Token->new(T_INFO, $+{'id'}),
+			Token->new(T_INFO, $+{'st'});
+		$message_isolated = 1;
 	} elsif (s/^(\[$re_ts8601\])(\[\s*$re_loglevel\s*\])(\[[a-z]+(?:\.\w+)+ *\] *)//) {
 		# [yyyy-mm-ddThh:mm:ss,sss][loglevel][org.java.classname]
 		push @output,
@@ -648,7 +667,7 @@ sub lex_next_line {
 		push @output, Token->new(T_MESSAGE);
 		push @output, Token->new(T_TRACE, $2)  if $2;
 		push @suffix, Token->new(T_INFO, $3)  if $3;
-	} elsif ($message_isolated && m/$re_continuation_line/) {
+	} elsif ($message_isolated && $_ && m/$re_continuation_line/) {
 		$is_continuation_line = 1;
 		$linetok->set_type(T_CONTLINE)  if $linetok && !$linetok->attr('packed');
 		if ($message_isolated && s/^( {4,}at (?:\S+\s+)??\(?)($re_path$re_lineno{1,2})(\)?)//) {

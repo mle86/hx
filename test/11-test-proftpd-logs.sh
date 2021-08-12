@@ -23,4 +23,10 @@ line="$(logline "$logfile" 3 | LEX)"
 assertRegex "$line" "/(?:$(re_tok $T_APP "proftpd\[46000\] mysys\.hostname\.fqdn \(127\.0\.0\.1\[127\.0\.0\.1\]\):?")|$(re_tok $T_APP "proftpd\[46000\]")$(re_tok "$T_APP|$T_HOST" "mysys\.hostname\.fqdn \(127\.0\.0\.1\[127\.0\.0\.1\]\):?"))/"
 
 
+xferlogfile="$HERE/samples/proftpd-xferlog.log"
+# Sun Aug 01 12:00:00 2021 0 client.addr 3910000 /home/user/storage/image.jpg b _ o r username ftp 0 * c
+line="$(logline "$xferlogfile" 1 | LEX)"
+assertRegex "$line" "/$(re_tok $T_CLIENT "client.addr")$(re_tok $T_MESSAGE "3910000")$(re_tok $T_FILENAME "/home/user/storage/image.jpg").*$(re_tok $T_MESSAGE "o").*$(re_tok $T_USERNAME "username")/"
+
+
 success
