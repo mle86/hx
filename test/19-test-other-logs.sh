@@ -95,7 +95,7 @@ assertRegex "$line" "/$(re_tok $T_APP "kernel:")$(re_tok $T_LOGLEVEL "\*ERROR\*"
 
 # 2021-08-12 11:00:00,000 UTC: message
 line="$(logline "$logfile" 17 | LEX)"
-assertRegex "$line" "/$(re_tok $T_DATE "2021-08-12 11:00:00,000 UTC:")$(re_tok $T_MESSAGE)/"
+assertRegex "$line" "/$(re_tok $T_DATE "2021-08-12 11:00:00,000 UTC:")$(re_tok $T_LOGLEVEL "FATAL:")$(re_tok $T_MESSAGE)/"
 
 
 success

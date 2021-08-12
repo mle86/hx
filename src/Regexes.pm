@@ -43,12 +43,12 @@ our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
 our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+|, line:? \d+| line:? \d+)/;
 
-our $re_loglevel = qr/(?:(?:PHP )?(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|alrt|alert|parse error|fatal error|stdout|stderr))/;
+our $re_loglevel = qr/(?:(?:PHP )?(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|alrt|alert|parse error|fatal error|fatal|stdout|stderr))/;
 our $re_loglevel_short = qr/(?:\b[EW]\b)/;
 our $re_loglevel_prefix = qr/(?:<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:(?:  ?|$)|$re_loglevel +- |\*+$re_loglevel[!:]?\*+:? *+)/;
 
 my $re_loglevel_warn = qr/\b(?:W|warn|warning|warnung|stderr)\b/i;
-my $re_loglevel_err  = qr/\b(?:E|err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency)\b/i;
+my $re_loglevel_err  = qr/\b(?:E|err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency|fatal)\b/i;
 sub read_loglevel ($) {
 	if    ($_[0] =~ m/$re_loglevel_warn/i) { return level => L_WARNING }
 	elsif ($_[0] =~ m/$re_loglevel_err/i)  { return level => L_ERROR }
