@@ -2,9 +2,10 @@
 use strict;
 use vars qw(
 	$re_json $re_json_string
+	$re_py_trace_source $re_py_trace_line
 	$re_continuation_line $re_repeat_begin $re_repeat_end
 	$re_lineno $re_loglevel $re_loglevel_short $re_loglevel_prefix
-	$re_fncall $re_memaddr
+	$re_fnname $re_fncall $re_memaddr
 	$re_exception
 	$re_info_brackets
 	$re_path $re_abspath $re_source
@@ -37,11 +38,21 @@ my  $re_json_object     = "\\s*\\{(?:$re_json_string_nc:(?&json)(?:,$re_json_str
 our $re_json            = qr/(?<json>$re_json_number|$re_json_const|$re_json_string_nc|$re_json_array|$re_json_object)/;
   # NB: the $re_json pattern captures into the <json> group. This means it uses one numbered capture group too.
 
-our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+))/;
+our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+|, line:? \d+| line:? \d+)/;
+
+my  $re_pathchr = qr/[A-Za-z0-9\-_\.\+\$@]/;
+our $re_abspath = qr/(?:\/[a-z]+[a-z\-0-9]+(?:\/+${re_pathchr}+)+)/;
+my  $re_relpath = qr/(?:(?!use(?:$|\s))(?:${re_pathchr}+:?\/+)*[A-Za-z0-9\-_\.\+\$]+)/;
+my  $re_url     = qr/[a-z]+:\/{2,3}+(?:[^@]+@)?+[\w\-]+(?:\.[\w\-]+)*(?::\d+)?(?:\/${re_pathchr}*)*/;
+our $re_path    = qr/(?:$re_abspath|$re_relpath|$re_url)/;
+our $re_source  = qr/(?:(?:thrown |called )?(?:\bin|\bat|@)(?: file:?)? \[?${re_path}${re_lineno}?\b\]?|(?<=[:,\.] )[Ff]ile:? ${re_path}${re_lineno}?|File \"$re_path\", line \d+\b)/;
+
+our $re_py_trace_source = qr/(?:^  (?=File )$re_source)/;
+our $re_py_trace_line = qr/(?:^    \S.*$)/;
+
+our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+))/;
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
-
-our $re_lineno   = qr/(?::\d+|\(\d+\)| on line \d+|, line:? \d+| line:? \d+)/;
 
 our $re_loglevel = qr/(?:(?:PHP )?(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|alrt|alert|parse error|fatal error|fatal|stdout|stderr))/;
 our $re_loglevel_short = qr/(?:\b[EW]\b)/;
@@ -57,7 +68,7 @@ sub read_loglevel ($) {
 
 my  $re_nsname    = qr/(?:\\?(?:[A-Za-z]\w*\\)+)/;
 my  $re_classname = qr/(?:$re_nsname?[A-Za-z]\w+)/;
-my  $re_fnname    = qr/(?:[A-Za-z_]\w*|\{closure\})/;
+our $re_fnname    = qr/(?:[A-Za-z_]\w*|\{closure\}|<module>)/;
 my  $re_fnprefix  = qr/(?:->|::)/;
 our $re_fncall    = qr/(?:(?<class>${re_nsname}(?=\{)|${re_classname}(?=${re_fnprefix})|${re_classname}::${re_nsname})?(?<fnp>${re_fnprefix}${re_nsname}?)?(?<fn>${re_fnname})(?<args> ?\(.*\)))/;
 our $re_memaddr   = qr/(?:0x[0-9a-fA-F]{6,})/;
@@ -67,13 +78,6 @@ my  $re_fqcn_php  = qr/(?:(?:[A-Za-z][A-Za-z0-9_]+\\)+[A-Za-z][A-Za-z0-9_]*\b)/;
 my  $re_fqcn_java = qr/(?:(?=[a-z])(?:[a-zA-Z0-9\_]+\.)+$re_excn)/;  # fqcn must contain backslashes
 my  $re_ex_code   = qr/(?:\/\d+|\(code:? \d+\))/;
 our $re_exception = qr/(?:(?:$re_fqcn_php|$re_fqcn_java|$re_excn)$re_ex_code?)/;
-
-my  $re_pathchr = qr/[A-Za-z0-9\-_\.\+\$@]/;
-our $re_abspath = qr/(?:\/[a-z]+[a-z\-0-9]+(?:\/+${re_pathchr}+)+)/;
-my  $re_relpath = qr/(?:(?!use(?:$|\s))(?:${re_pathchr}+:?\/+)*[A-Za-z0-9\-_\.\+\$]+)/;
-my  $re_url     = qr/[a-z]+:\/{2,3}+(?:[^@]+@)?+[\w\-]+(?:\.[\w\-]+)*(?::\d+)?(?:\/${re_pathchr}*)*/;
-our $re_path    = qr/(?:$re_abspath|$re_relpath|$re_url)/;
-our $re_source  = qr/(?:(?:thrown |called )?(?:\bin|\bat|@)(?: file:?)? \[?${re_path}${re_lineno}?\b\]?|(?<=[:,\.] )[Ff]ile:? ${re_path}${re_lineno}?)/;
 
 our $re_time   = qr/(?:\d\d:\d\d:\d\d)/;
 our $re_ms     = qr/(?:[\.,]\d{1,6})/;

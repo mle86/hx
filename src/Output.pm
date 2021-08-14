@@ -77,10 +77,13 @@ sub _format_tracefile ($$$) {
 	my $include_lineno_in_bold = ($lineno !~ m/(?:on line|in line| line)/);
 	my ($c_hi, $c_lo) = _color_hi_lo($c_file_location, $c_context);
 
+	my $file_suffix;
+	if ($file =~ s/(["'])$//) { $file_suffix = $1 }
+
 	$c_hi . $file .
 	(($include_lineno_in_bold)
-		? $lineno . $c_lo
-		: $c_lo . $lineno)
+		? $file_suffix . $lineno . $c_lo
+		: $c_lo . $file_suffix . $lineno)
 }
 
 sub format_exception ($) {
@@ -94,7 +97,7 @@ sub format_exception ($) {
 sub format_trace ($;$) {
 	my ($out, $c_base) = ($_[0], ($_[1] // $c_trace));
 
-	$out =~ s/\b([\w\-\.\$]+)($re_lineno)?(,|\)|\s*$|\])/ _format_tracefile($1, $2, $c_base) . $3 /ge;
+	$out =~ s/\b([\w\-\.\$]+["']?)($re_lineno)?(,|\)|\s*$|\])/ _format_tracefile($1, $2, $c_base) . $3 /ge;
 
 	$c_base . $out . $c0
 }

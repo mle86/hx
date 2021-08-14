@@ -7,8 +7,8 @@ LEX () { HX --lexer "$@" ; }
 
 SYSLOG="$HERE/samples/syslog.log"
 
-# logline LOGFILE [LINENO=1]
-logline () { tail -n "+${2:-1}" -- "$1" | head -n 1 ; }
+# logline LOGFILE [LINENO=1 [LINES=1]]
+logline () { tail -n "+${2:-1}" -- "$1" | head -n ${3:-1} ; }
 # syslogline [LINENO=1]
 syslogline () { logline "$SYSLOG" "$1" ; }
 # sysloggrep GREPEXPR

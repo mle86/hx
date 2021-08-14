@@ -108,6 +108,8 @@ if ($mode == M_LEXER) {
 
 ## Main input loop:  ###########################################################
 
+my $lastlinetok;
+
 sub striphttpstatus ($;$) {
 	my $type = $_[1] // T_INFO;
 	return unless ($_[0] =~ s/^$re_http$//);
@@ -151,6 +153,10 @@ sub lex_next_line {
  restofline:
 
 	my $is_continuation_line = m/$re_continuation_line/;
+
+	if (!$is_continuation_line && $lastlinetok && $lastlinetok->attr('py') eq 'trace' && m/^$re_py_trace_line/) {
+		$is_continuation_line = 1;
+	}
 
 	if (!@output) {
 		$linetok = Token->new(($is_continuation_line) ? T_CONTLINE : T_LINE);
@@ -340,6 +346,11 @@ sub lex_next_line {
 		push @output, Token->new(T_ERROR, $3)  if $3;
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^($re_exception: )(<[^>]+>,? ?)?(\[(?:Error|Errno) [^\]]+\] )?//) {
+		push @output, Token->new(T_ERROR, $1);
+		push @output, Token->new(T_APP, $2)  if $2;
+		push @output, Token->new(T_ERROR, $3)  if $3;
+		$message_isolated = 1;
 	} elsif (s/^($re_ymdts|\[$re_ymdts\])(:? )(\w+ )(HTTP )(\d\d\d)(: )//) {
 		push @output,
 			Token->new(T_DATE, $1 . $2),
@@ -683,12 +694,20 @@ sub lex_next_line {
 	}
 
 
-	if ($is_continuation_line && s/^(#\d+ )?(?:(${re_abspath}${re_lineno}?|\[internal function\])(: ))?($re_fncall|\{main\})(?<src> $re_source)?//) {
+	if ($is_continuation_line && s/^(#\d+ )?(?:(${re_abspath}${re_lineno}?|\[internal function\])(: ))?((?!Traceback[ :])$re_fncall|\{main\})(?<src> $re_source)?//) {
 		push @output, Token->new(T_INFO, $1)  if $1;
 		push @output, Token->new(T_TRACE, $2)  if $2;
 		push @output, Token->new(T_INFO, $3)  if $3;
 		push @output, Token->new(T_FNCALL, $4);
 		push @output, Token->new(T_TRACE, $+{'src'})  if $+{'src'};
+	} elsif ($is_continuation_line && m/^$re_py_trace_source/ && s/^(\s*)($re_source)([, ]+ in )($re_fnname)//) {
+		push @output,
+			Token->new(T_MESSAGE, $1),
+			Token->new(T_TRACE, $2),
+			Token->new(T_INFO, $3),
+			Token->new(T_FNCALL, $4);
+		$T_REST = T_INFO;
+		$linetok->set(py => 'trace');
 	} elsif ($is_continuation_line) {
 		# all continuation lines get info-colored:
 		push @output, Token->new(T_MESSAGE);
@@ -740,6 +759,8 @@ sub lex_next_line {
 		}
 		goto restofline;  # continue collecting @output and @suffix...
 	}
+
+	$lastlinetok = $linetok;
 
 	( @output, @suffix )
 }
