@@ -50,7 +50,7 @@ our $re_source  = qr/(?:(?:thrown |called )?(?:\bin|\bat|@)(?: file:?)? \[?${re_
 our $re_py_trace_source = qr/(?:^  (?=File )$re_source)/;
 our $re_py_trace_line = qr/(?:^    \S.*$)/;
 
-our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+))/;
+our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|\[stack ?trace\]:?$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+))/;
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
@@ -66,7 +66,7 @@ sub read_loglevel ($) {
 	return level => L_LOW
 }
 
-my  $re_nsname    = qr/(?:\\?(?:[A-Za-z]\w*\\)+)/;
+my  $re_nsname    = qr/(?:\\?(?:[A-Za-z]\w*\\{1,2})+)/;
 my  $re_classname = qr/(?:$re_nsname?[A-Za-z]\w+)/;
 our $re_fnname    = qr/(?:[A-Za-z_]\w*|\{closure\}|<module>)/;
 my  $re_fnprefix  = qr/(?:->|::)/;
