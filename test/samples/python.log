@@ -1,0 +1,3 @@
+2019-05-31 11:42:02,115 - __init__.py[WARN]: Attempting setup of ephemeral network on ens3 with 169.254.0.1/16 brd 169.254.255.255
+error: <class 'socket.error'>, [Errno 99] Cannot assign requested address: file: /usr/lib/python2.7/socket.py line: 571
+error: <class 'socket.error'>, [Errno 99] Cannot assign requested address in file:///usr/lib/python2.7/socket.py:571

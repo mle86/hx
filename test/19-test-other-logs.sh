@@ -17,29 +17,8 @@ line="$(logline "$logfile" 2 | LEX)"
 assertRegex "$line" "/$(re_tok $T_DATE "\[2019\.06\.07 12:16:21\]")/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "Opened .*")/"
 
-# 2019-05-31 11:42:02,115 - __init__.py[WARN]: Attempting setup of ephemeral network on ens3 with 169.254.0.1/16 brd 169.254.255.255
-line="$(logline "$logfile" 3 | LEX)"
-assertRegex "$line" "/$(re_tok $T_DATE "2019-05-31 11:42:02,115(?: -)?")/"
-assertRegex "$line" "/$(re_tok $T_APP "__init__\.py")/"
-assertRegex "$line" "/$(re_tok $T_LOGLEVEL "\[WARN\]:?")/"
-assertRegex "$line" "/$(re_tok $T_MESSAGE "Attempting .*")/"
-
-# error: <class 'socket.error'>, [Errno 99] Cannot assign requested address: file: /usr/lib/python2.7/socket.py line: 571
-line="$(logline "$logfile" 4 | LEX)"
-reError="$(re_tok $T_LOGLEVEL "error:?")"
-reType="$(re_tok $T_APP ":? ?<class 'socket\.error'>,?")"
-reErrno="$(re_tok $T_ERROR ",? ?\[Errno 99\]")"
-reMsg="$(re_tok $T_MESSAGE "Cannot assign requested address:?")"
-reSource="$(re_tok $T_TRACE ":? ?file: \/usr\/lib\/python2\.7\/socket\.py line: 571")"
-assertRegex "$line" "/${reError}${reType}${reErrno}${reMsg}${reSource}/"
-
-# error: <class 'socket.error'>, [Errno 99] Cannot assign requested address in file:///usr/lib/python2.7/socket.py:571
-line="$(logline "$logfile" 5 | LEX)"
-reSource="$(re_tok $T_TRACE "(?:in )?file:\/\/\/usr\/lib\/python2\.7\/socket\.py:571")"
-assertRegex "$line" "/${reMsg}${reSource}/"
-
 # Apr  1 10:00:00 mysys org.gnome.Shell.desktop[4600]: #2 0x7ffd00007d22 I   resource:///org/gnome/gjs/modules/_legacy.js:82 (0x7ffd00007d30 @ 71)
-line="$(logline "$logfile" 6 | LEX)"
+line="$(logline "$logfile" 3 | LEX)"
 reStack="$(re_tok $T_INFO "#2 0x7ffd00007d22 I +")"
 reMsg="(?:$(re_tok $T_MESSAGE)|$(re_tok $T_MESSAGE " +"))"
 reSource="$(re_tok $T_TRACE " *resource:\/\/\/org\/gnome\/gjs\/modules\/_legacy.js:82")"
@@ -47,54 +26,54 @@ reInfo="$(re_tok $T_INFO "\(0x7ffd00007d30 @ 71\)")"
 assertRegex "$line" "/${reStack}${reMsg}${reSource}${reInfo}/"
 
 # [Sun, Apr 26th, 13:49:59 2020] msg
-line="$(logline "$logfile" 7 | LEX)"
+line="$(logline "$logfile" 4 | LEX)"
 assertRegex "$line" "/$(re_tok $T_DATE "\[Sun, Apr 26th, 13:49:59 2020\]")/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "msg")/"
 
 # 2020-10-14 12:45:23 Platform HTTP 500: array_key_exists() expects parameter 2 to be array, null given [:, Import.php:300, Application.php:200, index.php:33]
-line="$(logline "$logfile" 8 | LEX)"
+line="$(logline "$logfile" 5 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "Platform( HTTP)?")/"
 assertRegex "$line" "/$(re_tok $T_HTTP_STATUS "(HTTP )?500")/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "array_key_exists\(\) expects parameter 2 to be array, null given")/"
 assertRegex "$line" "/$(re_tok "$T_TRACE|$T_INFO" "\[.*33\](\\\\n)?")/"
 
 # [myapp] (0.262733) init.c:105     | Start-up complete
-line="$(logline "$logfile" 9 | LEX)"
+line="$(logline "$logfile" 6 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "\[myapp\]")/"
 assertRegex "$line" "/$(re_tok $T_DATE "\(?0\.262733\)?")/"
 assertRegex "$line" "/$(re_tok "$T_TRACE|$T_INFO" "init\.c:105\s*")/"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "Start-up complete")/"
 
 # 12:00:00 ERROR     [app] message
-line="$(logline "$logfile" 10 | LEX)"
+line="$(logline "$logfile" 7 | LEX)"
 assertRegex "$line" "/$(re_tok $T_DATE "12:00:00")\s*$(re_tok $T_LOGLEVEL "ERROR\s*")\s*$(re_tok $T_APP '\[app\]')\s*$(re_tok $T_MESSAGE)/"
 
 # ERROR: app (pid 1000) Mon Jul 26 16:00:00 2021: message
-line="$(logline "$logfile" 11 | LEX)"
+line="$(logline "$logfile" 8 | LEX)"
 assertRegex "$line" "/$(re_tok $T_LOGLEVEL "ERROR:?")\s*$(re_tok $T_APP "app \(pid 1000\)")\s*$(re_tok $T_DATE 'Mon Jul 26 16:00:00 2021:?')\s*$(re_tok $T_MESSAGE)/"
 
 # update-alternatives 2021-07-03 13:05:40: run with --install ...
-line="$(logline "$logfile" 12 | LEX)"
+line="$(logline "$logfile" 9 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "update-alternatives")\s*$(re_tok $T_DATE "2021-07-03 13:05:40:?")\s*$(re_tok $T_MESSAGE)/"
 
 # /usr/bin/script.sh:50: Warning: Message
-line="$(logline "$logfile" 13 | LEX)"
+line="$(logline "$logfile" 10 | LEX)"
 assertRegex "$line" "/$(re_tok "$T_TRACE|$T_APP" "\\/usr\\/bin\\/script.sh:50:")\s*$(re_tok $T_LOGLEVEL "Warning:")\s*$(re_tok $T_MESSAGE)/"
 
 # 2021-07-26 15:00:00,000 INFO Starting unattended upgrades script
-line="$(logline "$logfile" 14 | LEX)"
+line="$(logline "$logfile" 11 | LEX)"
 assertRegex "$line" "/$(re_tok "$T_DATA" "2021-07-26 15:00:00,000")\s*$(re_tok $T_LOGLEVEL "INFO")\s*$(re_tok $T_MESSAGE)/"
 
 # E [01/Aug/2021:12:00:00 +0200] [cups-deviced] message
-line="$(logline "$logfile" 15 | LEX)"
+line="$(logline "$logfile" 12 | LEX)"
 assertRegex "$line" "/$(re_tok $T_LOGLEVEL "E")\s*$(re_tok $T_DATE "\[01/Aug/2021:12:00:00 \+0200\]")\s*$(re_tok "$T_MESSAGE|$T_INFO" "\[cups.*")/"
 
 # Aug  1 12:00:00 hostname kernel: *ERROR* message
-line="$(logline "$logfile" 16 | LEX)"
+line="$(logline "$logfile" 13 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "kernel:")$(re_tok $T_LOGLEVEL "\*ERROR\*")$(re_tok $T_MESSAGE "message")/"
 
 # 2021-08-12 11:00:00,000 UTC: message
-line="$(logline "$logfile" 17 | LEX)"
+line="$(logline "$logfile" 14 | LEX)"
 assertRegex "$line" "/$(re_tok $T_DATE "2021-08-12 11:00:00,000 UTC:")$(re_tok $T_LOGLEVEL "FATAL:")$(re_tok $T_MESSAGE)/"
 
 
