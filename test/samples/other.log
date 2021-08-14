@@ -12,3 +12,6 @@ update-alternatives 2021-07-03 13:05:40: run with --install ...
 E [01/Aug/2021:12:00:00 +0200] [cups-deviced] message
 Aug  1 12:00:00 hostname kernel: *ERROR* message
 2021-08-12 11:00:00,000 UTC: FATAL: message
+1622215601080	app::helper	INFO	Listening on port 34830
+console.warn: message
+(/usr/bin/program:1234): GLib-GObject-CRITICAL **: 12:00:00.123: g_object_set: assertion 'G_IS_OBJECT (object)' failed

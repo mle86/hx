@@ -440,6 +440,21 @@ sub lex_next_line {
 			Token->new(T_DATE, $2);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^($re_app\.)($re_loglevel: ?)//) {
+		# console.warn: message
+		push @output,
+			Token->new(T_APP, $1),
+			Token->new(T_LOGLEVEL, $2, read_loglevel($2));
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
+	} elsif (s/^((?:$re_time|$re_ymdts|$re_dmyts|$re_unixts)\s+)((?:${re_app}::)*$re_app\s+)($re_loglevel\s+)//) {
+		# 1622215601080	App	INFO	Message
+		push @output,
+			Token->new(T_DATE, $1),
+			Token->new(T_APP, $2),
+			Token->new(T_LOGLEVEL, $3, read_loglevel($3));
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	} elsif (s/^((?:$re_time|$re_ymdts|$re_dmyts)\s+)($re_loglevel\s+)((?:\[$re_app\]:?|$re_app:) +)//) {
 		# 12:00:00 ERROR     [app] message
 		push @output,
@@ -448,6 +463,9 @@ sub lex_next_line {
 			Token->new(T_APP, $3);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^(\((?:$re_path$re_lineno?)\):? )//) {
+		push @output,
+			Token->new(T_APP, $1);
 	}
 
 	if ($is_dmesg && s/^((-{3,}) ?[\[\(].+[\]\)] ?-{3,}\s*)//) {
@@ -509,6 +527,11 @@ sub lex_next_line {
 	} elsif ($message_isolated && !$loglevel_isolated && s/^((?=[A-Z]+\b)(?:$re_loglevel(?::\s*+|\s+|$)|$re_loglevel_prefix))//) {
 		# LOGLEVEL:
 		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
+		$loglevel_isolated = 1;
+	} elsif (!$loglevel_isolated && s/^((?:\w+-)*?$re_loglevel(?: \*\*)?+: ?+)($re_time$re_ms?:? ?)?+//) {
+		# GLib-GObject-CRITICAL **: 10:00:00.123:
+		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
+		push @output, Token->new(T_DATE, $2)  if $2;
 		$loglevel_isolated = 1;
 	}
 	

@@ -76,5 +76,17 @@ assertRegex "$line" "/$(re_tok $T_APP "kernel:")$(re_tok $T_LOGLEVEL "\*ERROR\*"
 line="$(logline "$logfile" 14 | LEX)"
 assertRegex "$line" "/$(re_tok $T_DATE "2021-08-12 11:00:00,000 UTC:")$(re_tok $T_LOGLEVEL "FATAL:")$(re_tok $T_MESSAGE)/"
 
+# 1622215601080	app::helper	INFO	Listening on port 34830
+line="$(logline "$logfile" 15 | LEX)"
+assertRegex "$line" "/$(re_tok $T_DATE "1622215601080\t")$(re_tok $T_APP "app::helper\t")$(re_tok $T_LOGLEVEL "INFO\t")$(re_tok $T_MESSAGE)/"
+
+# console.warn: message
+line="$(logline "$logfile" 16 | LEX)"
+assertRegex "$line" "/$(re_tok $T_APP "console\.?")$(re_tok $T_LOGLEVEL "\.?warn:?").*$(re_tok $T_MESSAGE ".*message")/"
+
+# (/usr/bin/program:1234): GLib-GObject-CRITICAL **: 12:00:00.123: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+line="$(logline "$logfile" 17 | LEX)"
+assertRegex "$line" "/$(re_tok $T_APP "\(\/usr/bin/program:1234\):")$(re_tok $T_LOGLEVEL "GLib-GObject-CRITICAL \*\*:")$(re_tok $T_DATE "12:00:00.123:")$(re_tok $T_MESSAGE)/"
+
 
 success
