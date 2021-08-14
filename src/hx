@@ -646,7 +646,7 @@ sub lex_next_line {
 		push @output, Token->new(T_INFO, $info)  if $info;
 		push @output, Token->new(T_TRACE, $trace);
 		$text_isolated = 1;
-	} elsif ($message_isolated && s#("[A-Z]\w* [^"]+?") (\d+)( .*)$##) {
+	} elsif ($message_isolated && s#^("[A-Z]\w* [^"]+?") (\d+)( .*)$##) {
 		# Apache2 log
 		push @output, Token->new(T_MESSAGE, $1 . ' ');
 		push @output, Token->new(T_HTTP_STATUS, $2);
