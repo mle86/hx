@@ -152,7 +152,7 @@ sub lex_next_line {
 
  restofline:
 
-	my $is_continuation_line = m/$re_continuation_line/;
+	my $is_continuation_line = m/$re_continuation_line_start/;
 
 	if (!$is_continuation_line && $lastlinetok && $lastlinetok->attr('py') eq 'trace' && m/^$re_py_trace_line/) {
 		$is_continuation_line = 1;

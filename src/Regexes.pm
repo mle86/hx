@@ -3,7 +3,7 @@ use strict;
 use vars qw(
 	$re_json $re_json_string
 	$re_py_trace_source $re_py_trace_line
-	$re_continuation_line $re_repeat_begin $re_repeat_end
+	$re_continuation_line_start $re_continuation_line $re_repeat_begin $re_repeat_end
 	$re_lineno $re_loglevel $re_loglevel_short $re_loglevel_prefix
 	$re_fnname $re_fncall $re_memaddr
 	$re_exception
@@ -50,7 +50,8 @@ our $re_source  = qr/(?:(?:thrown |called )?(?:\bin|\bat|@)(?: file:?)? \[?${re_
 our $re_py_trace_source = qr/(?:^  (?=File )$re_source)/;
 our $re_py_trace_line = qr/(?:^    \S.*$)/;
 
-our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:|Stack trace:$|\[stack ?trace\]:?$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+))/;
+our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|Stack trace:$|\[stack ?trace\]:?$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+))/;
+our $re_continuation_line_start = qr/(?:$re_continuation_line|^\s*?(?:URI:|Referr?er:|User-?[Aa]gent:))/;
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
