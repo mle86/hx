@@ -533,6 +533,14 @@ sub lex_next_line {
 		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
 		push @output, Token->new(T_DATE, $2)  if $2;
 		$loglevel_isolated = 1;
+	} elsif ($message_isolated && !$loglevel_isolated && s/^(\[ )($re_loglevel )($re_app)( \]:?\s+)($re_info_brackets:?\s+)?//) {
+		# [ LOGLEVEL APP ] [ COMPONENT ]:
+		# Nextcloud client
+		push @output,
+			Token->new(T_LOGLEVEL, $1),
+			Token->new(T_LOGLEVEL, $2, read_loglevel($2)),
+			Token->new(T_APP, $3 . $4);
+		push @output, Token->new(T_INFO, $5)  if $5;
 	}
 	
 	if (s/^(###!!! *)//) {

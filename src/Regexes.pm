@@ -81,7 +81,7 @@ my  $re_ex_code   = qr/(?:\/\d+|\(code:? \d+\))/;
 our $re_exception = qr/(?:(?:$re_fqcn_php|$re_fqcn_java|$re_excn)$re_ex_code?)/;
 
 our $re_time   = qr/(?:\d\d:\d\d:\d\d)/;
-our $re_ms     = qr/(?:[\.,]\d{1,6})/;
+our $re_ms     = qr/(?:[\.,:]\d{1,6})/;
 our $re_ddd    = qr/(?:[A-Za-z]{2,3} +\d+)/;
 our $re_ymd    = qr/(?:\d\d\d\d-\d\d-\d\d|\d\d\d\d\/\d\d\/\d\d|\d\d\d\d\.\d\d\.\d\d)/;
 our $re_dmy    = qr/(?:\d\d\/[A-Z][A-Za-z]{2}\/\d\d\d\d)/;
