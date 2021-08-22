@@ -740,6 +740,11 @@ sub lex_next_line {
 			Token->new(T_FNCALL, $4);
 		$T_REST = T_INFO;
 		$linetok->set(py => 'trace');
+	} elsif ($is_continuation_line && s/($re_abspath(?:$re_lineno){0,2})([\)\]]?\s*)$//) {
+		push @output, Token->new(T_MESSAGE);
+		push @suffix, Token->new(T_TRACE, $1);
+		push @suffix, Token->new(T_INFO, $2)  if $2;
+		$T_REST = T_INFO;
 	} elsif ($is_continuation_line) {
 		# all continuation lines get info-colored:
 		push @output, Token->new(T_MESSAGE);
