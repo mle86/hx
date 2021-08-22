@@ -54,7 +54,7 @@ our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|URI:|Referr?er:|User-?[Aa]gent:
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
-our $re_loglevel = qr/(?:(?:PHP )?(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|alrt|alert|parse error|fatal error|fatal|stdout|stderr))/;
+our $re_loglevel = qr/(?:(?:PHP )?(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|trace|alrt|alert|parse error|fatal error|fatal|stdout|stderr))/;
 our $re_loglevel_short = qr/(?:\b[EW]\b)/;
 our $re_loglevel_prefix = qr/(?:<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:(?:  ?|$)|$re_loglevel +- |\*+$re_loglevel[!:]?\*+:? *+)/;
 
