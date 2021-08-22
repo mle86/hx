@@ -464,6 +464,7 @@ sub lex_next_line {
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
 	} elsif (s/^(\((?:$re_path$re_lineno?)\):? )//) {
+		$message_isolated = 1;
 		push @output,
 			Token->new(T_APP, $1);
 	}

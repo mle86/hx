@@ -15,3 +15,4 @@ Aug  1 12:00:00 hostname kernel: *ERROR* message
 1622215601080	app::helper	INFO	Listening on port 34830
 console.warn: message
 (/usr/bin/program:1234): GLib-GObject-CRITICAL **: 12:00:00.123: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+(script:1) MyWarning: message...

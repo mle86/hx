@@ -88,5 +88,9 @@ assertRegex "$line" "/$(re_tok $T_APP "console\.?")$(re_tok $T_LOGLEVEL "\.?warn
 line="$(logline "$logfile" 17 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "\(\/usr/bin/program:1234\):")$(re_tok $T_LOGLEVEL "GLib-GObject-CRITICAL \*\*:")$(re_tok $T_DATE "12:00:00.123:")$(re_tok $T_MESSAGE)/"
 
+# (script:1) MyWarning: message...
+line="$(logline "$logfile" 18 | LEX)"
+assertRegex "$line" "/$(re_tok $T_APP "\(script:1\)")$(re_tok $T_ERROR "MyWarning:?").*$(re_tok $T_MESSAGE "message.*")/"
+
 
 success
