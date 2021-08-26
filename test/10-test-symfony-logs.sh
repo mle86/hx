@@ -58,4 +58,15 @@ reJson="$(re_tok "$T_JSON|$T_INFO" "\{\"exception.*")"
 assertRegex "$line" "/${reMsg}${reSource}.*${reJson}/"
 
 
+logfile="$HERE/samples/sym5-console.log"
+
+# ! [NOTE] Notice
+line="$(logline "$logfile" 1 | LEX)"
+assertRegex "$line" "/$(re_tok $T_LOGLEVEL " ! \[NOTE\]")$(re_tok $T_MESSAGE "Notice")/"
+
+# // Comment
+line="$(logline "$logfile" 6 | LEX)"
+assertRegex "$line" "/$(re_tok $T_CONTLINE).*$(re_tok $T_INFO " // Comment")/"
+
+
 success

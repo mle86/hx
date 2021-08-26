@@ -215,6 +215,12 @@ sub lex_next_line {
 			Token->new(T_LOGLEVEL, $3 . $4, read_loglevel($3));
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^((?: !)? \[(?:(?=[A-Z]+\])$re_loglevel)\] )//) {
+		# symfony console format
+		push @output,
+			Token->new(T_LOGLEVEL, $1, read_loglevel($1));
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	} elsif (s/^(\[$re_word $re_word \d+ $re_time$re_ms? \d{4}\]) +(\[\w*:\w+\]) +(\[(?:pid )?\d+(?:[,:]tid \d+)?\]) +($re_a2clnt )?//) {
 		# Apache2 error format
 		push @output, Token->new(T_DATE,     $1 . ' ');

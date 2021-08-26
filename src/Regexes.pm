@@ -50,14 +50,15 @@ our $re_source  = qr/(?:(?:thrown |called )?(?:\bin|\bat|@)(?: file:?)? \[?${re_
 our $re_py_trace_source = qr/(?:^  (?=File )$re_source)/;
 our $re_py_trace_line = qr/(?:^    \S.*$)/;
 
-our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|Stack trace:$|\[stack ?trace\]:?$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+))/;
-our $re_continuation_line_start = qr/(?:$re_continuation_line|^\s*?(?:URI:|Referr?er:|User-?[Aa]gent:))/;
-our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
-our $re_repeat_end        = qr/(?:\s*\]\s*)/;
-
-our $re_loglevel = qr/(?:(?:PHP )?(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|trace|alrt|alert|parse error|fatal error|fatal|stdout|stderr))/;
+my  $re_symfony_loglevels = qr/(?:NOTE|OK|WARNING|ERROR|CAUTION)/;
+our $re_loglevel = qr/(?:(?:PHP )?(?:(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|trace|alrt|alert|parse error|fatal error|fatal|stdout|stderr)|$re_symfony_loglevels))/;
 our $re_loglevel_short = qr/(?:\b[EW]\b)/;
 our $re_loglevel_prefix = qr/(?:<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:(?:  ?|$)|$re_loglevel +- |\*+$re_loglevel[!:]?\*+:? *+)/;
+
+our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|Stack trace:$|\[stack ?trace\]:?$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+)| \/\/ )/;
+our $re_continuation_line_start = qr/(?:(?!^ ! \[$re_symfony_loglevels)$re_continuation_line|^\s*?(?:URI:|Referr?er:|User-?[Aa]gent:))/;
+our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
+our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
 my $re_loglevel_warn = qr/\b(?:W|warn|warning|warnung|stderr)\b/i;
 my $re_loglevel_err  = qr/\b(?:E|err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency|fatal)\b/i;
