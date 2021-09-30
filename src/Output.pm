@@ -33,6 +33,7 @@ sub format_token ($;%) {
 	return format_trace($content, $c_info_prefix)  if $token->is(T_TRACE);
 	return format_trace($content, $c_message)  if $token->is(T_FILENAME) && ($opt{'line'}->attr('ps') || $opt{'line'}->attr('ftp'));
 	return format_trace($content)  if $token->is(T_FILENAME);
+	return format_info($content)  if $token->is(T_PACKEDLINE);
 	return format_exception($content)  if $token->is(T_ERROR);
 	return format_fncall($content, $opt{'packedline'})  if $token->is(T_FNCALL);
 	return format_rpt($content)  if $token->is(T_REPEAT);

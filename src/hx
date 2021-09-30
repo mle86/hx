@@ -610,7 +610,7 @@ sub lex_next_line {
 		$linetok->set('packed' => 1)  if $linetok;
 		@packedlines =
 			map { (Token->new(T_PACKEDLINE), $_) }
-				split(/(?=#\d+ |Stack trace: |Next $re_exception|\\n)/, $rest);
+				split(/(?=#\d+ |Stack trace: |Next $re_exception)/, $rest);
 	}
 
 	if ($message_isolated && $is_apache && s/^($re_a2err:) //) {
