@@ -288,7 +288,7 @@ sub lex_next_line {
 		push @output, Token->new(T_DATE, $1 . ' ', format => 'dmesg');
 		$is_dmesg = 1;
 	} elsif (s/^(Next) ($re_exception)(: )//) {
-		# Euv continuation:
+		# Chained exceptions:
 		push @output,
 			Token->new(T_DATE, $1 . ' '),
 			Token->new(T_ERROR, $2),
