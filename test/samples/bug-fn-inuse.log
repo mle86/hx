@@ -1,3 +1,4 @@
 2020-04-24 13:02:13,114 WARN: Strange entry in use/foo/bar.html
 2020-04-24 13:02:13,114 WARN: Syntax error in use.c
 2020-04-24 13:02:13,114 WARN: Address already in use
+2021-10-09 12:00:00,000 WARN: unexpected end-of-file in prolog

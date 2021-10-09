@@ -19,5 +19,10 @@ line="$(logline "$logfile" 3 | LEX)"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "Address already in use")/" \
 	"A trailing 'in use' was incorrectly recognized as a filename suffix."
 
+# 2021-10-09 12:00:00,000 WARN: unexpected end-of-file in prolog
+line="$(logline "$logfile" 4 | LEX)"
+assertRegex "$line" "/$(re_tok $T_MESSAGE "unexpected end-of-file in prolog")/" \
+	"A trailing 'in prolog' was incorrectly recognized as a filename suffix."
+
 
 success
