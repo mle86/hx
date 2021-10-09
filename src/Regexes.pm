@@ -6,7 +6,7 @@ use vars qw(
 	$re_continuation_line_start $re_continuation_line $re_repeat_begin $re_repeat_end
 	$re_lineno $re_loglevel $re_loglevel_short $re_loglevel_prefix
 	$re_fnname $re_fncall $re_memaddr
-	$re_exception
+	$re_exception $re_fqcn_java
 	$re_info_brackets
 	$re_path $re_abspath $re_source
 	$re_app $re_ip $re_host $re_client
@@ -68,18 +68,21 @@ sub read_loglevel ($) {
 	return level => L_LOW
 }
 
-my  $re_nsname    = qr/(?:\\?(?:[A-Za-z]\w*\\{1,2})+)/;
-my  $re_classname = qr/(?:$re_nsname?[A-Za-z]\w+)/;
-our $re_fnname    = qr/(?:[A-Za-z_]\w*|\{closure\}|<module>)/;
-my  $re_fnprefix  = qr/(?:->|::)/;
-our $re_fncall    = qr/(?:(?<class>${re_nsname}(?=\{)|${re_classname}(?=${re_fnprefix})|${re_classname}::${re_nsname})?(?<fnp>${re_fnprefix}${re_nsname}?)?(?<fn>${re_fnname})(?<args> ?\(.*\)))/;
-our $re_memaddr   = qr/(?:0x[0-9a-fA-F]{6,})/;
+my  $re_fqcn_java_prefix = qr/(?:#?(?=[A-Za-z])(?:[a-zA-Z0-9\_]+\.)+)/;  # fqcn must contain dots
+our $re_fqcn_java        = qr/(?:(?:$re_fqcn_java_prefix)[a-zA-Z0-9\_]+)/;
 
-my  $re_excn      = qr/(?:(?:[A-Z][A-Za-z0-9_]*)?(?:[Ee]xception|[Ee]rror|Fault|Warning)|ExceptionStack)/;  # short exception class name must end in "exception" or "error"
-my  $re_fqcn_php  = qr/(?:(?:[A-Za-z][A-Za-z0-9_]+\\)+[A-Za-z][A-Za-z0-9_]*\b)/;  # fqcn must contain backslashes
-my  $re_fqcn_java = qr/(?:#?(?=[a-z])(?:[a-zA-Z0-9\_]+\.)+$re_excn)/;  # fqcn must contain dots
-my  $re_ex_code   = qr/(?:\/\d+|\(code:? \d+\))/;
-our $re_exception = qr/(?:(?:$re_fqcn_php|$re_fqcn_java|$re_excn)$re_ex_code?)/;
+my  $re_nsname       = qr/(?:\\?(?:[A-Za-z]\w*\\{1,2})+)/;
+my  $re_classname    = qr/(?:$re_nsname?[A-Za-z]\w+)/;
+our $re_fnname       = qr/(?:[A-Za-z_]\w*|\{closure\}|<module>)/;
+my  $re_fnprefix     = qr/(?:->|::)/;
+our $re_fncall       = qr/(?:(?<class>${re_nsname}(?=\{)|${re_classname}(?=${re_fnprefix})|${re_classname}::${re_nsname})?(?<fnp>${re_fnprefix}${re_nsname}?)?(?<fn>${re_fnname})(?<args> ?\(.*\)))/;
+our $re_memaddr      = qr/(?:0x[0-9a-fA-F]{6,})/;
+
+my  $re_excn         = qr/(?:(?:[A-Z][A-Za-z0-9_]*)?(?:[Ee]xception|[Ee]rror|Fault|Warning)|ExceptionStack)/;  # short exception class name must end in "exception" or "error"
+my  $re_ex_fqcn_php  = qr/(?:(?:[A-Za-z][A-Za-z0-9_]+\\)+[A-Za-z][A-Za-z0-9_]*\b)/;  # fqcn must contain backslashes
+our $re_ex_fqcn_java = qr/(?:(?:$re_fqcn_java_prefix)$re_excn)/;
+my  $re_ex_code      = qr/(?:\/\d+|\(code:? \d+\))/;
+our $re_exception    = qr/(?:(?:$re_ex_fqcn_php|$re_ex_fqcn_java|$re_excn)$re_ex_code?)/;
 
 our $re_time   = qr/(?:\d\d:\d\d:\d\d)/;
 our $re_ms     = qr/(?:[\.,:]\d{1,6})/;

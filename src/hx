@@ -397,7 +397,7 @@ sub lex_next_line {
 			Token->new(T_INFO, $+{'id'}),
 			Token->new(T_INFO, $+{'st'});
 		$message_isolated = 1;
-	} elsif (s/^(\[$re_ts8601\])(\[\s*$re_loglevel\s*\])(\[[a-z]+(?:\.\w+)+ *\] *)//) {
+	} elsif (s/^(\[$re_ts8601\])(\[\s*$re_loglevel\s*\])(\[$re_fqcn_java *\] *)//) {
 		# [yyyy-mm-ddThh:mm:ss,sss][loglevel][org.java.classname]
 		push @output,
 			Token->new(T_DATE, $1, format => '8601'),
@@ -517,7 +517,7 @@ sub lex_next_line {
 	if ($message_isolated && !$loglevel_isolated && s/^($re_loglevel_prefix)//) {
 		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
 		$loglevel_isolated = 1;
-	} elsif ($message_isolated && !$loglevel_isolated && s/^($re_loglevel +)(\[\S+\]|\(\S+\)) ([a-z]+(?:\.\w+)+ )?//) {
+	} elsif ($message_isolated && !$loglevel_isolated && s/^($re_loglevel +)(\[\S+\]|\(\S+\)) ($re_fqcn_java )?//) {
 		# LOGLEVEL [component] org.java.classname
 		# LOGLEVEL (component) org.java.classname
 		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
