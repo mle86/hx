@@ -13,7 +13,8 @@ assertRegex "$line" "/$(re_tok $T_MESSAGE "sent 63 bytes.*")/"
 line="$(syslogline 2 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "kernel:?")/"
 assertRegex "$line" "/$(re_tok $T_INFO "\[ 2961.795960\]")/"
-assertRegex "$line" "/$(re_tok $T_MESSAGE "TCP: request_sock_TCP: Possible.*")/"
+assertRegex "$line" "/$(re_tok $T_APP "TCP: ")/"
+assertRegex "$line" "/$(re_tok $T_MESSAGE "request_sock_TCP: Possible.*")/"
 
 # Jul 17 18:52:43 hostname1 gnome-software[12960]: message repeated 5 times: [ Failed to load snap icon: local snap has no icon]
 line="$(syslogline 5 | LEX)"

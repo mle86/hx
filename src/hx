@@ -693,8 +693,9 @@ sub lex_next_line {
 			}
 			push @suffix, Token->new(T_MESSAGE, $rest);
 		}
-	} elsif ($message_isolated && $is_kernel && s/^(audit: (?:type=\w+ audit\([^\)]*\): *)?+)//) {
-		push @output, Token->new(T_MESSAGE, $1);
+	} elsif ($message_isolated && $is_kernel && s/^(audit: )((?:type=\w+ audit\([^\)]*\): *)?+)//) {
+		push @output, Token->new(T_APP, $1);
+		push @output, Token->new(T_MESSAGE, $2);
 		while (s/^(?:(msg='\s*)|(?<kv>$re_kv)(?<sep>[, ]+)?)//) {
 			if ($1) {
 				push @output, Token->new(T_MESSAGE, $1);
@@ -703,6 +704,8 @@ sub lex_next_line {
 			push @output, Token->new(T_KV, $+{'kv'}, k => $+{'k'}, src => 'audit');
 			push @output, Token->new(T_MESSAGE, $+{'sep'})  if $+{'sep'};
 		}
+	} elsif ($message_isolated && $_ && $is_kernel && s/^(\.*[A-Za-z].*?: )(?!$)//) {
+		push @output, Token->new(T_APP, $1);
 	} elsif ($message_isolated && s#^$re_cron_cmd##) {
 		# Cron syslog entry: (username) CMD ( cmd)
 		push @output,
