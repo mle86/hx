@@ -723,7 +723,7 @@ sub lex_next_line {
 		push @output, Token->new(T_MESSAGE);
 		push @output, Token->new(T_TRACE, $2)  if $2;
 		push @suffix, Token->new(T_INFO, $3)  if $3;
-	} elsif ($message_isolated && $_ && m/$re_continuation_line/) {
+	} elsif ($message_isolated && $_ && (m/$re_continuation_line/ || ($is_kernel && m/^(?:  |\.{3,} )/))) {
 		$is_continuation_line = 1;
 		$linetok->set_type(T_CONTLINE)  if $linetok && !$linetok->attr('packed');
 		if ($message_isolated && s/^( {4,}at (?:\S+\s+)??\(?)($re_path$re_lineno{1,2})(\)?)//) {
