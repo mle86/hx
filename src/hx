@@ -163,6 +163,7 @@ sub lex_next_line {
 		@output = ( $linetok );
 	}
 
+	my $is_syslog;
 	my $is_apache;
 	my $is_postfix;
 	my $is_kernel;
@@ -185,6 +186,7 @@ sub lex_next_line {
 			Token->new(T_HOST, $2 . ' '),
 			Token->new(T_APP, $3 . $4);
 		$client_follows = 1  if ($3 =~ m/^(?:named|bind9?)\b/);
+		$is_syslog = 1;
 		$is_kernel = 1  if ($3 =~ m/^kernel\b/);
 		$is_postfix = 1  if ($3 =~ m/^postfix|^amavis/);
 		$message_isolated = 1;
@@ -200,6 +202,7 @@ sub lex_next_line {
 			Token->new(T_APP,  $7 . ' ', type => 'pid'),  # PID
 			Token->new(T_INFO, $8 . ' ');  # msgid
 		$message_isolated = 1;
+		$is_syslog = 1;
 		$is_rfc5424 = 1;
 	} elsif (s/^($re_sects) ($re_app: )//) {
 		push @output,
@@ -548,6 +551,7 @@ sub lex_next_line {
 			Token->new(T_LOGLEVEL, $2, read_loglevel($2)),
 			Token->new(T_APP, $3 . $4);
 		push @output, Token->new(T_INFO, $5)  if $5;
+		$loglevel_isolated = 1;
 	}
 	
 	if (s/^(###!!! *)//) {
