@@ -92,5 +92,9 @@ assertRegex "$line" "/$(re_tok $T_APP "\(\/usr/bin/program:1234\):")$(re_tok $T_
 line="$(logline "$logfile" 18 | LEX)"
 assertRegex "$line" "/$(re_tok $T_APP "\(script:1\)")$(re_tok $T_ERROR "MyWarning:?").*$(re_tok $T_MESSAGE "message.*")/"
 
+# Sat Oct 09 2021 14:30:00 GMT+0200 (Central European Summer Time): message
+line="$(logline "$logfile" 19 | LEX)"
+assertRegex "$line" "/$(re_tok $T_DATE "Sat Oct 09 2021 14:30:00 GMT\+0200 \(Central European Summer Time\):?")$(re_tok $T_MESSAGE)/"
+
 
 success
