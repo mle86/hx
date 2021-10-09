@@ -290,7 +290,7 @@ sub lex_next_line {
 		# dmesg (other)
 		push @output, Token->new(T_DATE, $1 . ' ', format => 'dmesg');
 		$is_dmesg = 1;
-	} elsif (s/^(Next) ($re_exception)(: )//) {
+	} elsif (s/^(Next|Caused by:?) ($re_exception)(: )//) {
 		# Chained exceptions:
 		push @output,
 			Token->new(T_DATE, $1 . ' '),
