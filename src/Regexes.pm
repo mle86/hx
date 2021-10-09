@@ -55,7 +55,7 @@ our $re_loglevel = qr/(?:(?:PHP )?(?:(?i:warning|warnung|warn|error|err|fehler|i
 our $re_loglevel_short = qr/(?:\b[EW]\b)/;
 our $re_loglevel_prefix = qr/(?:<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:(?:  ?|$)|$re_loglevel +- |\*+$re_loglevel[!:]?\*+:? *+)/;
 
-our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|Stack trace:$|\[stack ?trace\]:?$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})at|$|\s+!\s+)| \/\/ )/;
+our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|Stack trace:$|\[stack ?trace\]:?$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})(?:at|\.\.\.)|$|\s+!\s+)| \/\/ )/;
 our $re_continuation_line_start = qr/(?:(?!^ ! \[$re_symfony_loglevels)$re_continuation_line|^\s*?(?:URI:|Referr?er:|User-?[Aa]gent:))/;
 our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[)(?<rest>\s*))/;
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
