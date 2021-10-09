@@ -77,7 +77,7 @@ our $re_memaddr   = qr/(?:0x[0-9a-fA-F]{6,})/;
 
 my  $re_excn      = qr/(?:(?:[A-Z][A-Za-z0-9_]*)?(?:[Ee]xception|[Ee]rror|Fault|Warning)|ExceptionStack)/;  # short exception class name must end in "exception" or "error"
 my  $re_fqcn_php  = qr/(?:(?:[A-Za-z][A-Za-z0-9_]+\\)+[A-Za-z][A-Za-z0-9_]*\b)/;  # fqcn must contain backslashes
-my  $re_fqcn_java = qr/(?:(?=[a-z])(?:[a-zA-Z0-9\_]+\.)+$re_excn)/;  # fqcn must contain backslashes
+my  $re_fqcn_java = qr/(?:#?(?=[a-z])(?:[a-zA-Z0-9\_]+\.)+$re_excn)/;  # fqcn must contain dots
 my  $re_ex_code   = qr/(?:\/\d+|\(code:? \d+\))/;
 our $re_exception = qr/(?:(?:$re_fqcn_php|$re_fqcn_java|$re_excn)$re_ex_code?)/;
 
