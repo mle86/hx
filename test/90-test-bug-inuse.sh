@@ -24,5 +24,10 @@ line="$(logline "$logfile" 4 | LEX)"
 assertRegex "$line" "/$(re_tok $T_MESSAGE "unexpected end-of-file in prolog")/" \
 	"A trailing 'in prolog' was incorrectly recognized as a filename suffix."
 
+line="$(logline "$HERE/samples/certbot.log" 2 | LEX)"
+# 2019-06-05 04:33:37,590:WARN:certbot.log:Root logging level set at 30
+assertRegex "$line" "/$(re_tok $T_MESSAGE ":?Root logging level set at 30")/" \
+	"A trailing 'set at 30' was incorrectly recognized as a filename suffix."
+
 
 success
