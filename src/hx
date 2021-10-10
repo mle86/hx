@@ -409,7 +409,7 @@ sub lex_next_line {
 			Token->new(T_INFO, $3);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
-	} elsif (s/^($re_ymdts|$re_dmyts|(?|($re_ts8601)|\[($re_ts8601)\])|$re_tsw|\[$re_tsw\]|$re_sects|\[$re_ymdts\]|\[$re_dmyts\]|$re_dmdty|$re_dmdyt|\[$re_dmdty\]|\[$re_dmdyt\])( |: ?|$|(?<=\]))//) {
+	} elsif (s/^($re_ymdts|$re_dmyts|(?|($re_ts8601)|\[($re_ts8601)\])|$re_tsw|\[$re_tsw\]|$re_sects|\[$re_ymdts\]|\[$re_dmyts\]|$re_ddmyt|$re_dmdty|$re_dmdyt|\[$re_ddmyt\]|\[$re_dmdty\]|\[$re_dmdyt\])( |: ?|$|(?<=\]))//) {
 		my %attr = ($2) ? (type => '8601') : ();
 		push @output, Token->new(T_DATE, $1 . $3, %attr);
 		$message_isolated = 1;
@@ -424,7 +424,7 @@ sub lex_next_line {
 			Token->new(T_DATE, $2),
 			Token->new(T_INFO, $3),
 			Token->new(T_INFO, $4);
-	} elsif (s/^($re_loglevel:?\s+)($re_app:? )((?:$re_dmdty|$re_dmdyt|$re_ymdts|$re_dmyts|$re_time|($re_ts8601)):? )//) {
+	} elsif (s/^($re_loglevel:?\s+)($re_app:? )((?:$re_dmdty|$re_dmdyt|$re_ddmyt|$re_ymdts|$re_dmyts|$re_time|($re_ts8601)):? )//) {
 		# ERROR: app (pid 1000) Mon Jul 26 16:00:00 2021: Message
 		my %attr = ($4) ? (type => '8601') : ();
 		push @output,
@@ -433,7 +433,7 @@ sub lex_next_line {
 			Token->new(T_DATE, $3, %attr);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
-	} elsif (s/^((?=[A-Za-z])$re_app:? )((?:$re_dmdty|$re_dmdyt|$re_ymdts|$re_dmyts|$re_time|($re_ts8601)):? )//) {
+	} elsif (s/^((?=[A-Za-z])$re_app:? )((?:$re_dmdty|$re_dmdyt|$re_ddmyt|$re_ymdts|$re_dmyts|$re_time|($re_ts8601)):? )//) {
 		# app 2021-07-03 13:05:40: message
 		my %attr = ($3) ? (type => '8601') : ();
 		push @output,

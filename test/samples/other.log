@@ -17,3 +17,4 @@ console.warn: message
 (/usr/bin/program:1234): GLib-GObject-CRITICAL **: 12:00:00.123: g_object_set: assertion 'G_IS_OBJECT (object)' failed
 (script:1) MyWarning: message...
 Sat Oct 09 2021 14:30:00 GMT+0200 (Central European Summer Time): message
+[Fri 08 Sep 2021 22:00:00 CEST] Crash report submitted successfully
