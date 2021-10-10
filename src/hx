@@ -345,7 +345,7 @@ sub lex_next_line {
 		$is_nginx = 1;
 		$message_isolated = 1;
 		$loglevel_isolated = 1  if $2;
-	} elsif (s/^(\[$re_dmdty\] )($re_client(?::\d+)? )(?:($re_http)(?<suffix>: ))?//) {
+	} elsif (s/^(\[$re_dmdty\] )($re_client:\d+ )(?:($re_http)(?<suffix>: ))?//) {
 		# "php -S" log format
 		my ($info, $suffix) = ($3, $+{'suffix'});
 		push @output,
