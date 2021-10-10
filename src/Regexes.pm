@@ -17,6 +17,7 @@ use vars qw(
 	$re_dmesg_ts $re_dmesg_app
 	$re_psstime
 	$re_tail_filename
+	$re_kmod_prefix
 	$re_cron_cmd
 	$re_kv
 	$re_ansi_color
@@ -126,6 +127,8 @@ our $re_psstime = qr/(?:\d{4}|\w+\d{1,2}|\d{1,2}:\d{2})/;
 our $re_tail_filename = qr/(?:(?<prefix>==+> +)(?<filename>$re_path)(?<suffix> +<==+\s*$))/;
 
 our $re_cron_cmd = qr/(?<user>\([\w\-]+\))(?<prefix> CMD \( +)(?<cmd>.+)(?<suffix>\)\s*$)/;
+
+our $re_kmod_prefix = qr/(?:\.*[A-Za-z].*?(?=: ))/;
 
 our $re_kv = qr/(?<k>\w[\w\.\-]*)(?<s>[=:])(?<v>$re_dqstr|<[^>]*+>|[^\s,]*+)(?=\s|,|$)/;
 

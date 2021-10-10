@@ -168,7 +168,6 @@ sub lex_next_line {
 	my $is_postfix;
 	my $is_kernel;
 	my $is_rfc5424;
-	my $is_dmesg;
 	my $is_ps;
 	my $is_wrap;
 	my $is_nginx_fastcgi;
@@ -204,6 +203,14 @@ sub lex_next_line {
 		$message_isolated = 1;
 		$is_syslog = 1;
 		$is_rfc5424 = 1;
+	} elsif (s/^($re_dmesg_ts) (kernel: )?(?:(\[$re_dmesg_app\](?: |$))|(-{3,} ?[\[\(].+[\]\)] ?-{3,}\s*))?//) {
+		# dmesg
+		push @output,
+			Token->new(T_DATE, $1 . ' ', format => 'dmesg'),
+			Token->new(T_APP, $2 . $3);
+		push @output, Token->new(T_INFO, $4, type => 'dmesg-separator')  if $4;
+		$message_isolated = 1;
+		$is_kernel = 1;
 	} elsif (s/^($re_sects) ($re_app: )//) {
 		push @output,
 			Token->new(T_DATE, $1 . ' '),
@@ -287,17 +294,6 @@ sub lex_next_line {
 		push @output, Token->new(T_LOGLEVEL, $4, read_loglevel($4));
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
-	} elsif (s/^($re_dmesg_ts) ($re_dmesg_app:|\[$re_dmesg_app\])( |$)//) {
-		# dmesg
-		push @output,
-			Token->new(T_DATE, $1 . ' ', format => 'dmesg'),
-			Token->new(T_APP, $2 . $3);
-		$message_isolated = 1;
-		$is_dmesg = 1;
-	} elsif (s/^($re_dmesg_ts) //) {
-		# dmesg (other)
-		push @output, Token->new(T_DATE, $1 . ' ', format => 'dmesg');
-		$is_dmesg = 1;
 	} elsif (s/^(Next|Caused by:?) ($re_exception)(: )//) {
 		# Chained exceptions:
 		push @output,
@@ -486,9 +482,7 @@ sub lex_next_line {
 			Token->new(T_APP, $1);
 	}
 
-	if ($is_dmesg && s/^((-{3,}) ?[\[\(].+[\]\)] ?-{3,}\s*)//) {
-		push @output, Token->new(T_INFO, $1, type => 'dmesg-separator');
-	} elsif (s/^$re_repeat_begin//) {
+	if (s/^$re_repeat_begin//) {
 		push @output, Token->new(T_REPEAT, $+{'prefix'}, n => $+{'n'});
 		push @output, Token->new(T_MESSAGE, $+{'rest'});
 		if (s/($re_repeat_end)$//) {
@@ -717,7 +711,7 @@ sub lex_next_line {
 			push @output, Token->new(T_KV, $+{'kv'}, k => $+{'k'}, src => 'audit');
 			push @output, Token->new(T_MESSAGE, $+{'sep'})  if $+{'sep'};
 		}
-	} elsif ($message_isolated && $_ && $is_kernel && s/^(\.*[A-Za-z].*?: )(?!$)//) {
+	} elsif ($message_isolated && $_ && $is_kernel && s/^($re_kmod_prefix: )(?!$)//) {
 		push @output, Token->new(T_APP, $1);
 	} elsif ($message_isolated && s#^$re_cron_cmd##) {
 		# Cron syslog entry: (username) CMD ( cmd)
