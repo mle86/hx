@@ -584,8 +584,14 @@ sub lex_next_line {
 		push @output, Token->new(T_JSON, $1);
 	} elsif ($message_isolated && !$is_ps && s/^(?<info>$re_info_brackets(?: *$re_info_brackets)*(?:: )?)(?<msg> *)//) {
 		my %attr = ($is_rfc5424) ? (type => 'rfc-5424-sd') : ();
-		push @output, Token->new(T_INFO, $+{'info'}, %attr);
-		push @output, Token->new(T_INFO, $+{'msg'});
+		my ($info, $msg) = @+{'info', 'msg'};
+		if ($is_kernel && length($msg) > 1) {
+			# Kernel fmt is strict. Extra spaces after brackets always indicate a continuation line. Put them back:
+			$_   = substr($msg, 1) . $_;
+			$msg = substr($msg, 0, 1);
+		}
+		push @output, Token->new(T_INFO, $info, %attr);
+		push @output, Token->new(T_INFO, $msg);
 	} elsif ($message_isolated && $is_rfc5424 && s/^(-) //) {
 		# RFC5424 with empty Structured Data field
 		push @output, Token->new(T_INFO, $1 . ' ');
@@ -730,7 +736,7 @@ sub lex_next_line {
 		push @output, Token->new(T_MESSAGE);
 		push @output, Token->new(T_TRACE, $2)  if $2;
 		push @suffix, Token->new(T_INFO, $3)  if $3;
-	} elsif ($message_isolated && $_ && (m/$re_continuation_line/ || ($is_kernel && m/^(?:  |\.{3,} )/))) {
+	} elsif ($message_isolated && $_ && (m/$re_continuation_line/ || ($is_kernel && m/^(?: |\.{3,} )/))) {
 		$is_continuation_line = 1;
 		$linetok->set_type(T_CONTLINE)  if $linetok && !$linetok->attr('packed');
 		if ($message_isolated && s/^( {4,}at (?:\S+\s+)??\(?)($re_path$re_lineno{1,2})(\)?)//) {
