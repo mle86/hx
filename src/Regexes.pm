@@ -4,7 +4,7 @@ use vars qw(
 	$re_json $re_json_string
 	$re_py_trace_source $re_py_trace_line
 	$re_continuation_line_start $re_continuation_line $re_repeat_begin $re_repeat_end
-	$re_lineno $re_loglevel $re_loglevel_short $re_loglevel_prefix
+	$re_lineno $re_loglevel $re_loglevel_short $re_loglevel_prefix $re_pgsql_loglevel
 	$re_fnname $re_fncall $re_memaddr
 	$re_exception $re_fqcn_java
 	$re_info_brackets
@@ -54,6 +54,7 @@ my  $re_symfony_loglevels = qr/(?:NOTE|OK|WARNING|ERROR|CAUTION)/;
 our $re_loglevel = qr/(?:(?:PHP )?(?:(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|trace|alrt|alert|parse error|fatal error|fatal|stdout|stderr)|$re_symfony_loglevels))/;
 our $re_loglevel_short = qr/(?:\b[EW]\b)/;
 our $re_loglevel_prefix = qr/(?:<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:(?:  ?|$)|$re_loglevel +- |\*+$re_loglevel[!:]?\*+:? *+)/;
+our $re_pgsql_loglevel = qr/(?:$re_loglevel|LOG|STATEMENT|HINT|DETAIL)/;
 
 our $re_continuation_line = qr/(?:^\s*?(?:#\d+\b|Stack trace:$|\[stack ?trace\]:?$|Traceback(?: \(most recent call last\))?:$|$re_py_trace_source|CLI:|  thrown in | {16,}|(?:\t|#011| {4,})(?:at|\.\.\.)|$|\s+!\s+)| \/\/ )/;
 our $re_continuation_line_start = qr/(?:(?!^ ! \[$re_symfony_loglevels)$re_continuation_line|^\s*?(?:URI:|Referr?er:|User-?[Aa]gent:))/;

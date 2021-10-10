@@ -279,6 +279,14 @@ sub lex_next_line {
 		push @output, Token->new(T_APP, $4)  if $4;
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^($re_ymdts|\[$re_ymdts\]) (\[\d+\] )?((?::|(?<=\] )(?:$re_client)?[:@](?:$re_host|\[unknown\])?|(?:$re_client)[:@](?:$re_host|\[unknown\])) )?($re_pgsql_loglevel:  ?)//) {
+		# postgres log format
+		push @output, Token->new(T_DATE, $1 . ' ');
+		push @output, Token->new(T_INFO, $2)  if $2;
+		push @output, Token->new(T_CLIENT, $3)  if $3;
+		push @output, Token->new(T_LOGLEVEL, $4, read_loglevel($4));
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	} elsif (s/^($re_dmesg_ts) ($re_dmesg_app:|\[$re_dmesg_app\])( |$)//) {
 		# dmesg
 		push @output,
