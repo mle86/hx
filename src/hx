@@ -175,7 +175,7 @@ sub lex_next_line {
 	my $client_follows;
 
 	my ($message_isolated, $loglevel_isolated, $exception_isolated, $text_isolated);
-	my $re_symfony_info = qr/(?:(?<sjdata>(?=\{")$re_json|\[\]|\{\}) (?<sjrest>\[[^\]]*\] *$))/;
+	my $re_symfony_info = qr/(?:(?<sjdata>(?=[\{\[])$re_json|\[\]|\{\}) (?<sjrest>\[[^\]]*\] *$))/;
 
 	# The start is probably the timestamp:
 	if (s/^($re_ddd {1,2}$re_time) ($re_host) ($re_app)(: )//) {
