@@ -18,3 +18,4 @@ console.warn: message
 (script:1) MyWarning: message...
 Sat Oct 09 2021 14:30:00 GMT+0200 (Central European Summer Time): message
 [Fri 08 Sep 2021 22:00:00 CEST] Crash report submitted successfully
+Nov  21 12:00:00 myhost myapp[10000]: GDBus.Error:org.freedesktop.portal.Error.NotAllowed: This call is not allowed

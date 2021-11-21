@@ -100,5 +100,10 @@ assertRegex "$line" "/$(re_tok $T_DATE "Sat Oct 09 2021 14:30:00 GMT\+0200 \(Cen
 line="$(logline "$logfile" 20 | LEX)"
 assertRegex "$line" "/$(re_tok $T_DATE "\[Fri 08 Sep 2021 22:00:00 CEST\]")$(re_tok $T_MESSAGE)/"
 
+# Nov  21 12:00:00 myhost myapp[10000]: GDBus.Error:org.freedesktop.portal.Error.NotAllowed: This call is not allowed
+# L D[format=syslog](Nov  21 12:00:00 ) H(myhost ) A(myapp[10000]: ) G[level=30](GDBus.Error:) X(org.freedesktop.portal.Error.NotAllowed: ) M(This call is not allowed) Z
+line="$(logline "$logfile" 21 | LEX)"
+assertRegex "$line" "/$(re_tok $T_LOGLEVEL "GDBus\.Error:?").*$(re_tok $T_ERROR "org\.freedesktop\.portal\.Error\.NotAllowed:?").*$(re_tok $T_MESSAGE)/"
+
 
 success
