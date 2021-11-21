@@ -131,7 +131,11 @@ sub read_color_defs ($) {
 		h5 => \$c_http_server_error,
 	);
 
-	foreach my $assignment (split /:/, $_[0]) {
+	my $input = remove_nonprintables($_[0]);
+	# The example assignments in README.md contain U+200B spaces for formatting purposes.
+	# Copy/paste leads to confusing "invalid section name: 'CL'" errors if we don't remove these characters here.
+
+	foreach my $assignment (split /:/, $input) {
 		my ($k, $v) = split /=/, $assignment;
 
 		my $setto;

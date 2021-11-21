@@ -34,13 +34,15 @@ foreach (@ARGV) {
 	elsif ($_ eq '--raw')     { shift @ARGV; $raw = 1 }
 }
 
-read_color_defs($ENV{'HX_COLORS'})  if (defined $ENV{'HX_COLORS'} && $ENV{'HX_COLORS'} ne '');
+read_color_defs($ENV{'HX_COLORS'})  if defined($ENV{'HX_COLORS'});
 read_settings($ENV{'HX_SETTINGS'} // undef);
 
 
 ## Output configuration:  ######################################################
 
 sub nowarn (&;@) { local $SIG{__WARN__} = sub { }; $_[0]->(@_) }
+
+sub remove_nonprintables ($) { $_[0] =~ s/[^[:print:]]++//gra }
 
 our $linestart;
 our $metalinestart;
