@@ -6,3 +6,4 @@
 2020-09-17 11:00:22.367 INFO  (commitScheduler-10-thread-1) [   x:core] o.a.s.u.DirectUpdateHandler2 end_commit_flush
 [2020-09-20T06:20:47,942][INFO ][o.e.x.m.p.l.CppLogMessageHandler] [0a0359200001] [controller/100] init
 [2020-09-20T06:20:48,732][INFO ][o.e.d.DiscoveryModule    ] [0a0359200001] using discovery type [zen] and host providers [settings]
+[fe80.local..recover()] WARN javax.jmdns.impl.JmDNSImpl - fe80..recover() Could not recover we are Down!

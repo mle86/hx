@@ -401,6 +401,14 @@ sub lex_next_line {
 			Token->new(T_INFO, $+{'id'}),
 			Token->new(T_INFO, $+{'st'});
 		$message_isolated = 1;
+	} elsif (s/^(\[[^]]+\] )($re_loglevel +)($re_fqcn_java +- +)//) {
+		# [info] loglevel org.java.classname -
+		push @output,
+			Token->new(T_APP, $1),
+			Token->new(T_LOGLEVEL, $2, read_loglevel($2)),
+			Token->new(T_INFO, $3);
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	} elsif (s/^(\[$re_ts8601\])(\[\s*$re_loglevel\s*\])(\[$re_fqcn_java *\] *)//) {
 		# [yyyy-mm-ddThh:mm:ss,sss][loglevel][org.java.classname]
 		push @output,

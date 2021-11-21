@@ -71,7 +71,7 @@ sub read_loglevel ($) {
 }
 
 my  $re_fqcn_java_prefix = qr/(?:#?(?=[A-Za-z])(?:[a-zA-Z0-9\_]+\.)+)/;  # fqcn must contain dots
-our $re_fqcn_java        = qr/(?:(?:$re_fqcn_java_prefix)[a-zA-Z0-9\_]+)/;
+our $re_fqcn_java        = qr/(?:(?:$re_fqcn_java_prefix)[a-zA-Z0-9\_]+(?:\$\w+)?)/;
 
 my  $re_nsname       = qr/(?:\\?(?:[A-Za-z]\w*\\{1,2})+)/;
 my  $re_classname    = qr/(?:$re_nsname?[A-Za-z]\w+)/;

@@ -32,5 +32,14 @@ re="${re}$(re_tok $T_INFO '\[0a0359200001\].*')"
 re="${re}$(re_tok $T_MESSAGE 'init')"
 assertRegex "$line" "/$re/"
 
+# [fe80.local..recover()] WARN javax.jmdns.impl.JmDNSImpl - fe80..recover() Could not recover we are Down!
+line="$(logline "$logfile" 9 | LEX)"
+re=
+re="${re}$(re_tok $T_APP '\[fe80.+\(\)\]')"
+re="${re}$(re_tok $T_LOGLEVEL 'WARN')"
+re="${re}(?:$(re_tok $T_INFO 'javax.*')$(re_tok $T_INFO '-')|$(re_tok $T_INFO 'javax.* -'))"
+re="${re}$(re_tok $T_MESSAGE 'fe80.*Could not recover.*')"
+assertRegex "$line" "/$re/"
+
 
 success
