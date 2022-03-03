@@ -52,7 +52,7 @@ our $re_py_trace_source = qr/(?:^  (?=File )$re_source)/;
 our $re_py_trace_line = qr/(?:^    \S.*$)/;
 
 my  $re_symfony_loglevels = qr/(?:NOTE|OK|WARNING|ERROR|CAUTION)/;
-our $re_loglevel = qr/(?:(?:PHP )?(?:(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|emergency|emerg|debug[123]?|dbg|fine|trace|alrt|alert|parse error|fatal error|fatal|stdout|stderr)|$re_symfony_loglevels))/;
+our $re_loglevel = qr/(?:(?:PHP )?(?:(?i:warning|warnung|warn|error|err|fehler|information|info|notice|noti|note|hinweis|critical|crit|schwerwiegend|severe|emergency|emerg|debug[123]?|dbg|fine|trace|alrt|alert|parse error|fatal error|fatal|stdout|stderr)|$re_symfony_loglevels))/;
 our $re_loglevel_short = qr/(?:\b[EW]\b)/;
 our $re_loglevel_prefix = qr/(?:<$re_loglevel>  ?|\[$re_loglevel\][: ]|$re_loglevel:(?:  ?|$)|$re_loglevel +- |\*+$re_loglevel[!:]?\*+:? *+)/;
 our $re_pgsql_loglevel = qr/(?:$re_loglevel|LOG|STATEMENT|HINT|DETAIL)/;
@@ -63,7 +63,7 @@ our $re_repeat_begin      = qr/(?:(?<prefix>message repeated (?<n>\d+) times: \[
 our $re_repeat_end        = qr/(?:\s*\]\s*)/;
 
 my $re_loglevel_warn = qr/\b(?:W|warn|warning|warnung|stderr)\b/i;
-my $re_loglevel_err  = qr/\b(?:E|err|error|errors|fehler|crit|critical|schwerwiegend|alrt|alert|emerg|emergency|fatal)\b/i;
+my $re_loglevel_err  = qr/\b(?:E|err|error|errors|fehler|crit|critical|schwerwiegend|severe|alrt|alert|emerg|emergency|fatal)\b/i;
 sub read_loglevel ($) {
 	if    ($_[0] =~ m/$re_loglevel_warn/i) { return level => L_WARNING }
 	elsif ($_[0] =~ m/$re_loglevel_err/i)  { return level => L_ERROR }
