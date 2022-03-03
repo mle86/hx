@@ -29,5 +29,12 @@ line="$(logline "$HERE/samples/certbot.log" 2 | LEX)"
 assertRegex "$line" "/$(re_tok $T_MESSAGE ":?Root logging level set at 30")/" \
 	"A trailing 'set at 30' was incorrectly recognized as a filename suffix."
 
+# Mar 03 12:00:00 myftp daemon: Cannot create directory: File exists
+line="$(logline "$logfile" 5 | LEX)"
+reOriginalMessage="$(re_tok $T_MESSAGE "Cannot create directory: File exists")"
+reSplitMessage="$(re_tok $T_MESSAGE "Cannot create directory:?")$(re_tok $T_MESSAGE ":? ?File exists")"
+assertRegex "$line" "/(?:$reOriginalMessage|$reSplitMessage)/" \
+	"A trailing 'file exists' was incorrectly recognized as a filename suffix."
+
 
 success
