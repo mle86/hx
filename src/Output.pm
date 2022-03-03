@@ -61,6 +61,9 @@ sub format_token ($;%) {
 		return $content;
 	}
 
+
+	return format_sql($content)  if ($content =~ m/^["']?(SELECT|UPDATE|INSERT|DELETE|REPLACE)/);
+
 	return format_message($content)
 }
 
@@ -248,6 +251,14 @@ sub format_kv ($) {
 
 	$content =~ s/\b($k)\b/${c_key_hi}$1${c_key_lo}/  unless $is_boring_keyword;
 	return $c_context . $content
+}
+
+sub format_sql ($) {
+	my ($content) = ($_[0]);
+
+	$content =~ s/\b(SELECT|UPDATE|(?:REPLACE|INSERT)(?:\s+INTO)|DELETE|FROM|SET|WHERE|(?:(?:LEFT|RIGHT|INNER|OUTER|FULL)\s+)*JOIN|ON|UNION|HAVING)\b/$c_bold$1$c_unbold/g;
+
+	$c_message . $content . $c0
 }
 
 # _color_hilo $hiColor $contextColor
