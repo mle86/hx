@@ -186,7 +186,7 @@ sub lex_next_line {
 			Token->new(T_DATE, $1 . ' ', format => 'syslog'),
 			Token->new(T_HOST, $2 . ' '),
 			Token->new(T_APP, $3 . $4);
-		$client_follows = 1  if ($3 =~ m/^(?:named|bind9?)\b/);
+		$client_follows = 1  if ($3 =~ m/^(?:named|bind9?|pure-?ftpd?)\b/);
 		$is_syslog = 1;
 		$is_kernel = 1  if ($3 =~ m/^kernel\b/);
 		$is_postfix = 1  if ($3 =~ m/^postfix|^amavis/);
@@ -576,10 +576,13 @@ sub lex_next_line {
 		push @output, Token->new(T_INFO, $1);
 	}
 
-	if ($message_isolated && $client_follows && s/^( *(?:client )?$re_ip(?:[:#]\d{1,5})?(?:[:,] ?)?)//) {
+	if ($message_isolated && $client_follows && s/^( *(?:client )?$re_ip(?:[:#]\d{1,5})?(?:[:,] ?)?|\((?:\?|$re_host)@(?:\?|$re_client)\) *)//) {
 		push @output, Token->new(T_CLIENT, $1);
 
-		if (s/(^ \([^\]]*\)[:,] ?)//) {
+		if (!$loglevel_isolated && s/^($re_loglevel_prefix)//) {
+			push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1));
+			$loglevel_isolated = 1;
+		} elsif (s/(^ \([^\]]*\)[:,] ?)//) {
 			push @output, Token->new(T_INFO, $1);
 		}
 	} elsif ($message_isolated && $is_ps && s/^(\[-?$re_path\]|\(-?$re_path\)|-?$re_path)//) {

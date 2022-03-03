@@ -1,0 +1,3 @@
+Sep 28 12:00:00 myhost pure-ftpd: (username@ip11.22.33.44.isp.net) [DEBUG] Command [list] []
+Sep 28 12:00:00 myhost pure-ftpd: (?@?) [ERROR] Sorry, but that file doesn't exist: [/etc/ssl/private/pure-ftpd.pem]
+Mar 03 12:00:00 myhost pure-ftpd: (?@127.0.0.1) [INFO] Logout.
