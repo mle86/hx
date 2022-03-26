@@ -16,5 +16,16 @@ re_line="${re_line}$(re_tok $T_MESSAGE "(?:: )?exception message")\s*"
 re_line="${re_line}$(re_tok $T_TRACE "in \/proj\/source.php:10")\s*"
 assertRegex "$line" "/$re_line/"
 
+# PHP message: 2022-03-26T18:00:00+01:00 [critical] Uncaught Error: Call to undefined method MyClass::build()
+line="$(logline "$logfile" 2 | LEX)"
+re_line=
+re_line="${re_line}$(re_tok $T_APP "PHP message:")\s*"
+re_line="${re_line}$(re_tok $T_DATE "2022-03-26T18:00:00\+01:00 ")\s*"
+re_line="${re_line}$(re_tok $T_LOGLEVEL "\[critical\]")\s*"
+re_line="${re_line}$(re_tok $T_MESSAGE "Uncaught")\s*"
+re_line="${re_line}$(re_tok $T_ERROR "Error:?")\s*"
+re_line="${re_line}$(re_tok $T_MESSAGE ":? ?Call to.*")"
+assertRegex "$line" "/$re_line/"
+
 
 success

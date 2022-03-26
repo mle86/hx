@@ -1,1 +1,2 @@
 PHP Warning:  Uncaught CustomException: exception message in /proj/source.php:10
+PHP message: 2022-03-26T18:00:00+01:00 [critical] Uncaught Error: Call to undefined method MyClass::build()

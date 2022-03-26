@@ -303,12 +303,14 @@ sub lex_next_line {
 			Token->new(T_ERROR, $2),
 			Token->new(T_MESSAGE, $3);
 		$message_isolated = 1;
-	} elsif (s/^(?:(PHP Fatal error: )|((?=PHP)$re_loglevel: ))( ?Uncaught (?:PHP Exception )?)($re_exception)//) {
+	} elsif (s/^(?:((?=PHP)$re_php_msg_prefix)|((?=PHP)$re_loglevel: ))($re_ts8601 )?(\[$re_loglevel\])?( ?Uncaught (?:PHP )?(?:Exception )?)($re_exception)?//) {
 		push @output, Token->new(T_APP, $1)  if $1;
 		push @output, Token->new(T_LOGLEVEL, $2, read_loglevel($2))  if $2;
+		push @output, Token->new(T_DATE, $3)  if $3;
+		push @output, Token->new(T_LOGLEVEL, $4, read_loglevel($4))  if $4;
 		push @output,
-			Token->new(T_MESSAGE, $3),
-			Token->new(T_ERROR, $4);
+			Token->new(T_MESSAGE, $5),
+			Token->new(T_ERROR, $6);
 		$message_isolated = 1;
 	} elsif (s/^($re_ymd $re_time(?:,\d+)?:)($re_loglevel:)([^:]+:)//) {
 		# LetsEncrypt/certbot
@@ -625,7 +627,7 @@ sub lex_next_line {
 		}
 	}
 
-	if ($message_isolated && s/^( *(?:PHP message:  ?)?(?:PHP Fatal error:  ?)?(?:Uncaught (?:PHP )?(?:Exception )?)?)($re_exception)(: +)//) {
+	if ($message_isolated && s/^( *$re_php_msg_prefix(?:Uncaught (?:PHP )?(?:Exception )?)?)($re_exception)(: +)//) {
 		push @output, Token->new(T_MESSAGE, $1)  if $1;
 		push @output, Token->new(T_ERROR, $2);
 		push @output, Token->new(T_MESSAGE, $3);

@@ -18,6 +18,7 @@ use vars qw(
 	$re_psstime
 	$re_tail_filename
 	$re_kmod_prefix
+	$re_php_msg_prefix
 	$re_cron_cmd
 	$re_kv
 	$re_ansi_color
@@ -130,6 +131,8 @@ our $re_tail_filename = qr/(?:(?<prefix>==+> +)(?<filename>$re_path)(?<suffix> +
 our $re_cron_cmd = qr/(?<user>\([\w\-]+\))(?<prefix> CMD \( +)(?<cmd>.+)(?<suffix>\)\s*$)/;
 
 our $re_kmod_prefix = qr/(?:\.*[A-Za-z].*?(?=: ))/;
+
+our $re_php_msg_prefix = qr/(?:PHP message:  ?)?(?:PHP Fatal error:  ?)?/;
 
 our $re_kv = qr/(?<k>\w[\w\.\-]*)(?<s>[=:])(?<v>$re_dqstr|<[^>]*+>|[^\s,]*+)(?=\s|,|$)/;
 
