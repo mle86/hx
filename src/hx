@@ -488,6 +488,12 @@ sub lex_next_line {
 			Token->new(T_APP, $3);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^([Ee]vent: +)((?:time |timestamp )?$re_unixts(?:)[,:] *+)(.*$)//) {
+		# evtest
+		push @output,
+			Token->new(T_APP, $1),
+			Token->new(T_DATE, $2),
+			Token->new(T_MESSAGE, $3, (format => 'evtest'));
 	} elsif (s/^(\((?:$re_path$re_lineno?)\):? )//) {
 		$message_isolated = 1;
 		push @output,
