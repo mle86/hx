@@ -279,15 +279,6 @@ sub lex_next_line {
 			Token->new(T_APP, $2);
 		$is_apache = 1;
 		$message_isolated = 1;
-	} elsif (s/^($re_ts8601) (\d+) (\[\w+\]) ($re_mysqld)?// ||
-		 s/^(${re_ymd} ${re_time}) (\d+) (\[\w+\]) ($re_mysqld)?//) {
-		# mysqld error:
-		push @output, Token->new(T_DATE, $1 . ' ', format => '8601');
-		push @output, Token->new(T_INFO, $2 . ' ');
-		push @output, Token->new(T_LOGLEVEL, $3 . ' ', read_loglevel($3));
-		push @output, Token->new(T_APP, $4)  if $4;
-		$message_isolated = 1;
-		$loglevel_isolated = 1;
 	} elsif (s/^($re_ymdts|\[$re_ymdts\]) (\[\d+\] )?((?::|(?<=\] )(?:$re_client)?[:@](?:$re_host|\[unknown\])?|(?:$re_client)[:@](?:$re_host|\[unknown\])) )?($re_pgsql_loglevel:  ?)//) {
 		# postgres log format
 		push @output, Token->new(T_DATE, $1 . ' ');
@@ -576,6 +567,14 @@ sub lex_next_line {
 			Token->new(T_LOGLEVEL, $2, read_loglevel($2)),
 			Token->new(T_APP, $3 . $4);
 		push @output, Token->new(T_INFO, $5)  if $5;
+		$loglevel_isolated = 1;
+	} elsif (s/^(?:(($re_ts8601)|$re_ymdts) )?(\d+) (\[$re_loglevel\]) ($re_mysqld)?//) {
+		# mysqld error:
+		push @output, Token->new(T_DATE, $1 . ' ', ($2) ? (format => '8601') : ())  if $1;
+		push @output, Token->new(T_INFO, $3 . ' ');
+		push @output, Token->new(T_LOGLEVEL, $4 . ' ', read_loglevel($4));
+		push @output, Token->new(T_APP, $5)  if $5;
+		$message_isolated = 1;
 		$loglevel_isolated = 1;
 	}
 	
