@@ -62,7 +62,7 @@ sub format_token ($;%) {
 	}
 
 
-	return format_sql($content)  if ($content =~ m/^["']?(SELECT|UPDATE|INSERT|DELETE|REPLACE)/);
+	return format_sql($content)  if ($content =~ m/^(?:Executing statement: *)?["']?(SELECT|UPDATE|INSERT|DELETE|REPLACE)/);
 
 	return format_message($content)
 }
