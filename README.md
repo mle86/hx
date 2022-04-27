@@ -179,6 +179,7 @@ error source **file/lineno**,
 **stack traces**,
 and
 **JSON error data**.
+It will be colored _grey_.
 
 <a name="others"></a>
 
