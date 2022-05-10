@@ -404,12 +404,12 @@ sub lex_next_line {
 			Token->new(T_INFO, $3);
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
-	} elsif (s/^($re_time$re_ms? )($re_loglevel )(\[.+\] )(- )?//) {
+	} elsif (s/^($re_time$re_ms? )($re_loglevel )(\[.+\] )?(- )//) {
 		# 18:00:00.357 LOGLEVEL [COMPONENT] -
 		push @output,
 			Token->new(T_DATE, $1),
-			Token->new(T_LOGLEVEL, $2, read_loglevel($2)),
-			Token->new(T_APP, $3);
+			Token->new(T_LOGLEVEL, $2, read_loglevel($2));
+		push @output, Token->new(T_APP, $3)  if $3;
 		push @output, Token->new(T_INFO, $4)  if $4;
 		$message_isolated = 1;
 		$loglevel_isolated = 1;

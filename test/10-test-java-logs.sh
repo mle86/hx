@@ -59,5 +59,14 @@ re="${re}$(re_tok $T_LOGLEVEL 'INFO:')"
 re="${re}$(re_tok $T_MESSAGE 'message')"
 assertRegex "$line" "/$re/"
 
+# 12:00:00.871 INFO - message
+line="$(logline "$logfile" 12 | LEX)"
+re=
+re="${re}$(re_tok $T_DATE '12:00:00\.871')"
+re="${re}$(re_tok $T_LOGLEVEL 'INFO(?: -)?')"
+re="${re}$(re_tok "$T_APP|$T_INFO" '-')?"
+re="${re}$(re_tok $T_MESSAGE 'message')"
+assertRegex "$line" "/$re/"
+
 
 success
