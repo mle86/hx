@@ -41,5 +41,23 @@ re="${re}(?:$(re_tok $T_INFO 'javax.*')$(re_tok $T_INFO '-')|$(re_tok $T_INFO 'j
 re="${re}$(re_tok $T_MESSAGE 'fe80.*Could not recover.*')"
 assertRegex "$line" "/$re/"
 
+# 18:00:00.357 INFO [Node.<init>] - message
+line="$(logline "$logfile" 10 | LEX)"
+re=
+re="${re}$(re_tok $T_DATE '18:00:00\.357')"
+re="${re}$(re_tok $T_LOGLEVEL 'INFO')"
+re="${re}$(re_tok $T_APP '\[Node\.<init>\](?: -)?')"
+re="${re}$(re_tok "$T_APP|$T_INFO" '-')?"
+re="${re}$(re_tok $T_MESSAGE 'message')"
+assertRegex "$line" "/$re/"
+
+# 2022-05-10 18:00:00.297:INFO: message
+line="$(logline "$logfile" 11 | LEX)"
+re=
+re="${re}$(re_tok $T_DATE '2022-05-10 18:00:00\.297:')"
+re="${re}$(re_tok $T_LOGLEVEL 'INFO:')"
+re="${re}$(re_tok $T_MESSAGE 'message')"
+assertRegex "$line" "/$re/"
+
 
 success
