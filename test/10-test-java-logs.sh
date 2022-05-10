@@ -68,5 +68,15 @@ re="${re}$(re_tok "$T_APP|$T_INFO" '-')?"
 re="${re}$(re_tok $T_MESSAGE 'message')"
 assertRegex "$line" "/$re/"
 
+# [java] [1652207719.965][WARN]: message
+line="$(logline "$logfile" 13 | LEX)"
+re=
+re="${re}$(re_tok $T_APP '\[java\]')"
+re="${re}$(re_tok $T_DATE '\[1652207719\.965\]')"
+re="${re}$(re_tok $T_LOGLEVEL '\[WARN\]:?')"
+re="${re}$(re_tok "$T_LOGLEVEL|$T_INFO" ':')?"
+re="${re}$(re_tok $T_MESSAGE 'message')"
+assertRegex "$line" "/$re/"
+
 
 success

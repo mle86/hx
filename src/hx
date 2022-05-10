@@ -413,6 +413,14 @@ sub lex_next_line {
 		push @output, Token->new(T_INFO, $4)  if $4;
 		$message_isolated = 1;
 		$loglevel_isolated = 1;
+	} elsif (s/^(\[$re_app\] )(\[$re_unixts\])(\[$re_loglevel\](?:: )?)//) {
+		# [java] [1652207719.965][WARN]: message
+		push @output,
+			Token->new(T_APP, $1),
+			Token->new(T_DATE, $2),
+			Token->new(T_LOGLEVEL, $3, read_loglevel($3));
+		$message_isolated = 1;
+		$loglevel_isolated = 1;
 	} elsif (s/^(\[$re_ts8601\])(\[\s*$re_loglevel\s*\])(\[$re_fqcn_java *\] *)//) {
 		# [yyyy-mm-ddThh:mm:ss,sss][loglevel][org.java.classname]
 		push @output,
