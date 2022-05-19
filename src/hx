@@ -609,10 +609,10 @@ sub lex_next_line {
 		} elsif (s/(^ \([^\]]*\)[:,] ?)//) {
 			push @output, Token->new(T_INFO, $1);
 		}
-	} elsif ($message_isolated && $is_ps && s/^(\[-?$re_path\]|\(-?$re_path\)|-?$re_path)//) {
+	} elsif ($message_isolated && $is_ps && s/^([\|\\_ ]*)(\[-?$re_path\]|\(-?$re_path\)|-?$re_path)//) {
 		push @output,
-			Token->new(T_MESSAGE),
-			Token->new(T_FILENAME, $1);
+			Token->new(T_MESSAGE, $1),
+			Token->new(T_FILENAME, $2);
 	} elsif ($message_isolated && $is_nginx) {
 		if (s/(")?((?: while reading(?:(?: response| header){0,2} from)? upstream)?, client: ${re_client}, (?:server:|request:).*)$//s) {
 			# end of fastcgi message should not affect main message parsing, it's a mostly boring wrapper -- so cut it out and put it into $suffix
