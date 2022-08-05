@@ -17,5 +17,9 @@ assertRegex "$line" "/$reDate$reApp$reMsg/"
 line="$(logline "$logfile" 2 | LEX)"
 assertRegex "$line" "/$(re_tok $T_CONTLINE).*$(re_tok $T_INFO " *#2  #3.*")/"
 
+# <6>[1604743.627189] ata1.00: configured for UDMA/133
+line="$(logline "$logfile" 3 | LEX)"
+assertRegex "$line" "/$(re_tok $T_LOGLEVEL "<6>")$(re_tok $T_DATE)$(re_tok $T_APP "ata1.00:")$(re_tok $T_MESSAGE)/"
+
 
 success

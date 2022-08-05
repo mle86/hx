@@ -213,6 +213,14 @@ sub lex_next_line {
 		push @output, Token->new(T_INFO, $4, type => 'dmesg-separator')  if $4;
 		$message_isolated = 1;
 		$is_kernel = 1;
+	} elsif (s/((?=<\d)$re_loglevel_prefix|^)($re_dmesg_ts )($re_dmesg_app )//) {
+		# dmesg raw
+		push @output, Token->new(T_LOGLEVEL, $1, read_loglevel($1))  if $1;
+		push @output,
+			Token->new(T_DATE, $2, format => 'dmesg'),
+			Token->new(T_APP, $3);
+		$message_isolated = 1;
+		$is_kernel = 1;
 	} elsif (s/^($re_sects) ($re_app: )//) {
 		push @output,
 			Token->new(T_DATE, $1 . ' '),
