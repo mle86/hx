@@ -323,8 +323,8 @@ sub lex_next_line {
 		# nginx + fastcgi
 		push @output, Token->new(T_DATE, $1);
 		push @output, Token->new(T_LOGLEVEL, $2, read_loglevel($2))  if $2;
-		push @output, Token->new(T_APP, $3);
-		push @output, Token->new(T_INFO, $4)  if $4;
+		push @output, Token->new(T_APP, $3);  # processId [#threadId]
+		push @output, Token->new(T_INFO, $4)  if $4;  # [*connectionId]
 		push @output, Token->new(T_WRAP, $5 . ($6 // ''));
 		$is_wrap = 1;
 		$is_nginx = 1;
