@@ -514,6 +514,10 @@ sub lex_next_line {
 		$message_isolated = 1;
 		push @output,
 			Token->new(T_APP, $1);
+	} elsif (s/^((?:In|On) $re_path$re_lineno?(?::\s*|\s*$))//) {
+		$message_isolated = 1;
+		push @output,
+			Token->new(T_APP, $1);
 	}
 
 	if (s/^$re_repeat_begin//) {
