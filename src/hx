@@ -679,7 +679,7 @@ sub lex_next_line {
 	if ($message_isolated && s/^.*?(?: |\\n)\K(Stack trace:(?: |\\n).*)$//s) {
 		my $rest = $1;
 		$linetok->set('packed' => 1)  if $linetok;
-		@packedlines =
+		unshift @packedlines,
 			map { (Token->new(T_PACKEDLINE), $_) }
 				split(/(?=#\d+ |Stack trace: |Next $re_exception)/, $rest);
 	}

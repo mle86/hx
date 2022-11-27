@@ -23,5 +23,10 @@ assertRegex "$line" "/$reLine/"
 line="$(logline "$logfile1" 1 | LEX)"
 assertRegex "$line" "/$(re_tok "$T_JSON" "\{\"exception.*${re_brk}.*\}")$(re_tok $T_INFO "\[\]")/"
 
+# A second bug also relating to packed lines:
+# [2022-11-27T18:56:00] Fatal Error: Class "Helper" not found in ErrorHandler.php:100 Stack trace: #0 in src/ErrorHandler.php:100\nStack trace:\n#0 src/ErrorHandler.php(200): ErrorHandler->handleException()\n#1 [internal function]: ErrorHandler->handleException()\n#2 {main}\n  thrown at /proj/src/ErrorHandler.php:100)"} []
+line="$(logline "$logfile1" 2 | LEX)"
+assertRegex "$line" "/$(re_tok $T_LINE).*$(re_tok $T_TRACE).*$(re_tok $T_PACKEDLINE).*$(re_tok $T_INFO "Stack trace:").*$(re_tok $T_PACKEDLINE).*$(re_tok $T_INFO "Stack trace:(${re_backslash}n)?").*$(re_tok $T_EOL).*/"
+
 
 success
